@@ -12,12 +12,13 @@ class BaseAPI:
     def get(self, item_id: str):
         return self.client.get(format_class_name(self.__class__.__name__), item_id)
 
+
+class NamedBaseAPI(BaseAPI):
     def get_id(self, name: str):
         response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
         return response[0]['id']
 
-
-class CampaignAPI(BaseAPI):
+class CampaignAPI(NamedBaseAPI):
 
     def create(self, name: str, description: str, location: str, date: datetime.datetime, diameter: float,
                scale_factor: float, water_density: float, water_depth: float, transient: float):
@@ -36,7 +37,7 @@ class CampaignAPI(BaseAPI):
         return self.client.get("campaign", f"{campaign_id}/sensors")
 
 
-class SensorAPI(BaseAPI):
+class SensorAPI(NamedBaseAPI):
 
     def create(self,
                name: str,
@@ -58,7 +59,6 @@ class SensorAPI(BaseAPI):
                 'is_local': is_local,
                 'campaign_id': campaign_id}
         self.client.post("sensor", body=body)
-
 
     def get_campaign(self, sensor_id: str):
         return self.client.get("sensor", f"{sensor_id}/campaign")
