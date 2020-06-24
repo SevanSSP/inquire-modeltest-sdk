@@ -16,7 +16,13 @@ campaign.create(name="SDKlasse",
                 transient= 0)
 
 sensors = SensorAPI(client)
-sensors.create("MK206","En test sensor","kg","mass",0,0,0,True,campaign.get_id("SDKlasse"))
+sensors.create(name="MK206",
+               description="En test sensor",
+               unit="kg",
+               kind="mass",
+               x=0,y=0,z=0,
+               is_local=True,
+               campaign_id=campaign.get_id("SDKlasse"))
 
 print(campaign.get(campaign.get_id("SDKlasse")))
 print(campaign.get_sensors(campaign.get_id("SDKlasse")))
