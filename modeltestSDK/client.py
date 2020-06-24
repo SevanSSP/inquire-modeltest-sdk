@@ -32,7 +32,7 @@ class SDKclient:
             response.raise_for_status()
         except HTTPError as http_err:
             print(f'HTTP error occurred: {http_err}')
-            return err
+            return http_err
         except Exception as err:
             print(f'Other error occurred: {err}')
             return err
