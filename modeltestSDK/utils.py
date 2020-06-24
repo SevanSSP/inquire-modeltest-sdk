@@ -178,3 +178,8 @@ def from_datetime_string(s):
     s = "+".join([dt[:26], tz])
 
     return datetime.fromisoformat(s)
+
+
+def format_class_name(s):
+    s = s.split("API")
+    return s[0].lower()

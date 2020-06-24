@@ -1,12 +1,20 @@
 from .client import SDKclient
 import datetime
 from uuid import uuid4
+from .utils import format_class_name
 
 
 class BaseAPI:
 
     def __init__(self, SDKclient):
         self.client = SDKclient
+
+    def get(self, item_id: str):
+        return self.client.get(format_class_name(self.__class__.__name__), item_id)
+
+    def get_id(self, name: str):
+        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
+        return response[0]['id']
 
 
 class CampaignAPI(BaseAPI):
@@ -23,13 +31,6 @@ class CampaignAPI(BaseAPI):
                 'water_depth': water_depth,
                 'transient': transient}
         self.client.post("campaign", body=body)
-
-    def get(self, campaign_id: str):
-        return self.client.get("campaign", campaign_id)
-
-    def get_id(self, name: str):
-        response = self.client.get("campaign", "all", parameters={'name': name})
-        return response[0]['id']
 
     def get_sensors(self, campaign_id: str):
         return self.client.get("campaign", f"{campaign_id}/sensors")
@@ -58,6 +59,9 @@ class SensorAPI(BaseAPI):
                 'campaign_id': campaign_id}
         self.client.post("sensor", body=body)
 
-    def get_id(self, name: str):
-        response = self.client.get("sensor", "all", parameters={'name': name})
-        return response[0]['id']
+
+    def get_campaign(self, sensor_id: str):
+        return self.client.get("sensor", f"{sensor_id}/campaign")
+
+    def get_timeseries(self, sensor_id: str):
+        return self.client.get("sensor", f"{sensor_id}/timeseries")
