@@ -23,7 +23,7 @@ class SDKclient:
     '''
     def __init__(self, config=Config):
         self.config = config
-        self.campaign = CampaignAPI(SDKclient=self)
+        self.campaign = CampaignAPI(client=self)
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """
@@ -79,5 +79,7 @@ class SDKclient:
     def post(self,resource: str, endpoint: str = "", body: dict = None):
         return self.do_request(requests.post, resource, endpoint, body=body)
 
+    def patch(self, resource: str, endpoint: str = "", body: dict = None):
+        return self.do_request(requests.patch, resource, endpoint, body=body)
     #def delete(self, resource: str, endpoint: str, parameters: dict = None):
     #    return self.do_request(requests.delete,resource,)

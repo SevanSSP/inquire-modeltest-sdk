@@ -1,4 +1,3 @@
-from .client import SDKclient
 import datetime
 from uuid import uuid4
 from typing import List
@@ -11,8 +10,8 @@ def get_id_from_response(response):
 
 class BaseAPI:
 
-    def __init__(self, SDKclient):
-        self.client = SDKclient
+    def __init__(self, client):
+        self.client = client
 
     def get(self, item_id: str):
         return self.client.get(format_class_name(self.__class__.__name__), item_id)
@@ -27,22 +26,18 @@ class NamedBaseAPI(BaseAPI):
     '''
     def get_id(self, name: str):
         response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
-        return response[0]['id']
+        if response:
+            return response[0]['id']
+        else:
+            raise Exception(f"Could not find any object with name {self.__class__.__name__}")
 
 class CampaignAPI(NamedBaseAPI):
 
-    def create(self, name: str, description: str, location: str, date: datetime.datetime, diameter: float,
-               scale_factor: float, water_density: float, water_depth: float, transient: float):
-        body = {'name': name,
-                'description': description,
-                'location': location,
-                'date': date,
-                'diameter': diameter,
-                'scale_factor': scale_factor,
-                'water_density': water_density,
-                'water_depth': water_depth,
-                'transient': transient}
-        self.client.post("campaign", body=body)
+    def create(self, body: dict):
+        return self.client.post("campaign", body=body)
+
+    def patch(self, body: dict, campaign_id: str):
+        self.client.patch(resource="campaign", endpoint=f"{campaign_id}", body=body)
 
     def get_sensors(self, campaign_id: str):
         return self.client.get("campaign", f"{campaign_id}/sensors")
