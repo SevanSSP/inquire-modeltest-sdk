@@ -7,7 +7,7 @@ import urllib.parse
 import requests
 from requests.exceptions import HTTPError
 from .utils import to_snake_case, to_camel_case
-from .api_resources import TimeseriesAPI, CampaignAPI, DatapointAPI
+from .api_resources import TimeseriesAPI, CampaignAPI, DatapointAPI, SensorAPI
 
 from .config import Config
 
@@ -24,6 +24,10 @@ class SDKclient:
     def __init__(self, config=Config):
         self.config = config
         self.campaign = CampaignAPI(SDKclient=self)
+        self.time_series = TimeseriesAPI(SDKclient=self)
+        self.data_point = DatapointAPI(SDKclient=self)
+        self.sensor = SensorAPI(SDKclient=self)
+
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """
@@ -49,7 +53,7 @@ class SDKclient:
                Notes
                -----
                The full request url is like
-                   'https://{base_url}/{resource}/{version}?firstparameter=value&anotherparameter=value
+                   'https://{host}/{base_url}/{resource}/{endpoint}?firstparameter=value&anotherparameter=value
                """
         url = self.config.host +"/" + "/".join([p for p in [self.config.base_url, resource, endpoint] if p.strip()])
 
@@ -59,10 +63,10 @@ class SDKclient:
         else:
             enc_parameters = ""
 
-        query_url= f"{url}/?{enc_parameters}"
+        query_url = f"{url}/?{enc_parameters}"
 
         try:
-            response = method(query_url,json=body)
+            response = method(query_url, json=body)
             response.raise_for_status()
         except HTTPError as http_err:
             print(f'HTTP error occurred: {http_err}')
@@ -73,11 +77,11 @@ class SDKclient:
         else:
             return response.json()
 
-    def get(self,resource: str, endpoint: str = "", parameters: dict = None):
+    def get(self, resource: str, endpoint: str = "", parameters: dict = None):
         return self.do_request(requests.get, resource, endpoint, parameters=parameters)
 
-    def post(self,resource: str, endpoint: str = "", body: dict = None):
+    def post(self, resource: str, endpoint: str = "", body: dict = None):
         return self.do_request(requests.post, resource, endpoint, body=body)
 
-    #def delete(self, resource: str, endpoint: str, parameters: dict = None):
-    #    return self.do_request(requests.delete,resource,)
+    def delete(self, resource: str, endpoint: str, parameters: dict = None):
+        return NotImplementedError #self.do_request(requests.delete,resource,)
