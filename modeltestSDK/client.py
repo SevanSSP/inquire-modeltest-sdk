@@ -7,16 +7,50 @@ import urllib.parse
 import requests
 from requests.exceptions import HTTPError
 from .utils import to_snake_case, to_camel_case
+from .api_resources import TimeseriesAPI, CampaignAPI, DatapointAPI
 
 from .config import Config
 
 
 class SDKclient:
+    '''
+    Main entrypoint into modeltest-db SDK.
 
+    Parameters
+    ----------
+    config : object, optional
+        Client configuration (host, base URL)
+    '''
     def __init__(self, config=Config):
         self.config = config
+        self.campaign = CampaignAPI(SDKclient=self)
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
+        """
+        Carry out request.
+        Parameters
+        ----------
+        method : {'GET', 'POST', 'PUT', 'PATCH', 'DELETE'}
+            Request method.
+        resource : str
+            API resource e.g. 'plant/timeseries'
+            version : str
+                 API version e.g. 'v1.3'
+               endpoint : str
+                   API resource endpoint e.g.
+               parameters : dict, optional
+                   Request parameters.
+               body : dict, optional
+                   Request body.
+               Returns
+               -------
+               dict
+                   Request response
+               Notes
+               -----
+               The full request url is like
+                   'https://{base_url}/{resource}/{version}?firstparameter=value&anotherparameter=value
+               """
         url = self.config.host +"/" + "/".join([p for p in [self.config.base_url, resource, endpoint] if p.strip()])
 
         if parameters is not None and isinstance(parameters, dict):
