@@ -1,7 +1,12 @@
 from .client import SDKclient
 import datetime
 from uuid import uuid4
+from typing import List
 from .utils import format_class_name
+
+
+def get_id_from_response(response):
+    return response[0]["id"]
 
 
 class BaseAPI:
@@ -75,11 +80,21 @@ class SensorAPI(NamedBaseAPI):
         return self.client.get("sensor", f"{sensor_id}/timeseries")
 
 
-class TimeseriesAPI():
+class TimeseriesAPI(BaseAPI):
 
-    def create(self, sensor_id: str, test_id: str):
+    def create(self, sensor_id: str, test_id: str, data: List=None):
         body = {'sensor_id': sensor_id, 'test_id': test_id}
-        self.client.post("timeseries", body=body)
+        response = self.client.post("timeseries", body=body)
+        '''
+        if data is not None and isinstance(data, List):
+            dp =    DatapointAPI(self.client)
+            timeseries_id = get_id_from_response(response)
+            for datapoint in data:
+                dp.create(timeseries_id,)
+        ''' #TODO: Må gjøres smartere for å få med klokkeslett
+
+
+
 
 
 class DatapointAPI(BaseAPI):

@@ -28,5 +28,4 @@ print(campaign.get(campaign.get_id("SDKlasse")))
 print(campaign.get_sensors(campaign.get_id("SDKlasse")))
 print(sensors.get(sensors.get_id("MK206")))
 print(campaign.get_tests(campaign.get_id("SDKlasse")))
-print(sensors.get_all())
-
+print(campaign.get_all())
