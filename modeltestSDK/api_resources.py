@@ -12,6 +12,9 @@ class BaseAPI:
     def get(self, item_id: str):
         return self.client.get(format_class_name(self.__class__.__name__), item_id)
 
+    def get_all(self):
+        return self.client.get(format_class_name(self.__class__.__name__), "all")
+
 
 class NamedBaseAPI(BaseAPI):
     '''
@@ -39,6 +42,8 @@ class CampaignAPI(NamedBaseAPI):
     def get_sensors(self, campaign_id: str):
         return self.client.get("campaign", f"{campaign_id}/sensors")
 
+    def get_tests(self, campaign_id: str):
+        return self.client.get("campaign", f"{campaign_id}/tests")
 
 class SensorAPI(NamedBaseAPI):
 
@@ -69,12 +74,13 @@ class SensorAPI(NamedBaseAPI):
     def get_timeseries(self, sensor_id: str):
         return self.client.get("sensor", f"{sensor_id}/timeseries")
 
-'''
+
 class TimeseriesAPI():
 
     def create(self, sensor_id: str, test_id: str):
-        body = {'sensor_id': sensor_id, 'test_id'}
-'''
+        body = {'sensor_id': sensor_id, 'test_id': test_id}
+        self.client.post("timeseries", body=body)
+
 
 class DatapointAPI(BaseAPI):
 
