@@ -170,12 +170,13 @@ def from_datetime_string(s):
         2008-09-03T20:56:35.450686-10:30
     """
     # datetime.fromisoformat() does not support Z as short notation for Zulu-time aka. +00:00
-    s = s.replace("Z", "+00:00")
+    if "Z" in s or "+" in s:
+        s = s.replace("Z", "+00:00")
 
-    # datetime.fromisoformat() and .strptime() does only handle 0, 3 or 6 decimal places (microseconds) but I frequently
-    # encounter deviations like 7 decimals. Truncate datetime string to 26 characters (6 decimals).
-    dt, tz = s.split("+")
-    s = "+".join([dt[:26], tz])
+        # datetime.fromisoformat() and .strptime() does only handle 0, 3 or 6 decimal places (microseconds) but I frequently
+        # encounter deviations like 7 decimals. Truncate datetime string to 26 characters (6 decimals).
+        dt, tz = s.split("+")
+        s = "+".join([dt[:26], tz])
 
     return datetime.fromisoformat(s)
 
