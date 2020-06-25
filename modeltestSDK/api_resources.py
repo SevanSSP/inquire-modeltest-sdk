@@ -12,6 +12,9 @@ class BaseAPI:
     def __init__(self, client):
         self.client = client
 
+    def create(self, body: dict):
+        return self.client.post(format_class_name(self.__class__.__name__), body=body)
+
     def get(self, item_id: str):
         return self.client.get(format_class_name(self.__class__.__name__), item_id)
 
@@ -35,9 +38,6 @@ class NamedBaseAPI(BaseAPI):
 
 class CampaignAPI(NamedBaseAPI):
 
-    def create(self, body: dict):
-        return self.client.post("campaign", body=body)
-
     def patch(self, body: dict, campaign_id: str):
         self.client.patch(resource="campaign", endpoint=f"{campaign_id}", body=body)
 
@@ -47,6 +47,14 @@ class CampaignAPI(NamedBaseAPI):
     def get_tests(self, campaign_id: str):
         return self.client.get("campaign", f"{campaign_id}/tests")
 
+class TestAPI(NamedBaseAPI):
+
+    def get_campaign(self, sensor_id: str):
+        return self.client.get("sensor", f"{sensor_id}/campaign")
+
+
+    def get_timeseries(self, sensor_id: str):
+        return self.client.get("sensor", f"{sensor_id}/timeseries")
 
 class SensorAPI(NamedBaseAPI):
 
