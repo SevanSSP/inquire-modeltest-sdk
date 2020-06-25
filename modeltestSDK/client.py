@@ -83,5 +83,5 @@ class SDKclient:
     def post(self, resource: str, endpoint: str = "", body: dict = None):
         return self.do_request(requests.post, resource, endpoint, body=body)
 
-    def delete(self, resource: str, endpoint: str, parameters: dict = None):
-        return NotImplementedError #self.do_request(requests.delete,resource,)
+    def delete(self, resource: str, endpoint: str):
+        return self.do_request(requests.delete, resource, endpoint)
