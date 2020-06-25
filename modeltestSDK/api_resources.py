@@ -1,5 +1,4 @@
 import datetime
-from uuid import uuid4
 from typing import List
 from .utils import format_class_name
 
@@ -18,6 +17,9 @@ class BaseAPI:
 
     def get_all(self):
         return self.client.get(format_class_name(self.__class__.__name__), "all")
+
+    def delete(self, item_id: str):
+        return self.client.delete(format_class_name(self.__class__.__name__), item_id)
 
 
 class NamedBaseAPI(BaseAPI):
@@ -44,6 +46,7 @@ class CampaignAPI(NamedBaseAPI):
 
     def get_tests(self, campaign_id: str):
         return self.client.get("campaign", f"{campaign_id}/tests")
+
 
 class SensorAPI(NamedBaseAPI):
 
