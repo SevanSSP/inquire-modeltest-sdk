@@ -23,6 +23,7 @@ class SDKclient:
     '''
     def __init__(self, config=Config):
         self.config = config
+        '''Initilize objects for interacting with the API'''
         self.campaign = CampaignAPI(client=self)
         self.timeseries = TimeseriesAPI(client=self)
         self.data_point = DatapointAPI(client=self)
