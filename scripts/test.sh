@@ -4,6 +4,6 @@ set -e
 set -x
 
 
-pytest --cov=app --cov-report=term-missing modeltestSDK/tests "${@}"
+pytest --cov --cov-report=term-missing modeltestSDK/tests "${@}"
 
 read -rn1
