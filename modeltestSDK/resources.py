@@ -70,6 +70,7 @@ class ResourceList(BaseResource):
     def to_pandas(self, ignore: List[str]=None):
         return pd.DataFrame (self.dump())
 
+
 class Campaign(BaseResource):
 
     def __init__(self, name: str, description: str, location: str, date: any, diameter: float,

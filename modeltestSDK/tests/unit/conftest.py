@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from modeltestSDK import Campaign
+from modeltestSDK import Campaign, BaseResource
 
 @pytest.fixture(scope="module")
 def new_campaign():
@@ -16,3 +16,8 @@ def new_campaign():
         transient= 1
         )
     return camp
+
+@pytest.fixture(scope="module")
+def new_base_resource():
+    base = BaseResource(
+    )
