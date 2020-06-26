@@ -1,7 +1,7 @@
 import datetime
 from typing import List
 from .utils import format_class_name
-
+import warnings
 
 def get_id_from_response(response):
     return response[0]["id"]
@@ -29,9 +29,12 @@ class NamedBaseAPI(BaseAPI):
     def get_id(self, name: str):
         response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
         if response:
+            if len(response) != 1:
+                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
+                              f" first was returned")
             return response[0]['id']
         else:
-            raise Exception(f"Could not find any object with name {self.__class__.__name__}")
+            raise Exception(f"Could not find any object with name {name}")
 
 class CampaignAPI(NamedBaseAPI):
 
@@ -39,7 +42,7 @@ class CampaignAPI(NamedBaseAPI):
         return self.client.post("campaign", body=body)
 
     def patch(self, body: dict, campaign_id: str):
-        self.client.patch(resource="campaign", endpoint=f"{campaign_id}", body=body)
+        return self.client.patch(resource="campaign", endpoint=f"{campaign_id}", body=body)
 
     def get_sensors(self, campaign_id: str):
         return self.client.get("campaign", f"{campaign_id}/sensors")
@@ -50,26 +53,11 @@ class CampaignAPI(NamedBaseAPI):
 
 class SensorAPI(NamedBaseAPI):
 
-    def create(self,
-               name: str,
-               description: str,
-               unit: str,
-               kind: str,
-               x: float,
-               y: float,
-               z: float,
-               is_local: bool,
-               campaign_id: str):
-        body = {'name': name,
-                'description': description,
-                'unit': unit,
-                'kind': kind,
-                'x': x,
-                'y': y,
-                'z': z,
-                'is_local': is_local,
-                'campaign_id': campaign_id}
-        self.client.post("sensor", body=body)
+    def create(self, body: dict):
+        return self.client.post("sensor", body=body)
+
+    def patch(self, body: dict, sensor_id: str):
+        return self.client.patch(resource="sensor", endpoint=f"{sensor_id}", body=body)
 
     def get_campaign(self, sensor_id: str):
         return self.client.get("sensor", f"{sensor_id}/campaign")
@@ -90,9 +78,6 @@ class TimeseriesAPI(BaseAPI):
             for datapoint in data:
                 dp.create(timeseries_id,)
         ''' #TODO: Må gjøres smartere for å få med klokkeslett
-
-
-
 
 
 class DatapointAPI(BaseAPI):
