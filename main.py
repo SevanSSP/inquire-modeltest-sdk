@@ -1,25 +1,27 @@
-from modeltestSDK import SDKclient, Campaign, SensorAPI
+from modeltestSDK import SDKclient, Campaign, Sensor
 import datetime
 
 client = SDKclient()
 
+campaign = Campaign.get_existing(name="Test", client=client)
 
-campaign = Campaign.get_existing(name="SDKlasse", client=client)
+sensor = Sensor(name="MK206",
+                 description="En test sensor",
+                 unit="kg",
+                 kind="mass",
+                 x=0,y=0,z=0,
+                 is_local=True,
+                 campaign_id=campaign.id,
+                 client=client)
 
-campaign.water_density = 20
-campaign.update()
+print(sensor.update())
 
-#print(campaign.update())
-#print(campaign2)
+print(sensor)
 
-# sensors = SensorAPI(client)
-# sensors.create(name="MK206",
-#                 description="En test sensor",
-#                 unit="kg",
-#                 kind="mass",
-#                 x=0,y=0,z=0,
-#                 is_local=True,
-#                 campaign_id=campaign.get_id("SDKlasse"))
+print(Sensor.get_existing(name="MK206", client=client))
+
+print(campaign.get_sensors())
+
 
 # print(campaign.get(campaign.get_id("SDKlasse")))
 # print(campaign.get_sensors(campaign.get_id("SDKlasse")))
