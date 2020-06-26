@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from typing import List, Union
 from .utils import make_serializable, from_datetime_string
 import datetime
-
+from typing import Optional
 
 class BaseResource(object):
     def __str__(self):
@@ -53,6 +53,9 @@ class BaseResource(object):
                 df.loc[name] = [value]
         return df
 
+    @classmethod
+    def from_dict(cls, data: dict, client = None):
+        raise NotImplemented
 
 class ResourceList(BaseResource):
     resources = list()
@@ -63,6 +66,9 @@ class ResourceList(BaseResource):
 
     def __len__(self):
         return len(self.resources)
+
+    def __str__(self):
+        return f"<{self.to_pandas()}>"
 
     def dump(self):
         return [_.dump() for _ in self]
@@ -96,30 +102,15 @@ class Campaign(BaseResource):
         return f"<Campaign {self.name}: \n{self.to_pandas()}>"
 
     def update(self):
-        body = self.dump()
-        if not self.id:
-            data = self._client.campaign.create(body=body)
-            if 'id' in data:
-                self.id = data['id']
-        else:
-            self._client.campaign.patch(body=body, campaign_id=self.id)
+        return self._client.campaign.patch(body=self.dump(), campaign_id=self.id)
 
     def get_sensors(self):
         if not self.id:
             raise Exception(f'Cannot get sensor for {self.name}. Campaign has not yet been created')
-        data = self._client.campaign.get_sensors(campaign_id=self.id)
-        sensors = [Sensor.from_dict(data=sensor, client=self._client) for sensor in data]
-        return SensorList(sensors=sensors, client=self._client)
+        return self._client.campaign.get_sensors(id=self.id)
 
     @classmethod
-    def get_existing(cls, name: str, client=None):
-        data = client.campaign.get(client.campaign.get_id(name=name))
-
-        return cls.from_dict(data=data, client=client)
-
-    @classmethod
-    def from_dict(cls, data, client=None):
-
+    def from_dict(cls, data: dict, client = None):
         return cls(name=data['name'], description=data['description'], location=data['location'],
             date=data['date'], diameter=data['diameter'], scale_factor=data['scale_factor'],
             water_density=data['water_density'], water_depth=data['water_depth'],
@@ -127,12 +118,9 @@ class Campaign(BaseResource):
 
 class CampaignList(ResourceList):
 
-    def __init__(self, campaign: List[Campaign], client=None):
-        self.resources = campaign
+    def __init__(self, resources: List[Campaign], client=None):
+        self.resources = resources
         self._client = client
-
-    def __str__(self):
-        return f"{self.to_pandas()}"
 
 class Sensor(BaseResource):
 
@@ -155,21 +143,13 @@ class Sensor(BaseResource):
         return f"<Sensor {self.name}: \n{self.to_pandas()}>"
 
     def update(self):
-        body = self.dump().copy()
-        if not self.id:
-            data = self._client.sensor.create(body=body)
-            if 'id' in data:
-                self.id = data['id']
-        else:
-            self._client.sensor.patch(body=body, sensor_id=self.id)
+        return self._client.sensor.patch(body=self.dump(), sensor_id=self.id)
+
+    def get_campaign(self):
+        return self._client.sensor.get_campaign(id=self.id)
 
     @classmethod
-    def get_existing(cls, name: str, client=None):
-        data = client.sensor.get(client.sensor.get_id(name=name))
-        return cls.from_dict(data=data, client=client)
-
-    @classmethod
-    def from_dict(cls, data, client):
+    def from_dict(cls, data: dict, client = None):
         return cls(name=data['name'], description=data['description'], unit=data['unit'],
                    kind=data['kind'], x=data['y'], y=data['y'], z=data['z'], is_local=data['is_local'],
                    campaign_id=data['campaign_id'], id=data['id'], client=client)
@@ -177,39 +157,64 @@ class Sensor(BaseResource):
 
 class SensorList(ResourceList):
 
-    def __init__(self, sensors: List[Sensor], client=None):
-        self.resources = sensors
+    def __init__(self, resources: List[Sensor], client=None):
+        self.resources = resources
         self._client = client
 
-    def __str__(self):
-        return f"{self.to_pandas()}"
+class Test(BaseResource):
+    pass
+
+class TestList(ResourceList):
+    pass
 
 class Timeseries(BaseResource):
 
-    def __init__(self, sensor_id, test_id, id: str = None, client=None):
+    def __init__(self, sensor_id: str, test_id: str, id: str = None, client=None):
 
         self.sensor_id = sensor_id
         self.test_id = test_id
         self.id = id
+        self.data_points: Optional[DataPointList] = None
         self._client = client
 
     def __str__(self):
-        return f"<Timeseries: {self.name}: \n{self.to_pandas()}>"
+        return f"<Timeseries: \n{self.to_pandas()}>"
 
     def update(self):
-        body = self.dump().copy()
-        if not self.id:
-            data = self._client.timeseries.create(body=body)
-            if 'id' in data:
-                self.id = data['id']
-        else:
-            self._client.timeseries.patch(body=body, sensor_id=self.id)
+        self._client.timeseries.patch(body=self.dump(), sensor_id=self.id)
+
+    def get_data_points(self):
+        self.data_points = self._client.timeseries.get_data_points(timeseries_id=self.id)
+        return self.data_points
 
     @classmethod
-    def get_existing(cls, name: str, client=None):
-        data = client.timeseries.get(client.sensor.get_id(name=name))
-        return cls.from_dict(data=data, client=client)
-
-    @classmethod
-    def from_dict(cls, data, client):
+    def from_dict(cls, data: dict, client = None):
         return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], id=data['id'], client=client)
+
+class TimeseriesList(ResourceList):
+
+    def __init__(self, resources: List[Timeseries], client=None):
+        self.resources = resources
+        self._client = client
+
+class DataPoint(BaseResource):
+
+    def __init__(self, timeseries_id: str, time: str, value: float, client=None):
+        self.timeseries_id = timeseries_id
+        self.time = time
+        self.value = value
+        self._client = client
+
+    def __str__(self):
+        return f"<DataPoint: \n{self.to_pandas()}>"
+
+    @classmethod
+    def from_dict(cls, data: dict, client = None):
+        return cls(timeseries_id=data['timeseries_id'], time=data['time'], value=data['value'],
+                   client=client)
+
+class DataPointList(ResourceList):
+
+    def __init__(self, resources: List[DataPoint], client=None):
+        self.resources = resources
+        self._client = client

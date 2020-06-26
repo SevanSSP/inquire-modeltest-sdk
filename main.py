@@ -3,25 +3,32 @@ import datetime
 
 client = SDKclient()
 
-campaign = Campaign.get_existing(name="Test", client=client)
 
-sensor = Sensor(name="MK206",
-                 description="En test sensor",
-                 unit="kg",
-                 kind="mass",
-                 x=0,y=0,z=0,
-                 is_local=True,
-                 campaign_id=campaign.id,
-                 client=client)
+campaign = client.campaign.create("test",
+                    "dest",
+                    "2020-06-25 12:39:26.13573",
+                    12,
+                    1,
+                    1025,
+                    5,
+                    10,
+                    19)
 
-print(sensor.update())
+print(campaign)
+print(client.campaign.get(id=campaign.id))
+
+sensor = client.sensor.create("test sensor",
+                              "desc",
+                              "SI",
+                              "mass",
+                              x=10,
+                              y=10,
+                              z=10,
+                              is_local=True,
+                              campaign_id=campaign.id)
 
 print(sensor)
-
-print(Sensor.get_existing(name="MK206", client=client))
-
-print(campaign.get_sensors())
-
+print(sensor.get_campaign())
 
 # print(campaign.get(campaign.get_id("SDKlasse")))
 # print(campaign.get_sensors(campaign.get_id("SDKlasse")))
