@@ -183,3 +183,33 @@ class SensorList(ResourceList):
 
     def __str__(self):
         return f"{self.to_pandas()}"
+
+class Timeseries(BaseResource):
+
+    def __init__(self, sensor_id, test_id, id: str = None, client=None):
+
+        self.sensor_id = sensor_id
+        self.test_id = test_id
+        self.id = id
+        self._client = client
+
+    def __str__(self):
+        return f"<Timeseries: {self.name}: \n{self.to_pandas()}>"
+
+    def update(self):
+        body = self.dump().copy()
+        if not self.id:
+            data = self._client.timeseries.create(body=body)
+            if 'id' in data:
+                self.id = data['id']
+        else:
+            self._client.timeseries.patch(body=body, sensor_id=self.id)
+
+    @classmethod
+    def get_existing(cls, name: str, client=None):
+        data = client.timeseries.get(client.sensor.get_id(name=name))
+        return cls.from_dict(data=data, client=client)
+
+    @classmethod
+    def from_dict(cls, data, client):
+        return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], id=data['id'], client=client)

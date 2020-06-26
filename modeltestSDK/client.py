@@ -24,7 +24,7 @@ class SDKclient:
     def __init__(self, config=Config):
         self.config = config
         self.campaign = CampaignAPI(client=self)
-        self.time_series = TimeseriesAPI(client=self)
+        self.timeseries = TimeseriesAPI(client=self)
         self.data_point = DatapointAPI(client=self)
         self.sensor = SensorAPI(client=self)
 

@@ -3,14 +3,7 @@ import datetime
 
 client = SDKclient()
 
-print(1)
 campaign = Campaign.get_existing(name="Test", client=client)
-
-print(campaign)
-
-#print(campaign.update())
-#print(campaign2)
-print(2)
 
 sensor = Sensor(name="MK206",
                  description="En test sensor",
@@ -20,14 +13,12 @@ sensor = Sensor(name="MK206",
                  is_local=True,
                  campaign_id=campaign.id,
                  client=client)
-print(3)
 
 print(sensor.update())
-print(4)
 
 print(sensor)
+
 print(Sensor.get_existing(name="MK206", client=client))
-print(5)
 
 print(campaign.get_sensors())
 

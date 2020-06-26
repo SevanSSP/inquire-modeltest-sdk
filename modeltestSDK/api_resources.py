@@ -61,9 +61,6 @@ class TestAPI(NamedBaseAPI):
 
 class SensorAPI(NamedBaseAPI):
 
-    def create(self, body: dict):
-        return self.client.post("sensor", body=body)
-
     def patch(self, body: dict, sensor_id: str):
         return self.client.patch(resource="sensor", endpoint=f"{sensor_id}", body=body)
 
@@ -86,6 +83,15 @@ class TimeseriesAPI(BaseAPI):
             for datapoint in data:
                 dp.create(timeseries_id,)
         ''' #TODO: Må gjøres smartere for å få med klokkeslett
+
+    def patch(self, body: dict, sensor_id: str):
+        return self.client.patch(resource="timeseries", endpoint=f"{sensor_id}", body=body)
+
+    def get_test(self, sensor_id: str):
+        return self.client.get("timeseries", f"{sensor_id}/campaign")
+
+    def get_sensor(self, sensor_id: str):
+        return self.client.get("sensor", f"{sensor_id}/timeseries")
 
 
 class DatapointAPI(BaseAPI):
