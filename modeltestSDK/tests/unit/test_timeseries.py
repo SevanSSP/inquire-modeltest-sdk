@@ -1,5 +1,3 @@
-import uuid
-from sqlalchemy.dialects.postgresql import UUID
 
 
 def test_types(new_timeseries):
