@@ -64,6 +64,9 @@ class ResourceList(BaseResource):
         for r in self.resources:
             yield r
 
+    def __getitem__(self, key):
+        return self.resources[key]
+
     def __len__(self):
         return len(self.resources)
 
