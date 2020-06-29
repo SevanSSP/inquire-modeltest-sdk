@@ -3,7 +3,7 @@ from typing import List
 from .utils import format_class_name
 import warnings
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
-                        DataPoint, DataPointList)
+                        DataPoint, DataPointList, Floater, FloaterList)
 
 def get_id_from_response(response):
     return response[0]["id"]
@@ -68,27 +68,37 @@ class CampaignAPI(NamedBaseAPI):
 
 class TestAPI(NamedBaseAPI):
 
-    def create(self, body: dict):
-        data = self.client.post(self._resource_path, body=body)
-        return Test.from_dict(data=data, client=self.client)
-
-    def get(self, item_id: str):
-        data = self.client.get(self._resource_path, item_id)
-        return Test.from_dict(data=data, client=self.client)
-
-    def get_all(self, type: str = None):
-        data = self.client.get(self._resource_path, "all", parameters={"type": type})
-        resources = [Test.from_dict(data=obj, client=self.client) for obj in data]
-        return TestList(resources=resources, client=self.client)
-
     def delete(self, item_id: str):
         self.client.delete(self._resource_path, item_id)
 
-    def get_campaign(self, sensor_id: str):
-        return self.client.get(self._resource_path, f"{sensor_id}/campaign")
+    def get_campaign(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/campaign")
+        return Campaign.from_dict(data=data, client=self.client)
 
-    def get_timeseries(self, sensor_id: str):
-        return self.client.get(self._resource_path, f"{sensor_id}/timeseries")
+    def get_timeseries(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/timeseries")
+        resources = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
+        return TimeseriesList(resources=resources, client=self.client)
+
+class FloaterAPI(TestAPI):
+
+    def create(self, description: str, test_date: str, campaign_id: str, type: str, measured_hs: str,
+                 measured_tp: str, category: str, orientation: float, draft: float, wave_id: str, wind_id: str):
+        body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
+                   type=type, measured_hs=measured_hs, measured_tp=measured_tp,
+                   category=category, orientation =orientation, draft =draft, wave_id =wave_id,
+                   wind_id =wind_id, id=id)
+        data = self.client.post(self._resource_path, body=body)
+        return Floater.from_dict(data=data, client=self.client)
+
+    def get(self, id: str):
+        data = self.client.get(self._resource_path, id)
+        return Floater.from_dict(data=data, client=self.client)
+
+    def get_all(self):
+        data = self.client.get(self._resource_path, "all")
+        obj_list = [Floater.from_dict(data=obj, client=self.client) for obj in data]
+        return FloaterList(resources=obj_list, client=None)
 
 class SensorAPI(NamedBaseAPI):
 
