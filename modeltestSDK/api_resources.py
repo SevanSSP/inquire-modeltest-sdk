@@ -151,6 +151,12 @@ class TimeseriesAPI(BaseAPI):
         obj_list = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
         return DataPointList(resources=obj_list, client=None)
 
+    def post_data_points(self, id, body):
+        data = self.client.post(self._resource_path, f"{id}/datapoints", body=body)
+        print(data)
+        obj_list = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
+        return DataPointList(resources=obj_list, client=None)
+
 '''
 class DatapointAPI(BaseAPI):
 
