@@ -197,7 +197,7 @@ class Test(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   type=data['type'], measured_hs=data['measured_hs'], measured_tp=data['measured_tp'], id=data['id'],
+                   type=data['type'], id=data['id'], measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    client=client)
 
 class TestList(ResourceList):
