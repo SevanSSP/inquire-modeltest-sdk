@@ -173,8 +173,7 @@ class SensorList(ResourceList):
         self._client = client
 
 class Test(BaseResource):
-    def __init__(self, description: str, test_date: str, campaign_id: str, type: str, measured_hs: str,
-                 measured_tp: str, id: str = None, client=None):
+    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: float, measured_tp: float ,type: str, id: str = None, client=None):
 
         self.description = description
         self.test_date = test_date
@@ -186,7 +185,7 @@ class Test(BaseResource):
         self._client = client
 
     def __str__(self):
-        return f"<Timeseries: \n{self.to_pandas()}>"
+        return f"<Test: \n{self.to_pandas()}>"
 
     def update(self):
         self._client.timeseries.patch(body=self.dump(), id=self.id)
@@ -201,7 +200,7 @@ class Test(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   type=data['type'], measured_hs=data['measured_hs'], measured_tp=data['measured_tp'], id=data['id'],
+                   type=data['type'], id=data['id'], measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    client=client)
 
 class TestList(ResourceList):

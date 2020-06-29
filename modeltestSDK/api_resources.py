@@ -68,8 +68,11 @@ class CampaignAPI(NamedBaseAPI):
 
 class TestAPI(NamedBaseAPI):
 
-    def create(self, body: dict):
+    def create(self, description: str, test_date: any, direction: str, measured_hs: float, measured_tp: float, campaign_id: str, type: str):
+        body = dict(description=description, test_date=test_date, direction=direction, measured_hs=measured_hs, measured_tp=measured_tp,
+                    campaign_id=campaign_id, type=type)
         data = self.client.post(self._resource_path, body=body)
+        print(data)
         return Test.from_dict(data=data, client=self.client)
 
     def get(self, item_id: str):
