@@ -61,9 +61,10 @@ class CampaignAPI(NamedBaseAPI):
         obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
         return SensorList(resources=obj_list, client=None)
 
-    # TODO: Implement
-    def get_tests(self, campaign_id: str):
-        return self.client.get(self._resource_path, f"{campaign_id}/tests")
+    def get_tests(self, id: str, type: str = None):
+        data = self.client.get(self._resource_path, f"{id}/tests", parameters={"type": type})
+        resources = [Test.from_dict(data=obj, client=self.client) for obj in data]
+        return TestList(resources=resources, client=self.client)
 
 class TestAPI(NamedBaseAPI):
 
@@ -75,11 +76,10 @@ class TestAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, item_id)
         return Test.from_dict(data=data, client=self.client)
 
-    # TODO: finish
-    def get_all(self):
-        data = self.client.get(self._resource_path, "all")
-        objList = [Test.from_dict(data=obj) for obj in data]
-        #return TestList()
+    def get_all(self, type: str = None):
+        data = self.client.get(self._resource_path, "all", parameters={"type": type})
+        resources = [Test.from_dict(data=obj, client=self.client) for obj in data]
+        return TestList(resources=resources, client=self.client)
 
     def delete(self, item_id: str):
         self.client.delete(self._resource_path, item_id)
@@ -119,9 +119,10 @@ class SensorAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, f"{id}/campaign")
         return Campaign.from_dict(data=data, client=self.client)
 
-    def get_timeseries(self, sensor_id: str):
-        data = self.client.get(self._resource_path, f"{sensor_id}/timeseries")
-        return Timeseries.from_dict(data=data, client=self.client)
+    def get_timeseries(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/timeseries")
+        resources = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
+        return TimeseriesList(resources=resources, client=self.client)
 
 
 class TimeseriesAPI(BaseAPI):
@@ -153,9 +154,6 @@ class TimeseriesAPI(BaseAPI):
 
     def post_data_points(self, id, body):
         data = self.client.post(self._resource_path, f"{id}/datapoints", body=body)
-        print(data)
-        obj_list = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
-        return DataPointList(resources=obj_list, client=None)
 
 '''
 class DatapointAPI(BaseAPI):

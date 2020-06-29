@@ -7,7 +7,7 @@ import urllib.parse
 import requests
 from requests.exceptions import HTTPError
 from .utils import to_snake_case, to_camel_case
-from .api_resources import TimeseriesAPI, CampaignAPI, SensorAPI
+from .api_resources import TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI
 
 from .config import Config
 
@@ -26,6 +26,7 @@ class SDKclient:
         self.campaign = CampaignAPI(client=self)
         self.timeseries = TimeseriesAPI(client=self)
         self.sensor = SensorAPI(client=self)
+        self.test = TestAPI(client=self)
 
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
