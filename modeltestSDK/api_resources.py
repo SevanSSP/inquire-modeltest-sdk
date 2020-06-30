@@ -3,7 +3,8 @@ from typing import List
 from .utils import format_class_name
 import warnings
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
-                        DataPoint, DataPointList, Floater, FloaterList)
+                        DataPoint, DataPointList, Floater, FloaterList, WaveCurrentCalibration, WaveCurrentCalibrationList,
+                        WindConditionCalibration, WindConditionCalibrationList )
 
 def get_id_from_response(response):
     return response[0]["id"]
@@ -99,6 +100,50 @@ class FloaterAPI(TestAPI):
         data = self.client.get(self._resource_path, "all")
         obj_list = [Floater.from_dict(data=obj, client=self.client) for obj in data]
         return FloaterList(resources=obj_list, client=None)
+
+class WaveCurrentCalibrationAPI(TestAPI):
+
+    def create(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
+               measured_tp: str, wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
+               wave_direction: float, current_velocity: float, current_direction: float, id: str = None):
+
+        body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
+                    measured_hs=measured_hs, measured_tp=measured_tp, wave_spectrum=wave_spectrum,
+                    wave_period=wave_period, wave_height=wave_height, gamma=gamma, wave_direction=wave_direction,
+                    current_velocity=current_velocity, current_direction=current_direction, id=id)
+
+        data = self.client.post(self._resource_path, body=body)
+        return WaveCurrentCalibration.from_dict(data=data, client=self.client)
+
+    def get(self, id: str):
+        data = self.client.get(self._resource_path, id)
+        return WaveCurrentCalibration.from_dict(data=data, client=self.client)
+
+    def get_all(self):
+        data = self.client.get(self._resource_path, "all")
+        obj_list = [WaveCurrentCalibration.from_dict(data=obj, client=self.client) for obj in data]
+        return WaveCurrentCalibrationList(resources=obj_list, client=None)
+
+class WindConditionCalibrationAPI(TestAPI):
+
+    def create(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
+                 measured_tp: str, wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
+                 id: str = None):
+        body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
+                    measured_hs=measured_hs, measured_tp=measured_tp, wind_spectrum=wind_spectrum,
+                    wind_velocity=wind_velocity, zref=zref, wind_direction=wind_direction, id=id)
+
+        data = self.client.post(self._resource_path, body=body)
+        return WindConditionCalibration.from_dict(data=data, client=self.client)
+
+    def get(self, id: str):
+        data = self.client.get(self._resource_path, id)
+        return WindConditionCalibration.from_dict(data=data, client=self.client)
+
+    def get_all(self):
+        data = self.client.get(self._resource_path, "all")
+        obj_list = [WindConditionCalibration.from_dict(data=obj, client=self.client) for obj in data]
+        return WindConditionCalibrationList(resources=obj_list, client=None)
 
 class SensorAPI(NamedBaseAPI):
 
