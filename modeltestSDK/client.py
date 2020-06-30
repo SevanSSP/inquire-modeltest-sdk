@@ -30,8 +30,8 @@ class SDKclient:
         self.sensor = SensorAPI(client=self)
         self.test = TestAPI(client=self)
         self.floater = FloaterAPI(client=self)
-        self.wind_current_condition = WindConditionCalibrationAPI(client=self)
-        self.wave_current_condition = WaveCurrentCalibrationAPI(client=self)
+        self.wind_condition_calibration = WindConditionCalibrationAPI(client=self)
+        self.wave_current_calibration = WaveCurrentCalibrationAPI(client=self)
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """
