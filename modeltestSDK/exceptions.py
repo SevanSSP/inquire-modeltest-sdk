@@ -7,3 +7,9 @@ class AuthenticationError(BaseException):
         print(self.msg)
 
 
+def parse_response(response):
+    print("\n Server side error:")
+    if response['detail'] is not None:
+        for error in response['detail']:
+            print(error)
+    print("\n")
