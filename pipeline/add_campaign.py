@@ -6,6 +6,8 @@ from modeltestSDK.utils import get_datetime_date, get_parent_dir
 from .add_timeseries import read_datapoints_from_csv_with_pandas
 from .add_floater_test import add_floater_test
 from .add_sensors import add_sensors
+from .add_wave_current_calibration import add_wave_current_calibrations
+from .add_wind_condition_calibration import add_wind_condition_calibrations
 
 
 def find_gamma(Hs, Tp):
@@ -26,63 +28,10 @@ def find_gamma(Hs, Tp):
 # TODO: Koble riktig wave+wind calibration til floater som opprettes
 #
 def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_dir: str):
-    # Legg til alle wave_calibrations
-    os.chdir(campaign_dir)
-    os.chdir(os.getcwd() + "\\" + "WaveCalib")
-    calibs = os.listdir(path='.')
-    for calib in calibs:
-        # find wave spectrum and wave height+period
-        wave_spectrum = calib.split("_")[0]
-        if wave_spectrum == "Irreg":
-            wave_spectrum = "jonswap"  # jonswap er forsøkt tilnærmet i SWACH testene
-        if wave_spectrum == "Reg":
-            wave_spectrum = "regular"
-        wave_height = calib.split("_")[1]
-        wave_height = float(wave_height.split("s")[1])
-        wave_period = calib.split("_")[2]
-        wave_period = float(wave_period.split("p")[1])
-        measured_hs = wave_height  # midlertidig
-        measured_tp = wave_period  # midlertidig #TODO: Lese inn calibration
-        gamma = find_gamma(measured_hs, measured_tp)
+    # Legg til alle wave_calibrations. Foreløpig ligger også wind calibrations i metoden under
+    wave_current_calibration = add_wave_current_calibrations(campaign_dir=campaign_dir, campaign=campaign, client=client)
 
-        # find test date and time
-        os.chdir(os.getcwd() + "\\" + calib)
-        times = os.listdir(path='.')
-        date = times[0].split(" ")[1]
-        timestamp = times[0].split(" ")[2]
-        date_time = date + timestamp
-
-        wave_current_calibration = client.wave_current_calibration.create(description=calib,
-                                                                          test_date=get_datetime_date(date_time),
-                                                                          campaign_id=campaign.id,
-                                                                          measured_hs=measured_hs,
-                                                                          measured_tp=measured_tp,
-                                                                          wave_spectrum=wave_spectrum,
-                                                                          wave_period=wave_period,
-                                                                          wave_height=wave_height,
-                                                                          gamma=gamma,  # TODO: Add gamma
-                                                                          wave_direction=0,
-                                                                          current_velocity=0,
-                                                                          current_direction=0)
-
-        for time in times:
-            os.chdir(os.getcwd() + "\\" + time)
-            file = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == time.split(" ")[0]]
-            read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id)
-            os.chdir(get_parent_dir(os.getcwd()))
-        os.chdir(get_parent_dir(os.getcwd()))
-
-
-        # TODO: Må kunne skille mellom en wind calibration og wave calibration, ønsker ikke nødvendigvis å legge inn samtidig
-
-        wind_condition_calibration = client.wind_condition_calibration.create(test_name=calib,
-                                                                              test_date=get_datetime_date(date_time),
-                                                                              campaign_id=campaign.id,
-                                                                              measured_hs=10,  # random verdi
-                                                                              measured_tp=10,  # random verdi
-                                                                              wind_spectrum=None,
-                                                                              wind_velocity=None,
-                                                                              wind_direction=None)
+    wind_condition_calibration = add_wind_condition_calibrations(client=client, campaign=campaign)
 
     os.chdir(campaign_dir)
     for concept_id in concept_ids:
