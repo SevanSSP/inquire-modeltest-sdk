@@ -19,10 +19,40 @@ class TwoWayDict(dict):
         """Returns the number of connections"""
         return dict.__len__(self) // 2
 
+
 sensorDict = TwoWayDict()
 sensorDict["Wave 1 Moonpool Slot 7 AI0-AI8"] = "wave2"
 
+
 def add_sensors(campaign: Campaign, client: SDKclient):
+    client.sensor.create(name="M206_COG X",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id) #TODO: Oppdatere faktiske data
+    client.sensor.create(name="M206_COG Y",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)  # TODO: Oppdatere faktiske data
+    client.sensor.create(name="M206_COG Z",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)  # TODO: Oppdatere faktiske data
+
     client.sensor.create(name='Wave 1 Moonpool Slot 7 AI0-AI8',
                          description='Wave model moonpool - A',
                          unit='mm',
