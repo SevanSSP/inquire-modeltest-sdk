@@ -73,8 +73,6 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         os.chdir(get_parent_dir(os.getcwd()))
 
 
-
-        read_datapoints_from_csv_with_pandas('ss', wave_current_calibration.id)
         # TODO: Må kunne skille mellom en wind calibration og wave calibration, ønsker ikke nødvendigvis å legge inn samtidig
 
         wind_condition_calibration = client.wind_condition_calibration.create(test_name=calib,
@@ -108,8 +106,6 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
                                                 testname=test,
                                                 date=get_datetime_date(date_time),
                                                 concept_id=concept_id)
-                for file in files:
-                    read_datapoints_from_csv_with_pandas(file=file, test_id=floater_test.id)
 
                 os.chdir(get_parent_dir(os.getcwd()))
             os.chdir(get_parent_dir(os.getcwd()))
@@ -129,7 +125,7 @@ def main():
                                       water_depth=300,  # står kun >300
                                       transient=3 * 60 * 60)  # 3 hours in seconds)
     concept_ids = ["M206", "M207"]
-    fill_campaign(campaign, concept_ids, SDKclient, campaign_dir)
+    fill_campaign(campaign, concept_ids, client, campaign_dir)
 
     add_sensors(campaign, client)
 

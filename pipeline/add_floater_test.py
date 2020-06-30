@@ -1,6 +1,7 @@
 import datetime
 from modeltestSDK.resources import Campaign, Test, Floater, WaveCurrentCalibration, WindConditionCalibration
 from modeltestSDK.client import SDKclient
+from .add_timeseries import read_datapoints_from_csv_with_pandas
 
 
 def add_floater_test(files, campaign: Campaign, testname: str, wave_current_calibration: WaveCurrentCalibration, wind_condition_calibration: WindConditionCalibration, date: datetime, concept_id: str, client: SDKclient):
@@ -30,5 +31,8 @@ def add_floater_test(files, campaign: Campaign, testname: str, wave_current_cali
                                          draft=draft,
                                          wave_id=wave_current_calibration.id,
                                          wind_id=wind_condition_calibration.id)
+
+    for file in files:
+        read_datapoints_from_csv_with_pandas(file=file, test_id=floater_test.id)
 
     return floater_test
