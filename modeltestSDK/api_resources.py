@@ -107,10 +107,11 @@ class WaveCurrentCalibrationAPI(TestAPI):
                measured_tp: str, wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float, id: str = None):
 
-        body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
-                    measured_hs=measured_hs, measured_tp=measured_tp, wave_spectrum=wave_spectrum,
-                    wave_period=wave_period, wave_height=wave_height, gamma=gamma, wave_direction=wave_direction,
-                    current_velocity=current_velocity, current_direction=current_direction, id=id)
+        body = dict(description=description, type="waveCurrentCalibration", test_date=test_date,
+                    campaign_id=campaign_id,measured_hs=measured_hs, measured_tp=measured_tp,
+                    wave_spectrum=wave_spectrum,wave_period=wave_period, wave_height=wave_height,
+                    gamma=gamma, wave_direction=wave_direction,current_velocity=current_velocity,
+                    current_direction=current_direction, id=id)
 
         data = self.client.post(self._resource_path, body=body)
         return WaveCurrentCalibration.from_dict(data=data, client=self.client)
