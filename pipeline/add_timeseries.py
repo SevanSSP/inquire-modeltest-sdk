@@ -3,12 +3,13 @@ from modeltestSDK.client import SDKclient
 import pandas as pd
 
 
-def read_datapoints_from_csv_with_pandas(file, test_id):
+def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
     df = pd.read_csv(file, sep=';')
 
     col_names = list(df.columns)
     for sensor in col_names[1:]:
-        timeseries = Timeseries(sensor_id='sensor_id',  # må finne riktig sensor id
+        sensor_id = client.sensor.get_id("sensor")
+        timeseries = Timeseries(sensor_id=sensor_id,
                                 test_id=test_id)
         datapoints = df[[col_names[0], sensor]].values.tolist()
         print(col_names[0], sensor)

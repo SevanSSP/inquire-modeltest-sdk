@@ -33,6 +33,7 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
 
     wind_condition_calibration = add_wind_condition_calibrations(client=client, campaign=campaign)
 
+        # TODO: Må kunne skille mellom en wind calibration og wave calibration, ønsker ikke nødvendigvis å legge inn samtidig
 
     # legg til alle floater testene
     os.chdir(campaign_dir)
