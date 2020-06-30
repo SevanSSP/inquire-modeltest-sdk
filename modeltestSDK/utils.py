@@ -199,4 +199,4 @@ def get_datetime_date(date):
     hour = int(date[6:8])
     minute = int(date[8:10])
     second = int(date[10:12])
-    return datetime(year, month, day, hour, minute, second)
+    return datetime(year, month, day, hour, minute, second).isoformat()

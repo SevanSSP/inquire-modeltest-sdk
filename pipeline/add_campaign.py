@@ -1,10 +1,26 @@
 import os
 import datetime
-from modeltestSDK.resources import Campaign, Test, DataPoint, WaveCurrentCondition, WindCurrentCondition
+from modeltestSDK.resources import Campaign, Test, DataPoint, WaveCurrentCalibration, WindConditionCalibration
 from modeltestSDK.client import SDKclient
 from modeltestSDK.utils import get_datetime_date, get_parent_dir
 
-from .floater_test import add_floater_test
+from .add_floater_test import add_floater_test
+from .add_sensors import add_sensors
+
+
+def find_gamma(Hs, Tp):
+    if Hs == 7.0 and Tp == 12.0:
+        gamma = 2.0
+    elif Hs == 7.0 and Tp == 16.0:
+        gamma = 2.0
+    elif Hs == 10.0 and Tp == 13.0:
+        gamma = 3.0
+    elif Hs == 10.0 and Tp == 16.0:
+        gamma = 3.0
+    else:  # Hs==15.0 and Tp==16.0: # ifølge specs er det 15.6 og ikke 15.0
+        gamma = 2.8
+        raise Warning("Gamma might be wrong")
+    return gamma
 
 
 def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_dir: str):
@@ -30,22 +46,24 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         wave_height = float(wave_height.split("s")[1])
         wave_period = calib.split("_")[2]
         wave_period = float(wave_period.split("p")[1])
-        print(wave_spectrum)
-        print(wave_height)
-        print(wave_period)
         measured_hs = wave_height  # midlertidig
         measured_tp = wave_period  # midlertidig #TODO: Lese inn calibration
-        wave_current_calibration = client.waveCurrentCalibration.create(test_name=calib,
-                                                                        test_date=get_datetime_date(date_time),
-                                                                        campaign_id=campaign.id,
-                                                                        measured_hs=measured_hs,
-                                                                        measured_tp=measured_tp,
-                                                                        wave_spectrum=wave_spectrum,
-                                                                        wave_period=wave_period,
-                                                                        wave_height=wave_height)
-        #TODO: Må kunne skille mellom en wind calibration og wave calibration, ønsker ikke nødvendigvis å legge inn samtidig
+        gamma = find_gamma(measured_hs, measured_tp)
+        wave_current_condition = client.wave_current_condition.create(description=calib,
+                                                                      test_date=get_datetime_date(date_time),
+                                                                      campaign_id=campaign.id,
+                                                                      measured_hs=measured_hs,
+                                                                      measured_tp=measured_tp,
+                                                                      wave_spectrum=wave_spectrum,
+                                                                      wave_period=wave_period,
+                                                                      wave_height=wave_height,
+                                                                      gamma=gamma,  # TODO: Add gamma
+                                                                      wave_direction=0,
+                                                                      current_velocity=0,
+                                                                      current_direction=0)
+        # TODO: Må kunne skille mellom en wind calibration og wave calibration, ønsker ikke nødvendigvis å legge inn samtidig
         '''
-        wind_calibration = client.windConditionCalibration.create(test_name=calib,
+        wind_calibration = client.wind_current_condition.create(test_name=calib,
                                                                   test_date=get_datetime_date(date_time),
                                                                   campaign_id=campaign.id,
                                                                   measured_hs=10,  # random verdi
@@ -90,6 +108,8 @@ def main():
                                       water_depth=300,  # står kun >300
                                       transient=3 * 60 * 60)  # 3 hours in seconds)
     concept_ids = ["M206", "M207"]
+
+    add_sensors(campaign, client)
 
 
 if __name__ == "__main__":
