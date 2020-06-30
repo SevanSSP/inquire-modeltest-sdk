@@ -136,7 +136,7 @@ class CampaignList(ResourceList):
 class Sensor(BaseResource):
 
     def __init__(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-                 is_local: bool, campaign_id: str, id: str = None, client=None):
+                 is_local: bool, campaign_id: str = None, id: str = None, client=None):
 
         self.id = id
         self.name = name
@@ -176,8 +176,8 @@ class SensorList(ResourceList):
         self._client = client
 
 class Test(BaseResource):
-    def __init__(self, description: str, test_date: str, campaign_id: str, type: str, measured_hs: str,
-                 measured_tp: str, id: str = None, client=None):
+    def __init__(self, description: str, test_date: str, type: str,campaign_id: str = None, measured_hs: str = None,
+                 measured_tp: str = None, id: str = None, client=None):
 
         self.description = description
         self.test_date = test_date
@@ -212,12 +212,12 @@ class TestList(ResourceList):
 class Floater(Test):
     type = "floater"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str, type: str, measured_hs: str,
-                 measured_tp: str, category: str, orientation: float, draft: float, wave_id: str, wind_id: str,
+    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
+                 measured_tp: str, category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None,
                  id: str = None, client=None):
 
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                        type=type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
+                        type=self.type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
 
         self.category=category
         self.orientation=orientation
@@ -228,7 +228,7 @@ class Floater(Test):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   type=data['type'], measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
+                   measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    category=data['category'], orientation =data['orientation'], draft =data['draft'],
                    wave_id = data['wave_id'], wind_id = data['wind_id'], id= data['id'], client=client)
 
@@ -238,15 +238,16 @@ class FloaterList(ResourceList):
         self.resources = resources
         self._client = client
 
-class WaveCurrentCondition(Test):
+class WaveCurrentCalibration(Test):
     type = "waveCurrentCalibration"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str, type: str, measured_hs: str,
-                 measured_tp: str, wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
-                 wave_direction: float, current_velocity: float, current_direction: float, id: str = None, client=None):
+    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
+                 measured_tp: str, wave_spectrum: str = None, wave_height: float = None, wave_period: float = None,
+                 gamma: float = None, wave_direction: float = None, current_velocity: float = None,
+                 current_direction: float = None, id: str = None, client=None):
 
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
+                         type=self.type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
 
         self.wave_spectrum = wave_spectrum
         self.wave_height = wave_height
@@ -256,27 +257,48 @@ class WaveCurrentCondition(Test):
         self.current_velocity = current_velocity
         self.current_direction = current_direction
 
-        def from_dict(cls, data: dict, client=None):
-            return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                       type=data['type'], measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
-                       wave_spectrum = data['wave_spectrum'], wave_height = data['wave_height'],
-                       wave_period = data['wave_period'], gamma = data['gamma'],
-                       wave_direction = data['wave_direction'], current_velocity = data['current_velocity'],
-                       current_direction = data['current_direction'])
+    @classmethod
+    def from_dict(cls, data: dict, client=None):
+        return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
+                   measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
+                   wave_spectrum = data['wave_spectrum'], wave_height = data['wave_height'],
+                   wave_period = data['wave_period'], gamma = data['gamma'],
+                   wave_direction = data['wave_direction'], current_velocity = data['current_velocity'],
+                   current_direction = data['current_direction'], id=data['id'], client=client)
 
-class WaveCurrentConditionList(ResourceList):
+class WaveCurrentCalibrationList(ResourceList):
 
-    def __init__(self, resources: List[Floater], client=None):
+    def __init__(self, resources: List[WaveCurrentCalibration], client=None):
         self.resources = resources
         self._client = client
 
-class WindCurrentCondition(Test):
-    type = "windConditionCalibration"
-    def __init__(self, description: str, test_date: str, campaign_id: str, type: str, measured_hs: str,
-                 measured_tp: str, id: str = None, client=None):
-        super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
 
+class WindConditionCalibration(Test):
+    type = "windConditionCalibration"
+
+    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
+                 measured_tp: str, wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
+                 wind_direction: float = None, id: str = None, client=None):
+        super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
+                         type=self.type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
+
+        self.wind_spectrum = wind_spectrum
+        self.wind_velocity = wind_velocity
+        self.zref = zref
+        self.wind_direction = wind_direction
+
+    @classmethod
+    def from_dict(cls, data: dict, client=None):
+        return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
+                   measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
+                   wind_spectrum=data['wind_spectrum'], wind_velocity=data['wind_velocity'],
+                   zref=data['zref'], wind_direction=data['wind_direction'], id=data['id'],  client=client)
+
+class WindConditionCalibrationList(ResourceList):
+
+    def __init__(self, resources: List[WindConditionCalibration], client=None):
+        self.resources = resources
+        self._client = client
 
 class Timeseries(BaseResource):
 
@@ -332,4 +354,6 @@ class DataPointList(ResourceList):
     def __init__(self, resources: List[DataPoint], client=None):
         self.resources = resources
         self._client = client
+
+
 

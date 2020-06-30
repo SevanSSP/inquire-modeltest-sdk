@@ -7,7 +7,8 @@ import urllib.parse
 import requests
 from requests.exceptions import HTTPError
 from .utils import to_snake_case, to_camel_case
-from .api_resources import TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterAPI
+from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterAPI, WindConditionCalibrationAPI,
+                            WaveCurrentCalibrationAPI)
 
 from .config import Config
 
@@ -29,7 +30,8 @@ class SDKclient:
         self.sensor = SensorAPI(client=self)
         self.test = TestAPI(client=self)
         self.floater = FloaterAPI(client=self)
-
+        self.wind_current_condition = WindConditionCalibrationAPI(client=self)
+        self.wave_current_condition = WaveCurrentCalibrationAPI(client=self)
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """
