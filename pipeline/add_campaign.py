@@ -33,6 +33,8 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
 
     wind_condition_calibration = add_wind_condition_calibrations(client=client, campaign=campaign)
 
+
+    # legg til alle floater testene
     os.chdir(campaign_dir)
     for concept_id in concept_ids:
         os.chdir(campaign_dir + "\\" + concept_id)
