@@ -1,7 +1,7 @@
 from modeltestSDK.client import SDKclient
 from modeltestSDK.utils import get_datetime_date
 
-from .add_sensors import add_sensors
+from .add_sensors import add_sensors, sensorDict
 from .add_campaign import fill_campaign
 
 
@@ -18,9 +18,15 @@ def main():
                                       water_depth=300,  # står kun >300
                                       transient=3 * 60 * 60)  # 3 hours in seconds)
     add_sensors(campaign=campaign, client=client)
-    concept_ids = ["M206", "M207"]
-    fill_campaign(campaign, concept_ids, client, campaign_dir)
 
+    print(client.sensor.get(client.sensor.get_id("HEI")))
+    concept_ids = ["M206", "M207"]
+    # fill_campaign(campaign, concept_ids, client, campaign_dir)
+
+    # Set default return value for sensor Dictionary
+    all_sensors = client.sensor.get_all()
+    for sensor in all_sensors:
+        sensorDict.setdefault(sensor.name, sensor.name)
 
 if __name__ == "__main__":
     main()
