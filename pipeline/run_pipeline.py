@@ -19,9 +19,8 @@ def main():
                                       transient=3 * 60 * 60)  # 3 hours in seconds)
     add_sensors(campaign=campaign, client=client)
 
-    print(client.sensor.get(client.sensor.get_id("HEI")))
     concept_ids = ["M206", "M207"]
-    # fill_campaign(campaign, concept_ids, client, campaign_dir)
+    fill_campaign(campaign, concept_ids, client, campaign_dir)
 
     # Set default return value for sensor Dictionary
     all_sensors = client.sensor.get_all()

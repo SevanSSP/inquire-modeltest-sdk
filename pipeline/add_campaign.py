@@ -68,7 +68,7 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         for time in times:
             os.chdir(os.getcwd() + "\\" + time)
             file = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == time.split(" ")[0]]
-            read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id)
+            read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id,client=client)
             os.chdir(get_parent_dir(os.getcwd()))
         os.chdir(get_parent_dir(os.getcwd()))
 

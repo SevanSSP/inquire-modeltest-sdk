@@ -33,6 +33,6 @@ def add_floater_test(files, campaign: Campaign, testname: str, wave_current_cali
                                          wind_id=wind_condition_calibration.id)
 
     for file in files:
-        read_datapoints_from_csv_with_pandas(file=file, test_id=floater_test.id)
+        read_datapoints_from_csv_with_pandas(file=file, test_id=floater_test.id, client=client)
 
     return floater_test
