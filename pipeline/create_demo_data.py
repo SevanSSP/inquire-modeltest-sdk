@@ -1,4 +1,4 @@
-from modeltestSDK.resources import Campaign, Test, DataPoint
+from modeltestSDK.resources import Campaign, Test, DataPoint, WaveCurrentCondition, WindCurrentCondition
 from modeltestSDK.client import SDKclient
 import datetime
 
@@ -50,8 +50,9 @@ if __name__ == "__main__":
     demo_campaign(client)
 
     camp_id = client.campaign.get_id("SWATCH")
-    test = client.test.create(description="wavecalibration", test_date=(datetime.datetime.utcnow()).isoformat(),
-                              direction="north", measured_hs= 2.0, measured_tp = 1.0, campaign_id=camp_id, type="floater")
+
+    test = client.floater.create(description="wavecalibration", test_date=(datetime.datetime.utcnow()).isoformat(),
+                              orientation="hd0", measured_hs= 2.0, measured_tp = 1.0, campaign_id=camp_id, type="floater", category="decay", draft=20)
     sensor = client.sensor.create(name="waveMK1", description="Wave sensor", unit="m", kind="length", x=0, y=0, z=0,
                                   is_local=True,campaign_id=camp_id)
     ts = client.timeseries.create(test_id=test.id,sensor_id=sensor.id)

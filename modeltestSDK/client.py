@@ -8,7 +8,7 @@ import requests
 from requests.exceptions import HTTPError
 from .utils import to_snake_case, to_camel_case
 from .api_resources import TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterAPI
-
+from .exceptions import parse_response
 from .config import Config
 
 
@@ -70,10 +70,9 @@ class SDKclient:
         try:
             response = method(query_url, json=body)
             response.raise_for_status()
-            #print(response)
         except HTTPError as http_err:
             print(f'HTTP error occurred: {http_err}')
-            #print(response.json()) #TODO: parse errors
+            parse_response(response.json()) #TODO: parse errors
             raise Exception(http_err) #(response.json()['detail'][0]['msg'])
         except Exception as err:
             print(f'Other error occurred: {err}')
