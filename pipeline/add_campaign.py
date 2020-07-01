@@ -19,7 +19,7 @@ def find_gamma(Hs, Tp):
         gamma = 3.0
     else:  # Hs==15.0 and Tp==16.0: # ifølge specs er det 15.6 og ikke 15.0
         gamma = 2.8
-        raise Warning("Gamma might be wrong")
+        #raise Warning("Gamma might be wrong")
     return gamma
 
 
@@ -68,21 +68,22 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         for time in times:
             os.chdir(os.getcwd() + "\\" + time)
             file = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == time.split(" ")[0]]
-            read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id,client=client)
+            #read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id,client=client)
             os.chdir(get_parent_dir(os.getcwd()))
         os.chdir(get_parent_dir(os.getcwd()))
 
 
         # TODO: Må kunne skille mellom en wind calibration og wave calibration, ønsker ikke nødvendigvis å legge inn samtidig
 
-        wind_condition_calibration = client.wind_condition_calibration.create(test_name=calib,
+        wind_condition_calibration = client.wind_condition_calibration.create(description=calib,
                                                                               test_date=get_datetime_date(date_time),
                                                                               campaign_id=campaign.id,
                                                                               measured_hs=10,  # random verdi
                                                                               measured_tp=10,  # random verdi
-                                                                              wind_spectrum=None,
-                                                                              wind_velocity=None,
-                                                                              wind_direction=None)
+                                                                              wind_spectrum="None",
+                                                                              zref=0,
+                                                                              wind_velocity=0,
+                                                                              wind_direction=0)
 
     os.chdir(campaign_dir)
     for concept_id in concept_ids:
@@ -105,7 +106,7 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
                                                 wind_condition_calibration=wind_condition_calibration,
                                                 testname=test,
                                                 date=get_datetime_date(date_time),
-                                                concept_id=concept_id)
+                                                concept_id=concept_id, client=client)
 
                 os.chdir(get_parent_dir(os.getcwd()))
             os.chdir(get_parent_dir(os.getcwd()))

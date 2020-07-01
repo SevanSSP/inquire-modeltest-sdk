@@ -130,7 +130,7 @@ class WindConditionCalibrationAPI(TestAPI):
     def create(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
                  measured_tp: str, wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
                  id: str = None):
-        body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
+        body = dict(description=description, test_date=test_date, type="windConditionCalibration", campaign_id=campaign_id,
                     measured_hs=measured_hs, measured_tp=measured_tp, wind_spectrum=wind_spectrum,
                     wind_velocity=wind_velocity, zref=zref, wind_direction=wind_direction, id=id)
 
