@@ -276,7 +276,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-    client.sensor.create(name='F_BB_Aft_Slot 8 AI 4',
+    client.sensor.create(name='F_BB_Aft_ Slot 8 AI4',
                          description='Force BB Aft',
                          unit='N',
                          kind='force',
@@ -397,6 +397,16 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name='Wagon Master Speed',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='F_pullout Slot 8 AI2 (Single ended)',
                          description='Accelerometer - E',
                          unit='m/s^2',
                          kind='acceleration',
