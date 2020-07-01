@@ -26,7 +26,7 @@ def main():
     fill_campaign(campaign, concept_ids, client, campaign_dir)
 
     toc = time.perf_counter()
-    print(f"Downloaded the tutorial in {toc - tic:0.4f} seconds")
+    print(f"Importing campaign took {toc - tic:0.4f} seconds")
 
     # Set default return value for sensor Dictionary
     all_sensors = client.sensor.get_all()
