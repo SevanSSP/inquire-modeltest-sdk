@@ -269,7 +269,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          unit='mm',
                          kind='length',
                          x=(1095/1000)*75,
-                         y=(-2740/1000)*75,
+                         y=(-2750/1000)*75,
                          z=None,
                          is_local=True,
                          campaign_id=campaign.id)
