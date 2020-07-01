@@ -202,6 +202,46 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
+    client.sensor.create(name="Wave 1 Center Slot 7 AI0-AI8",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="Wave 3 Front Slot 7 AI2-AI10",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="Wave US Front Slot 7 AI3-AI11",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="Wave 4 Side Slot 7 AI4-AI12",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
 
     # TODO: Oppdatere faktiske data, alt over her er ikke ekte data
 
