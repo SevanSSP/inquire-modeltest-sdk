@@ -416,4 +416,182 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
+    #M207 sensors
 
+
+    client.sensor.create(name="M207_COG X",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+    client.sensor.create(name="M207_COG Y",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+    client.sensor.create(name="M207_COG Z",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_COG Yaw",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_COG Pitch",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_COG Roll",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_acc_pos X",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_acc_pos Y",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_acc_pos Z",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_acc_pos Yaw",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_acc_pos Pitch",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_acc_pos Roll",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_COF X",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+    client.sensor.create(name="M207_COF Y",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_COF Z",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_COF Yaw",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_COF Pitch",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name="M207_COF Roll",
+                         description="",
+                         unit="mm",
+                         kind="length",
+                         x=0,
+                         y=0,
+                         z=0,
+                         is_local=True,
+                         campaign_id=campaign.id)
