@@ -21,6 +21,6 @@ def read_datapoints_from_csv_with_pandas(file, test_id,client: SDKclient):
                                   value=value,
                                   client=client)
             timeseries.data_points.append(datapoint)
-        timeseries.post_data_points()
+        #timeseries.post_data_points()
         toc = TIME.perf_counter()
-        print(f"Posting timeseries tok  {toc - tic:0.4f} seconds")
+        print(f"Posting timeseries for sensor {sensor} in file {file} took  {toc - tic:0.4f} seconds")

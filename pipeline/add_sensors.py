@@ -161,6 +161,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          z=0,
                          is_local=True,
                          campaign_id=campaign.id)
+
     client.sensor.create(name="M206_COF Z",
                          description="",
                          unit="mm",
@@ -235,7 +236,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-    client.sensor.create(name='Wave 4 Side SLot 7 AI4-AI12',
+    client.sensor.create(name='Wave 4 Side Slot 7 AI4-AI12',
                          description='Wave side - D',
                          unit='mm',
                          kind='length',
@@ -295,7 +296,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-    client.sensor.create(name='MTI aks, X, Y, Z',
+    client.sensor.create(name='MIT 2 Roll (X)',
                          description='Accelerometer - E',
                          unit='m/s^2',
                          kind='acceleration',
@@ -304,4 +305,105 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          z=(47.5 * 1000) / 75 + 60,
                          is_local=True,
                          campaign_id=campaign.id)
+
+    client.sensor.create(name='MTI 2 Pitch (Y)',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='MTI 2 Yaw (Z)',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='MTI 2 aks X',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='MTI 2 aks Y',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='MTI 2 aks Z',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='MTI 2 rate X',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='MTI 2 rate Y',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='MTI 2 rate Z',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='Wagon Master Position',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
+    client.sensor.create(name='Wagon Master Speed',
+                         description='Accelerometer - E',
+                         unit='m/s^2',
+                         kind='acceleration',
+                         x=0,
+                         y=372.5,
+                         z=(47.5 * 1000) / 75 + 60,
+                         is_local=True,
+                         campaign_id=campaign.id)
+
 
