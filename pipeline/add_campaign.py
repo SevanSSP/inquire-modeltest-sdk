@@ -3,7 +3,7 @@ import datetime
 from modeltestSDK.resources import Campaign, Test, DataPoint, WaveCurrentCalibration, WindConditionCalibration
 from modeltestSDK.client import SDKclient
 from modeltestSDK.utils import get_datetime_date, get_parent_dir
-
+from .add_timeseries import read_datapoints_from_csv_with_pandas
 from .add_floater_test import add_floater_test
 from .add_sensors import add_sensors
 
@@ -19,24 +19,19 @@ def find_gamma(Hs, Tp):
         gamma = 3.0
     else:  # Hs==15.0 and Tp==16.0: # ifølge specs er det 15.6 og ikke 15.0
         gamma = 2.8
-        raise Warning("Gamma might be wrong")
+        #raise Warning("Gamma might be wrong")
     return gamma
 
 
+# TODO: Koble riktig wave+wind calibration til floater som opprettes
+#
 def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_dir: str):
     # Legg til alle wave_calibrations
     os.chdir(campaign_dir)
     os.chdir(os.getcwd() + "\\" + "WaveCalib")
     calibs = os.listdir(path='.')
     for calib in calibs:
-        # find test date and time
-        os.chdir(os.getcwd() + "\\" + calib)
-        times = os.listdir(path='.')
-        date = times[0].split(" ")[1]
-        timestamp = times[0].split(" ")[2]
-        date_time = date + timestamp
-        os.chdir(get_parent_dir(os.getcwd()))
-
+        # find wave spectrum and wave height+period
         wave_spectrum = calib.split("_")[0]
         if wave_spectrum == "Irreg":
             wave_spectrum = "jonswap"  # jonswap er forsøkt tilnærmet i SWACH testene
@@ -49,29 +44,50 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         measured_hs = wave_height  # midlertidig
         measured_tp = wave_period  # midlertidig #TODO: Lese inn calibration
         gamma = find_gamma(measured_hs, measured_tp)
-        wave_current_condition = client.wave_current_condition.create(description=calib,
-                                                                      test_date=get_datetime_date(date_time),
-                                                                      campaign_id=campaign.id,
-                                                                      measured_hs=measured_hs,
-                                                                      measured_tp=measured_tp,
-                                                                      wave_spectrum=wave_spectrum,
-                                                                      wave_period=wave_period,
-                                                                      wave_height=wave_height,
-                                                                      gamma=gamma,  # TODO: Add gamma
-                                                                      wave_direction=0,
-                                                                      current_velocity=0,
-                                                                      current_direction=0)
+
+        # find test date and time
+        os.chdir(os.getcwd() + "\\" + calib)
+        times = os.listdir(path='.')
+        date = times[0].split(" ")[1]
+        timestamp = times[0].split(" ")[2]
+        date_time = date + timestamp
+
+        wave_current_calibration = client.wave_current_calibration.create(description=calib,
+                                                                          test_date=get_datetime_date(date_time),
+                                                                          campaign_id=campaign.id,
+                                                                          measured_hs=measured_hs,
+                                                                          measured_tp=measured_tp,
+                                                                          wave_spectrum=wave_spectrum,
+                                                                          wave_period=wave_period,
+                                                                          wave_height=wave_height,
+                                                                          gamma=gamma,  # TODO: Add gamma
+                                                                          wave_direction=0,
+                                                                          current_velocity=0,
+                                                                          current_direction=0)
+
+        for time in times:
+            os.chdir(os.getcwd() + "\\" + time)
+            files = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == time.split(" ")[0]]
+            for file in files:
+                print(os.getcwd())
+                print(file)
+                read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id,client=client)
+            os.chdir(get_parent_dir(os.getcwd()))
+        os.chdir(get_parent_dir(os.getcwd()))
+
+
         # TODO: Må kunne skille mellom en wind calibration og wave calibration, ønsker ikke nødvendigvis å legge inn samtidig
-        '''
-        wind_calibration = client.wind_current_condition.create(test_name=calib,
-                                                                  test_date=get_datetime_date(date_time),
-                                                                  campaign_id=campaign.id,
-                                                                  measured_hs=10,  # random verdi
-                                                                  measured_tp=10,  # random verdi
-                                                                  wind_spectrum=None,
-                                                                  wind_velocity=None,
-                                                                  wind_direction=None)
-        '''
+
+        wind_condition_calibration = client.wind_condition_calibration.create(description=calib,
+                                                                              test_date=get_datetime_date(date_time),
+                                                                              campaign_id=campaign.id,
+                                                                              measured_hs=10,  # random verdi
+                                                                              measured_tp=10,  # random verdi
+                                                                              wind_spectrum="None",
+                                                                              zref=0,
+                                                                              wind_velocity=0,
+                                                                              wind_direction=0)
+
     os.chdir(campaign_dir)
     for concept_id in concept_ids:
         os.chdir(campaign_dir + "\\" + concept_id)
@@ -87,8 +103,13 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
                 files = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if
                          x.split(" ")[0] == test]  # Only add to test files if start with test name
                 # print("FILES: ", files, campaign_id, get_datetime_date(date_time))
-                add_floater_test(files=files, campaign=campaign, testname=test, date=get_datetime_date(date_time),
-                                 concept_id=concept_id)
+                floater_test = add_floater_test(files=files,
+                                                campaign=campaign,
+                                                wave_current_calibration=wave_current_calibration,
+                                                wind_condition_calibration=wind_condition_calibration,
+                                                testname=test,
+                                                date=get_datetime_date(date_time),
+                                                concept_id=concept_id, client=client)
 
                 os.chdir(get_parent_dir(os.getcwd()))
             os.chdir(get_parent_dir(os.getcwd()))
@@ -97,7 +118,7 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
 
 def main():
     client = SDKclient()
-    campaign_dir = "C:/Users/jen/Documents/STT"
+    campaign_dir = "C:/Users/nbu/Documents/SWACH"
     campaign = client.campaign.create(name=campaign_dir.split("/")[-1],
                                       description="Modeltest for SWACH",
                                       date=get_datetime_date("180120120000"),
@@ -108,6 +129,7 @@ def main():
                                       water_depth=300,  # står kun >300
                                       transient=3 * 60 * 60)  # 3 hours in seconds)
     concept_ids = ["M206", "M207"]
+    fill_campaign(campaign, concept_ids, client, campaign_dir)
 
     add_sensors(campaign, client)
 
