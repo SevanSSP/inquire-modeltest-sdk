@@ -27,15 +27,30 @@ tic = time.perf_counter()
 
 #print(campaigns)
 
-
-stt = client.campaign.get("63efc89b-a091-4f3b-8ba6-8608cc367eec")
+campaign_id = client.campaign.get_id("STT")
+stt = client.campaign.get(campaign_id)
 print(stt.get_tests())
 
+test_id = client.floater.get_id("waveIrreg_2101")
+test = client.floater.get(test_id)
 
-test = client.wave_current_calibration.get("eb51ceaa-4670-4142-a757-86c5314ab1a4")
+print(client.wave_current_calibration.get(test.wave_id))
 
 print(test.get_timeseries())
+timeseries = test.get_timeseries().to_pandas()
 
+data =[]
+sensors = []
+for i in range(38):
+    timeseries_id = timeseries["id"][i]
+    ts = client.timeseries.get(timeseries_id)
+    timeseries_data = ts.get_data_points().to_pandas()
+    sensor = client.sensor.get(ts.sensor_id)
+    data.append(timeseries_data)
+    sensors.append(sensor)
+
+plot_timeseries(data, test, sensors)
+'''
 ts = client.timeseries.get_data_points("b377256e-665b-41f9-be97-942f99ec7524")
 
 timeseries = client.timeseries.get("b377256e-665b-41f9-be97-942f99ec7524")
@@ -63,7 +78,7 @@ plot_timeseries([data1,data2], test, [sensor1,sensor2])
 
 #stt.test[10].timeseries[0].to_pandas()
 
-
+'''
 
 '''
 timeseries = client.timeseries.get(id="b893da62-d5dc-4e92-b281-edac22223b26")

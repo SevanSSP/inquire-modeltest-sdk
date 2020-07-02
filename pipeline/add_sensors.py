@@ -204,7 +204,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
     # Wave sensors
 
     # Denne skal kanskje være Moonpool istedet for Center. Vent på svar fra Einar
-    '''    client.sensor.create(name="Wave 1 Center Slot 7 AI0-AI8",
+    client.sensor.create(name="Wave 1 Center Slot 7 AI0-AI8",
                          description="Relative wave probe for moonpool",
                          unit="mm",
                          kind="length",
@@ -213,7 +213,6 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          z=None,
                          is_local=True,
                          campaign_id=campaign.id)
-    '''
 
     client.sensor.create(name='Wave 1 Moonpool Slot 7 AI0-AI8',
                          description='Wave model moonpool - A',
