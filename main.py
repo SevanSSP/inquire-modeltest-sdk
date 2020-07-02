@@ -20,31 +20,7 @@ client = SDKclient()
 
 #print(len (timeseries.get_data_points()))
 
-'''
-wave_current_condition_list = client.wind_current_condition.get_all()
-print(wave_current_condition_list)
-print(wave_current_condition_list[0].id)
-print("GET wave ", client.wave_current_condition.get(id=wave_current_condition_list[0].id))
-wave_current_condition = wave_current_condition_list[0]
-print(wave_current_condition.get_campaign())
-print(wave_current_condition.get_timeseries())
-'''
-async def post(session, url, body):
-    async with session.post(url, json=body) as response:
-        return await response.text()
 
-async def multiple_tasks(client, body):
-    url = "http://127.0.0.1:8000/api/timeseries/test/"
-    tasks = []
-    async with aiohttp.ClientSession() as session:
-        for offset in range(0, 13):
-            print(offset, len(body))
-            tasks.append(post(session, url, body))
-        res = await asyncio.gather(*tasks)
-        print(res)
-    return res
-
-'''
 timeseries = client.timeseries.get(id="b893da62-d5dc-4e92-b281-edac22223b26")
 time1 = time.time()
 
