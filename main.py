@@ -11,6 +11,7 @@ import asyncio
 import time
 import matplotlib.pyplot as plt
 import matplotlib.style as mplstyle
+from modeltestSDK.utils import to_datetime_string
 mplstyle.use('fast')
 
 
@@ -18,8 +19,6 @@ client = SDKclient()
 
 
 campaigns = client.campaign.get_all()
-
-
 
 tic = time.perf_counter()
 
@@ -56,6 +55,7 @@ plt.show()
 
 
 
+'''
 timeseries = client.timeseries.get(id="b893da62-d5dc-4e92-b281-edac22223b26")
 time1 = time.time()
 
@@ -86,3 +86,4 @@ time2 = time.time()
 
 full_time = (time2 - time1) * 1000.0
 print(f'function took {full_time} milliseconds')
+'''
