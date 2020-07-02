@@ -69,8 +69,11 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
 
         for time in times:
             os.chdir(os.getcwd() + "\\" + time)
-            file = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == time.split(" ")[0]]
-            read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id, client=client)
+            files = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == time.split(" ")[0]]
+            for file in files:
+                print(os.getcwd())
+                print(file)
+                read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id,client=client)
             os.chdir(get_parent_dir(os.getcwd()))
         os.chdir(get_parent_dir(os.getcwd()))
 
@@ -123,7 +126,7 @@ def main():
                                       diameter=70,  # main hull cylinder
                                       scale_factor=75,  # står i rapporten
                                       water_density=1025,  # usikkert
-                                      water_depth=300,  # står kun >300
+                                      water_depth=4.1 * 75,  # Kilde på at dybden i tanken er 4.1m er fisk.no, fant ikke noe annet offisielt tall
                                       transient=3 * 60 * 60)  # 3 hours in seconds)
     concept_ids = ["M206", "M207"]
     fill_campaign(campaign, concept_ids, client, campaign_dir)
