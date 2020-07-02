@@ -17,9 +17,11 @@ def find_gamma(Hs, Tp):
         gamma = 3.0
     elif Hs == 10.0 and Tp == 16.0:
         gamma = 3.0
-    else:  # Hs==15.0 and Tp==16.0: # ifølge specs er det 15.6 og ikke 15.0
+    elif Hs == 15.0 and Tp == 16.0:  # Hs==15.0 and Tp==16.0: # ifølge specs er det 15.6 og ikke 15.0
         gamma = 2.8
-        #raise Warning("Gamma might be wrong")
+    else:
+        #Regular waves
+        gamma = 0
     return gamma
 
 
@@ -60,7 +62,7 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
                                                                           wave_spectrum=wave_spectrum,
                                                                           wave_period=wave_period,
                                                                           wave_height=wave_height,
-                                                                          gamma=gamma,  # TODO: Add gamma
+                                                                          gamma=gamma,
                                                                           wave_direction=0,
                                                                           current_velocity=0,
                                                                           current_direction=0)
@@ -105,8 +107,6 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
                 # print("FILES: ", files, campaign_id, get_datetime_date(date_time))
                 floater_test = add_floater_test(files=files,
                                                 campaign=campaign,
-                                                wave_current_calibration=wave_current_calibration,
-                                                wind_condition_calibration=wind_condition_calibration,
                                                 testname=test,
                                                 date=get_datetime_date(date_time),
                                                 concept_id=concept_id, client=client)

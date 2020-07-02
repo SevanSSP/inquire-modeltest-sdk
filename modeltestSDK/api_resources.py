@@ -190,7 +190,7 @@ class TimeseriesAPI(BaseAPI):
 
     def get(self, id: str):
         data = self.client.get(self._resource_path, id)
-        return Sensor.from_dict(data=data, client=self.client)
+        return Timeseries.from_dict(data=data, client=self.client)
 
     def get_all(self):
         data = self.client.get(self._resource_path, "all")
