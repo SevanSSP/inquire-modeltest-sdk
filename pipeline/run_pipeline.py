@@ -10,7 +10,7 @@ def main():
     tic = time.perf_counter()
 
     client = SDKclient()
-    campaign_dir = "C:/Users/nbu/Documents/SWACH"
+    campaign_dir = "C:/Users/hly/Documents/STT"
     campaign = client.campaign.create(name=campaign_dir.split("/")[-1],
                                       description="Modeltest for SWACH",
                                       date=get_datetime_date("180120120000"),
