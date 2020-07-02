@@ -188,7 +188,7 @@ async def fetch(session, url):
 
 async def multiple_tasks(resource, endpoint, entries):
     url = "http://127.0.0.1:8000/api/" + "/".join([p for p in [resource, endpoint] if p.strip()])
-    limit = 5000
+    limit = 12000
     print(entries)
     tasks = []
     async with aiohttp.ClientSession() as session:
@@ -206,15 +206,12 @@ async def post(session, url, body):
 async def multiple_tasks_post(entries, body):
     url = "http://127.0.0.1:8000/api/datapoint/list/"
     tasks = []
-    limit = 5000
-    print(body[0])
+    limit = 10000
     async with aiohttp.ClientSession() as session:
         for offset in range(0, entries, limit):
             data = body[offset:(offset + limit)]
-            print(len(body), offset, offset + limit)
             tasks.append(post(session, url, data))
         res = await asyncio.gather(*tasks)
-        print(res)
 import gzip
 
 class TimeseriesAPI(BaseAPI):

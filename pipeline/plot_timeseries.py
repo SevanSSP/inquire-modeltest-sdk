@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import datetime
 
+
+
 def plot_timeseries(datas, test, sensors):
 
     plt.figure()
@@ -19,6 +21,7 @@ def plot_timeseries(datas, test, sensors):
 
         plt.plot(data["time"], data["value"], 'o', markerfacecolor='none', alpha=0.8, markersize=2, label=sensor.name)
         plt.gcf().autofmt_xdate()
+
         plt.ylabel(sensor.unit)
 
         labels.append(sensor.name)

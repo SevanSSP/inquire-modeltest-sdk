@@ -3,6 +3,7 @@ from modeltestSDK.resources import Campaign, Test, Floater, WaveCurrentCalibrati
 from modeltestSDK.client import SDKclient
 from pipeline.add_timeseries import read_datapoints_from_csv_with_pandas
 from modeltestSDK.utils import TwoWayDict
+from collections import defaultdict
 
 waveCalibDict = TwoWayDict()
 waveCalibDict["waveIrreg_2101"] = "Irreg_Hs7_Tp12"
@@ -12,12 +13,13 @@ waveCalibDict["waveIrreg_2104"] = "Irreg_Hs10_Tp16"
 waveCalibDict["waveIrreg_2105"] = "Irreg_Hs15_Tp16"
 waveCalibDict["waveReg_1101"] = "Reg_Hs3_Tp6.5"
 waveCalibDict["waveReg_1102"] = "Reg_Hs3_Tp8"
-waveCalibDict["waveReg_1103"] = "Reg_Hs3_Tp8"
-waveCalibDict["waveReg_1104"] = "Reg_Hs3_Tp10"
-waveCalibDict["waveReg_1105"] = "Reg_Hs3_Tp10"
-waveCalibDict["waveReg_1106"] = "Reg_Hs3_Tp13"
-waveCalibDict["waveReg_1107"] = "Reg_Hs3_Tp13"
-waveCalibDict["waveReg_1108"] = "Reg_Hs3_Tp15"
+waveCalibDict["waveReg_1103"] = "Reg_Hs5_Tp8"
+waveCalibDict["waveReg_1104"] = "Reg_Hs5_Tp10"
+waveCalibDict["waveReg_1105"] = "Reg_Hs7_Tp10"
+waveCalibDict["waveReg_1106"] = "Reg_Hs7_Tp13"
+waveCalibDict["waveReg_1107"] = "Reg_Hs10_Tp13"
+waveCalibDict["waveReg_1108"] = "Reg_Hs10_Tp15"
+
 
 
 def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, concept_id: str, client: SDKclient):
@@ -34,8 +36,10 @@ def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, c
         category = "decay"
     elif x[0:3] == "X10":
         category = "pull out"
-
-    wave_id = client.wave_current_calibration.get_id(waveCalibDict(testname))
+    try:
+        wave_id = client.wave_current_calibration.get_id(waveCalibDict[testname])
+    except:
+        wave_id = None
 
     floater_test = client.floater.create(description=testname,
                                          test_date=date,
@@ -50,7 +54,6 @@ def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, c
                                          wind_id=None)
 
     for file in files:
-        print(file)
         read_datapoints_from_csv_with_pandas(file=file, test_id=floater_test.id, client=client)
 
     return floater_test
