@@ -118,7 +118,7 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
 
 def main():
     client = SDKclient()
-    campaign_dir = "C:/Users/nbu/Documents/SWACH"
+    campaign_dir = "C:/Users/jen/Documents/STT"
     campaign = client.campaign.create(name=campaign_dir.split("/")[-1],
                                       description="Modeltest for SWACH",
                                       date=get_datetime_date("180120120000"),

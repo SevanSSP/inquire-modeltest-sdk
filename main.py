@@ -25,17 +25,20 @@ campaigns = client.campaign.get_all()
 
 tic = time.perf_counter()
 
-stt = client.campaign.get("49627a4c-9b8e-4eb4-816a-2d252be6b961")
+#print(campaigns)
 
 
+stt = client.campaign.get("63efc89b-a091-4f3b-8ba6-8608cc367eec")
+print(stt.get_tests())
 
-test = client.floater.get("eb4e6456-4a85-472b-91fe-21689c5201a2")
+
+test = client.wave_current_calibration.get("eb51ceaa-4670-4142-a757-86c5314ab1a4")
 
 print(test.get_timeseries())
 
-ts = client.timeseries.get_data_points("bdef448e-d924-4cce-9ca5-cfb601e5f0a8")
+ts = client.timeseries.get_data_points("b377256e-665b-41f9-be97-942f99ec7524")
 
-timeseries = client.timeseries.get("bdef448e-d924-4cce-9ca5-cfb601e5f0a8")
+timeseries = client.timeseries.get("b377256e-665b-41f9-be97-942f99ec7524")
 
 sensor1 = client.sensor.get(timeseries.sensor_id)
 
@@ -43,9 +46,9 @@ data1 = ts.to_pandas()#.head(5000)
 
 toc1 = time.perf_counter()
 
-ts = client.timeseries.get_data_points("ea1a2f9b-bc65-4ed6-8d96-25090768e7d3")
+ts = client.timeseries.get_data_points("ff253475-dd0f-4b0b-9eeb-f548d2700885")
 
-timeseries = client.timeseries.get("ea1a2f9b-bc65-4ed6-8d96-25090768e7d3")
+timeseries = client.timeseries.get("ff253475-dd0f-4b0b-9eeb-f548d2700885")
 
 sensor2 = client.sensor.get(timeseries.sensor_id)
 

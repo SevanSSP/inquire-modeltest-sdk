@@ -19,7 +19,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
     # M_206_COG sensors. Er usikker på om x og y er null for COG.
 
     client.sensor.create(name="M206_COG X",
-                         description="",
+                         description="Surge COG",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -28,7 +28,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
     client.sensor.create(name="M206_COG Y",
-                         description="",
+                         description="Sway COG",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -37,7 +37,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
     client.sensor.create(name="M206_COG Z",
-                         description="",
+                         description="Heave COG",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -47,9 +47,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_COG Yaw",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="COG Yaw",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=VCG_M206,
@@ -57,9 +57,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_COG Pitch",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="COG Pitch",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=VCG_M206,
@@ -67,9 +67,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_COG Roll",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="COG Roll",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=VCG_M206,
@@ -80,7 +80,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 # M206_acc sensors. Målte verdier fra akselerometer har akselerometeret som origo.
 
     client.sensor.create(name="M206_acc_pos X",
-                         description="",
+                         description="Surge position of 6DOF",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -90,7 +90,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_acc_pos Y",
-                         description="",
+                         description="Sway position of 6DOF",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -100,7 +100,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_acc_pos Z",
-                         description="",
+                         description="heave position of 6DOF",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -110,9 +110,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_acc_pos Yaw",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="Yaw at position of 6DOF",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+deck_height+(60/1000)*75,
@@ -120,9 +120,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_acc_pos Pitch",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="Pitch at position of 6DOF",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+deck_height+(60/1000)*75,
@@ -130,9 +130,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_acc_pos Roll",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="Roll at position of 6DOF",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+deck_height+(60/1000)*75,
@@ -142,7 +142,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
 # M206_cof sensors. Vet ikke hvor Centre of Floatation ligger
     client.sensor.create(name="M206_COF X",
-                         description="",
+                         description="Surge COF",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -152,7 +152,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_COF Y",
-                         description="",
+                         description="Sway COF",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -162,7 +162,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_COF Z",
-                         description="",
+                         description="Heave COF ",
                          unit="mm",
                          kind="length",
                          x=0,
@@ -172,9 +172,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_COF Yaw",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="COF Yaw ",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
@@ -182,9 +182,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_COF Pitch",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="COF Pitch ",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
@@ -192,20 +192,20 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_COF Roll",
-                         description="",
-                         unit="mm",
-                         kind="length",
+                         description="COF Roll",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
                          is_local=True,
                          campaign_id=campaign.id)
 
-# Wave sensors
+    # Wave sensors
 
     # Denne skal kanskje være Moonpool istedet for Center. Vent på svar fra Einar
-    client.sensor.create(name="Wave 1 Center Slot 7 AI0-AI8",
-                         description="",
+    '''    client.sensor.create(name="Wave 1 Center Slot 7 AI0-AI8",
+                         description="Relative wave probe for moonpool",
                          unit="mm",
                          kind="length",
                          x=(-117/1000)*75,
@@ -213,7 +213,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          z=None,
                          is_local=True,
                          campaign_id=campaign.id)
-
+    '''
 
     client.sensor.create(name='Wave 1 Moonpool Slot 7 AI0-AI8',
                          description='Wave model moonpool - A',
@@ -471,8 +471,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_COG Yaw",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=VCG_M207,
@@ -481,8 +481,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_COG Pitch",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=VCG_M207,
@@ -491,8 +491,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_COG Roll",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=VCG_M207,
@@ -532,8 +532,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_acc_pos Yaw",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
@@ -542,8 +542,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_acc_pos Pitch",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
@@ -552,8 +552,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_acc_pos Roll",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
@@ -592,8 +592,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_COF Yaw",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
@@ -602,8 +602,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_COF Pitch",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
@@ -612,8 +612,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name="M207_COF Roll",
                          description="",
-                         unit="mm",
-                         kind="length",
+                         unit="deg",
+                         kind="angle",
                          x=0,
                          y=0,
                          z=0,
