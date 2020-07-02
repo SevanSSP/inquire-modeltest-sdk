@@ -5,7 +5,7 @@ import random
 from modeltestSDK.utils import from_datetime_string, to_datetime_string
 from typing import List
 
-from pipeline.plot_timeseries import plotTS
+from pipeline.plot_timeseries import plot_timeseries
 
 import time
 import matplotlib.pyplot as plt
@@ -38,6 +38,8 @@ sensor1 = client.sensor.get(timeseries.sensor_id)
 
 data1 = ts.to_pandas()#.head(5000)
 
+toc1 = time.perf_counter()
+
 ts = client.timeseries.get_data_points("ea1a2f9b-bc65-4ed6-8d96-25090768e7d3")
 
 timeseries = client.timeseries.get("ea1a2f9b-bc65-4ed6-8d96-25090768e7d3")
@@ -46,10 +48,12 @@ sensor2 = client.sensor.get(timeseries.sensor_id)
 
 data2 = ts.to_pandas()
 
-toc = time.perf_counter()
-print(f"Query took {toc-tic:0.4f} seconds")
+toc2 = time.perf_counter()
 
-plotTS([data1,data2], test, [sensor1,sensor2])
+print(f"Query 1 took {toc1-tic:0.4f} seconds")
+print(f"Query 2 took {toc2-toc1:0.4f} seconds")
+
+plot_timeseries([data1,data2], test, [sensor1,sensor2])
 
 #stt.test[10].timeseries[0].to_pandas()
 
