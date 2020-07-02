@@ -15,7 +15,6 @@ def read_datapoints_from_csv_with_pandas(file, test_id,client: SDKclient):
         timeseries = client.timeseries.create(sensor_id=sensor_id,
                                 test_id=test_id)
         datapoints = df[[col_names[0], sensor]].values.tolist()
-        #print(col_names[0], sensor)
         for time, value in datapoints:
             datapoint = DataPoint(timeseries_id=timeseries.id,
                                   time=datetime.datetime.strptime(time, "%H:%M %S.%f").isoformat(),
