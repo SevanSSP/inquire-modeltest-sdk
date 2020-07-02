@@ -44,9 +44,21 @@ async def multiple_tasks(client, body):
         print(res)
     return res
 
+'''
+timeseries = client.timeseries.get(id="b893da62-d5dc-4e92-b281-edac22223b26")
+time1 = time.time()
 
-timeseries = client.timeseries.create(test_id="91ddc4f3-e47d-4500-b740-dc4a24e3c9b6",
-                                      sensor_id="8ef3e529-8816-44ee-820e-a048368f5fca")
+print(len(timeseries.get_data_points()), "TEST")
+
+time2 = time.time()
+full_time = (time2 - time1) * 1000.0
+print(f'function took {full_time} milliseconds')
+
+
+
+
+timeseries = client.timeseries.create(test_id="bee124c3-3d25-4fdd-8e22-e33ef8ecd17c",
+                                      sensor_id="0c0e130d-d370-4cd2-8709-961c8dd74b8c")
 
 time1 = time.time()
 lst=()
@@ -55,12 +67,11 @@ for i in range(130000):
     timeseries.data_points.append(DataPoint(timeseries_id=timeseries.id, time=str(datetime.datetime.now()),
                           value=random.uniform(0, 10000), client=client))
 
-data = asyncio.get_event_loop().run_until_complete(multiple_tasks(client, body=timeseries.data_points.dump()[0:10000]))
+#data = asyncio.get_event_loop().run_until_complete(multiple_tasks(client, body=timeseries.data_points.dump()[0:10000]))
+
+print(timeseries.post_data_points())
 
 time2 = time.time()
-
-#print(timeseries.post_data_points())
-
 
 full_time = (time2 - time1) * 1000.0
 print(f'function took {full_time} milliseconds')

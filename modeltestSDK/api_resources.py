@@ -14,8 +14,6 @@ def get_id_from_response(response):
 
 
 class BaseAPI:
-
-
     def __init__(self, client):
         self._resource_path = format_class_name(self.__class__.__name__)
         self.client = client
@@ -183,53 +181,41 @@ class SensorAPI(NamedBaseAPI):
         resources = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
         return TimeseriesList(resources=resources, client=self.client)
 
-
 async def fetch(session, url):
     async with session.get(url) as response:
         print("STARTED")
         return await response.json()
 
-async def multiple_tasks(resource, endpoint, entries, client):
+async def multiple_tasks(resource, endpoint, entries):
     url = "http://127.0.0.1:8000/api/" + "/".join([p for p in [resource, endpoint] if p.strip()])
-    limit = 1000
+    limit = 5000
+    print(entries)
     tasks = []
     async with aiohttp.ClientSession() as session:
-        for offset in range(0, limit, entries):
-            url_query = url + f"?offset={offset}&limit=limit"
+        for offset in range(0, entries, limit):
+            url_query = url + f"?offset={offset}&limit={limit}"
             tasks.append(fetch(session, url_query))
         res = await asyncio.gather(*tasks)
+        print(len(res))
     return res
 
 async def post(session, url, body):
-    print(len(body))
-    async with session.post(url, json=body) as response:
-        return
-
-async def multiple_tasks_post(resource, endpoint, entries, body, client):
-    url = "http://127.0.0.1:8000/api/" + "/".join([p for p in [resource, endpoint] if p.strip()]) + "/"
-    print(url)
-    limit = 10000
-    tasks = []
-    async with aiohttp.ClientSession() as session:
-        for offset in range(0, entries-limit, limit):
-            data = body[offset:(offset+limit)]
-            print(len(data), offset)
-            tasks.append(post(session, url, body[offset:(offset+limit)]))
-        res = await asyncio.gather(*tasks)
-    return res
-
-async def post_2(session, url, body):
     async with session.post(url, json=body) as response:
         return await response.text()
 
-async def multiple_tasks_post_2(entries, body):
+async def multiple_tasks_post(entries, body):
     url = "http://127.0.0.1:8000/api/datapoint/list/"
     tasks = []
+    limit = 5000
+    print(body[0])
     async with aiohttp.ClientSession() as session:
-        for offset in range(0, 13):
-            data = body[offset*10000:(offset*10000 + 10000)]
-            tasks.append(post_2(session, url, data))
+        for offset in range(0, entries, limit):
+            data = body[offset:(offset + limit)]
+            print(len(body), offset, offset + limit)
+            tasks.append(post(session, url, data))
         res = await asyncio.gather(*tasks)
+        print(res)
+import gzip
 
 class TimeseriesAPI(BaseAPI):
 
@@ -256,13 +242,18 @@ class TimeseriesAPI(BaseAPI):
     def get_data_points(self, id: str):
         entries = self.client.get(self._resource_path, f"{id}/datapoints/length")
         data = asyncio.get_event_loop().run_until_complete(multiple_tasks(self._resource_path, f"{id}/datapoints",
-                                                           entries, self.client))
-        obj_list = [DataPoint.from_dict(data=obj, client=self.client) for obj in data[0]]
-        return DataPointList(resources=obj_list, client=None)
+                                                                          entries))
+        resources = []
+        print(data[0][0])
+        for obj_list in data:
+            for obj in obj_list:
+                resources.append(DataPoint.from_dict(data=obj, client=self.client))
+
+        return DataPointList(resources=resources, client=None)
 
     def post_data_points(self, id, body):
         entries = len(body)
-        data = asyncio.get_event_loop().run_until_complete(multiple_tasks_post_2(entries, body))
+        data = asyncio.get_event_loop().run_until_complete(multiple_tasks_post(entries, body))
 
 '''
 class DatapointAPI(BaseAPI):
