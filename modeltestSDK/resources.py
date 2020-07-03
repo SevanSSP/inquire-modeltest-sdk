@@ -386,9 +386,10 @@ class DataPoint(BaseResource):
         return f"<DataPoint: \n{self.to_pandas()}>"
 
     @classmethod
-    def from_dict(cls, data: dict, client = None):
+    def from_dict(cls, data: str, client = None):
         # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE
-        return cls(time=data[0], value=data[1],
+        time, value = data.replace("\n", "").split("\t")
+        return cls(time=time, value=float(value),
                    client=client)
 
 class DataPointList(ResourceList):

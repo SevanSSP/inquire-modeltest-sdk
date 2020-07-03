@@ -239,7 +239,7 @@ class SensorAPI(NamedBaseAPI):
 # async def post(session, url, body):
 #     async with session.post(url, json=body) as response:
 #         return await response.text()
-# 
+#
 #
 # async def multiple_tasks_post(entries, body):
 #     url = "http://127.0.0.1:8000/api/datapoint/list/"

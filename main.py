@@ -34,12 +34,6 @@ print(stt.get_tests())
 test = client.floater.get_by_name("waveIrreg_2101")
 stt.populate_test(test)
 
-#print(stt.test)
-
-#print(client.wave_current_calibration.get(test.wave_id))
-
-#print(test.get_timeseries())
-
 timeseries = test.get_timeseries()
 stt.test["waveIrreg_2101"].populate_timeseries(timeseries)
 
@@ -91,9 +85,10 @@ plot_timeseries([data1,data2], test, [sensor1,sensor2])
 
 #timeseries = client.timeseries.get(id="14ec6b18-a4b0-4d69-941b-602c6641d98b")
 #print(timeseries.get_data_points(), "TEST")
-test = client.test.get(id="7113683a-1e6b-454d-b6ea-25bf2a60b52f")
+
+test = client.test.get(id="3d311a2b-86d0-4a9f-a8d3-ad6c92532554")
 timeseriesList = test.get_timeseries()
-print(timeseriesList)
+
 
 
 for timeseries in timeseriesList:
@@ -103,6 +98,7 @@ for timeseries in timeseriesList:
     full_time = (time2 - time1) * 1000.0
     print(f'function took {full_time} milliseconds')
 
+print(timeseriesList[0].data_points[0:20])
 
 '''
 
