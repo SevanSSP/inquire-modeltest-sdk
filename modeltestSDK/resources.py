@@ -103,6 +103,7 @@ class Campaign(BaseResource):
         self.water_depth = water_depth
         self.transient = transient
         self._client = client
+        self.test = dict()
 
     def __str__(self):
         return f"<Campaign {self.name}: \n{self.to_pandas()}>"
@@ -119,6 +120,11 @@ class Campaign(BaseResource):
         if not self.id:
             raise Exception(f'Cannot get tests for {self.name}. Campaign has not yet been created')
         return self._client.campaign.get_tests(id=self.id, type=type)
+
+    def populate(self, child):
+        self.test[child.description] = child
+
+
 
     @classmethod
     def from_dict(cls, data: dict, client = None):
@@ -331,6 +337,19 @@ class TimeseriesList(ResourceList):
     def __init__(self, resources: List[Timeseries], client=None):
         self.resources = resources
         self._client = client
+
+    def to_pandas(self, ignore: List[str]=None):
+        df = pd.DataFrame(self.dump())
+        df = df.drop(columns=['test_id','data_points'])
+        for i in df.index:
+            df.at[i, "sensor_id"] = self._client.sensor.get(df["sensor_id"][i]).name
+        return df
+
+
+    def __str__(self):
+        return f"<Test: \n{self.to_pandas()}>"
+
+
 
 class DataPoint(BaseResource):
 

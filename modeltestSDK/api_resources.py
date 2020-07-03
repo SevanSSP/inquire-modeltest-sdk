@@ -46,6 +46,16 @@ class CampaignAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, id)
         return Campaign.from_dict(data=data, client=self.client)
 
+    def get_by_name(self, name: str):
+        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
+        if response:
+            if len(response) != 1:
+                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
+                              f" first was returned")
+            return Campaign.from_dict(data=response[0],client=self.client)
+        else:
+            raise Exception(f"Could not find any object with name {name}")
+
     def get_all(self):
         data = self.client.get(self._resource_path, "all")
         obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
@@ -96,6 +106,16 @@ class FloaterAPI(TestAPI):
     def get(self, id: str):
         data = self.client.get(self._resource_path, id)
         return Floater.from_dict(data=data, client=self.client)
+
+    def get_by_name(self, description: str):
+        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'description': description})
+        if response:
+            if len(response) != 1:
+                warnings.warn(f"Searching {self.__class__.__name__} for name {description} returned several objects,"
+                              f" first was returned")
+            return Floater.from_dict(data=response[0],client=self.client)
+        else:
+            raise Exception(f"Could not find any object with name {description}")
 
     def get_all(self):
         data = self.client.get(self._resource_path, "all")
@@ -160,6 +180,16 @@ class SensorAPI(NamedBaseAPI):
     def get(self, id: str):
         data = self.client.get(self._resource_path, id)
         return Sensor.from_dict(data=data, client=self.client)
+
+    def get_by_name(self, name: str):
+        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
+        if response:
+            if len(response) != 1:
+                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
+                              f" first was returned")
+            return Sensor.from_dict(data=response[0], client=self.client)
+        else:
+            raise Exception(f"Could not find any object with name {name}")
 
     def get_all(self):
         data = self.client.get(self._resource_path, "all")
