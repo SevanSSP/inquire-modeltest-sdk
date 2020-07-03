@@ -70,6 +70,10 @@ class CampaignAPI(NamedBaseAPI):
 
 class TestAPI(NamedBaseAPI):
 
+    def get(self, id: str):
+        data = self.client.get(self._resource_path, id)
+        return Test.from_dict(data=data, client=self.client)
+
     def delete(self, item_id: str):
         self.client.delete(self._resource_path, item_id)
 
@@ -240,20 +244,15 @@ class TimeseriesAPI(BaseAPI):
         return self.client.patch(resource=self._resource_path, endpoint=f"{id}", body=body)
 
     def get_data_points(self, id: str):
-        entries = self.client.get(self._resource_path, f"{id}/datapoints/length")
-        data = asyncio.get_event_loop().run_until_complete(multiple_tasks(self._resource_path, f"{id}/datapoints",
-                                                                          entries))
-        resources = []
-        print(data[0][0])
-        for obj_list in data:
-            for obj in obj_list:
-                resources.append(DataPoint.from_dict(data=obj, client=self.client))
+        data = self.client.get(resource=self._resource_path,  endpoint=f"{id}/datapoints" )
+        if not data:
+            return DataPointList(resources=[], client=self.client)
 
-        return DataPointList(resources=resources, client=None)
+        resources = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
+        return DataPointList(resources=resources, client=self.client)
 
     def post_data_points(self, id, body):
-        entries = len(body)
-        data = asyncio.get_event_loop().run_until_complete(multiple_tasks_post(entries, body))
+        data = self.client.post(resource="datapoint", endpoint="list", body=body)
 
 '''
 class DatapointAPI(BaseAPI):

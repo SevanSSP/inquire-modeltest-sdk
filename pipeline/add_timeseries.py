@@ -5,7 +5,7 @@ import pandas as pd
 import time as timer
 
 def read_datapoints_from_csv_with_pandas(file, test_id,client: SDKclient):
-    df = pd.read_csv(file, sep=';').head(10000)
+    df = pd.read_csv(file, sep=';')
 
     col_names = list(df.columns)
     for sensor in col_names[1:]:
@@ -16,6 +16,8 @@ def read_datapoints_from_csv_with_pandas(file, test_id,client: SDKclient):
                                 test_id=test_id)
         datapoints = df[[col_names[0], sensor]].values.tolist()
         for time, value in datapoints:
+            if pd.isna(value):
+                continue
             datapoint = DataPoint(timeseries_id=timeseries.id,
                                   time=datetime.datetime.strptime(time, "%H:%M %S.%f").isoformat(),
                                   value=value,

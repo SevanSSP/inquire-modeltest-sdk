@@ -336,6 +336,7 @@ class TimeseriesList(ResourceList):
 class DataPoint(BaseResource):
 
     def __init__(self, time: str, value: float, timeseries_id: str = None, client=None):
+
         self.timeseries_id = timeseries_id
         self.time = time
         self.value = value
@@ -346,7 +347,8 @@ class DataPoint(BaseResource):
 
     @classmethod
     def from_dict(cls, data: dict, client = None):
-        return cls(time=data['time'], value=data['value'],
+        # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE
+        return cls(time=data[0], value=data[1],
                    client=client)
 
 class DataPointList(ResourceList):
