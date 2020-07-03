@@ -45,8 +45,8 @@ def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, c
                                          test_date=date,
                                          campaign_id=campaign.id,
                                          type="floater",
-                                         measured_hs=10,  # en random verdi
-                                         measured_tp=13,  # en random verdi
+                                         # measured_hs=10,  # en random verdi
+                                         # measured_tp=13,  # en random verdi
                                          category=category,
                                          orientation=orientation,
                                          draft=draft,

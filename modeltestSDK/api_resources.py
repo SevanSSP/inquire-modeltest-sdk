@@ -94,10 +94,10 @@ class TestAPI(NamedBaseAPI):
 
 class FloaterAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, type: str, measured_hs: str,
-                 measured_tp: str, category: str, orientation: float, draft: float, wave_id: str=None, wind_id: str=None):
+    def create(self, description: str, test_date: str, campaign_id: str, type: str, # measured_hs: str, measured_tp: str,
+               category: str, orientation: float, draft: float, wave_id: str=None, wind_id: str=None):
         body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
-                   type=type, measured_hs=measured_hs, measured_tp=measured_tp,
+                   type=type,   # measured_hs=measured_hs, measured_tp=measured_tp,
                    category=category, orientation =orientation, draft =draft, wave_id =wave_id,
                    wind_id =wind_id)
         data = self.client.post(self._resource_path, body=body)
@@ -124,12 +124,12 @@ class FloaterAPI(TestAPI):
 
 class WaveCurrentCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-               measured_tp: str, wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
+    def create(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+               wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float, id: str = None):
 
         body = dict(description=description, type="waveCurrentCalibration", test_date=test_date,
-                    campaign_id=campaign_id,measured_hs=measured_hs, measured_tp=measured_tp,
+                    campaign_id=campaign_id, # measured_hs=measured_hs, measured_tp=measured_tp,
                     wave_spectrum=wave_spectrum,wave_period=wave_period, wave_height=wave_height,
                     gamma=gamma, wave_direction=wave_direction,current_velocity=current_velocity,
                     current_direction=current_direction, id=id)
@@ -148,11 +148,12 @@ class WaveCurrentCalibrationAPI(TestAPI):
 
 class WindConditionCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-                 measured_tp: str, wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
+    def create(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+               wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
                  id: str = None):
         body = dict(description=description, test_date=test_date, type="windConditionCalibration", campaign_id=campaign_id,
-                    measured_hs=measured_hs, measured_tp=measured_tp, wind_spectrum=wind_spectrum,
+                    # measured_hs=measured_hs, measured_tp=measured_tp,
+                    wind_spectrum=wind_spectrum,
                     wind_velocity=wind_velocity, zref=zref, wind_direction=wind_direction, id=id)
 
         data = self.client.post(self._resource_path, body=body)
