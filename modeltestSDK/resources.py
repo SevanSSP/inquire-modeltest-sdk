@@ -327,9 +327,9 @@ class Timeseries(BaseResource):
 
     def __str__(self):
         return f"<Timeseries: \n{self.to_pandas()}>"
-    '''
-    def to_pandas(self, ignore: List[str]=None):
 
+    def to_pandas(self, ignore: List[str]=None):
+        ignore = list() if ignore is None else ignore
         dumped = self.dump()
 
         df = pd.DataFrame(columns=["value"])
@@ -338,10 +338,8 @@ class Timeseries(BaseResource):
                 df.loc[name] = self._client.sensor.get(value).name
             elif name not in ignore:
                 df.loc[name] = [value]
-        df = df.drop(columns=['data_points'])
-
         return df
-    '''
+
     def update(self):
         self._client.timeseries.patch(body=self.dump(), id=self.id)
 
