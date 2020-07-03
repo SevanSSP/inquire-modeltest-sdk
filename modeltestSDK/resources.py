@@ -104,6 +104,7 @@ class Campaign(BaseResource):
         self.transient = transient
         self._client = client
         self.test = dict()
+        self.sensor = dict()
 
     def __str__(self):
         return f"<Campaign {self.name}: \n{self.to_pandas()}>"
@@ -121,8 +122,11 @@ class Campaign(BaseResource):
             raise Exception(f'Cannot get tests for {self.name}. Campaign has not yet been created')
         return self._client.campaign.get_tests(id=self.id, type=type)
 
-    def populate(self, child):
+    def populate_test(self, child):
         self.test[child.description] = child
+
+    def populate_sensor(self, child):
+        self.sensor[child.name] = child
 
 
 
@@ -193,6 +197,8 @@ class Test(BaseResource):
         self.id = id
         self._client = client
 
+        self.timeseries = dict()
+
     def __str__(self):
         return f"<Test: \n{self.to_pandas()}>"
 
@@ -201,6 +207,10 @@ class Test(BaseResource):
 
     def get_timeseries(self):
         return self._client.test.get_timeseries(id=self.id)
+
+    def populate_timeseries(self, child):
+        for ts in child:
+            self.timeseries[self._client.sensor.get(ts.sensor_id).name] = ts
 
     @classmethod
     def from_dict(cls, data: dict, client=None):
@@ -317,6 +327,18 @@ class Timeseries(BaseResource):
 
     def __str__(self):
         return f"<Timeseries: \n{self.to_pandas()}>"
+
+    def to_pandas(self, ignore: List[str]=None):
+        ignore = list() if ignore is None else ignore
+        dumped = self.dump()
+
+        df = pd.DataFrame(columns=["value"])
+        for name, value in dumped.items():
+            if name == "sensor_id":
+                df.loc[name] = self._client.sensor.get(value).name
+            elif name not in ignore:
+                df.loc[name] = [value]
+        return df
 
     def update(self):
         self._client.timeseries.patch(body=self.dump(), id=self.id)

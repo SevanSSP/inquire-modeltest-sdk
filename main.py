@@ -32,18 +32,21 @@ stt = client.campaign.get_by_name("STT")
 print(stt.get_tests())
 
 #test_id = client.floater.get_id("waveIrreg_2101")
-test2 = client.floater.get_by_name("waveIrreg_2102")
-stt.populate(test2)
-test = client.floater.get_by_name("waveIrreg_2103")
-stt.populate(test)
+test = client.floater.get_by_name("waveIrreg_2101")
+stt.populate_test(test)
 
-print(stt.test)
+#print(stt.test)
 
 #print(client.wave_current_calibration.get(test.wave_id))
 
 #print(test.get_timeseries())
-'''
-timeseries = test.get_timeseries().to_pandas()
+
+timeseries = test.get_timeseries()
+stt.test["waveIrreg_2101"].populate_timeseries(timeseries)
+
+print(stt.test["waveIrreg_2101"].timeseries["M206_COG X"])
+
+timeseries = timeseries.to_pandas()
 
 data =[]
 sensors = []
@@ -56,7 +59,7 @@ for i in range(5):
     sensors.append(sensor)
 
 plot_timeseries(data, test, sensors)
-'''
+
 '''
 ts = client.timeseries.get_data_points("b377256e-665b-41f9-be97-942f99ec7524")
 
