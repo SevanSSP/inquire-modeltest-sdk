@@ -7,7 +7,6 @@ from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorLi
                         DataPoint, DataPointList, Floater, FloaterList, WaveCurrentCalibration, WaveCurrentCalibrationList,
                         WindConditionCalibration, WindConditionCalibrationList )
 import requests
-import aiohttp
 
 def get_id_from_response(response):
     return response[0]["id"]

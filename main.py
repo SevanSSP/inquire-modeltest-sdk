@@ -5,7 +5,6 @@ import random
 from modeltestSDK.utils import from_datetime_string
 from typing import List
 import time
-import aiohttp
 import asyncio
 
 from pipeline.plot_timeseries import plot_timeseries
@@ -42,7 +41,7 @@ print(stt.test)
 #print(client.wave_current_calibration.get(test.wave_id))
 
 #print(test.get_timeseries())
-'''
+
 timeseries = test.get_timeseries().to_pandas()
 
 data =[]
@@ -56,8 +55,7 @@ for i in range(5):
     sensors.append(sensor)
 
 plot_timeseries(data, test, sensors)
-'''
-'''
+
 ts = client.timeseries.get_data_points("b377256e-665b-41f9-be97-942f99ec7524")
 
 timeseries = client.timeseries.get("b377256e-665b-41f9-be97-942f99ec7524")
@@ -82,17 +80,18 @@ print(f"Query 1 took {toc1-tic:0.4f} seconds")
 print(f"Query 2 took {toc2-toc1:0.4f} seconds")
 
 plot_timeseries([data1,data2], test, [sensor1,sensor2])
-
+'''
 #stt.test[10].timeseries[0].to_pandas()
 
-'''
 
-'''
+
+
 #timeseries = client.timeseries.get(id="14ec6b18-a4b0-4d69-941b-602c6641d98b")
 #print(timeseries.get_data_points(), "TEST")
-test = client.test.get(id="78d05ce8-d3fd-40e1-a65d-6d0efaa154dc")
+test = client.test.get(id="7113683a-1e6b-454d-b6ea-25bf2a60b52f")
 timeseriesList = test.get_timeseries()
 print(timeseriesList)
+
 
 for timeseries in timeseriesList:
     time1 = time.time()
