@@ -43,9 +43,9 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         wave_height = float(wave_height.split("s")[1])
         wave_period = calib.split("_")[2]
         wave_period = float(wave_period.split("p")[1])
-        measured_hs = wave_height  # midlertidig
-        measured_tp = wave_period  # midlertidig #TODO: Lese inn calibration
-        gamma = find_gamma(measured_hs, measured_tp)
+        # measured_hs = wave_height  # midlertidig
+        # measured_tp = wave_period  # midlertidig #TODO: Lese inn calibration
+        gamma = find_gamma(wave_height, wave_period)
 
         # find test date and time
         os.chdir(os.getcwd() + "\\" + calib)
@@ -57,8 +57,8 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         wave_current_calibration = client.wave_current_calibration.create(description=calib,
                                                                           test_date=get_datetime_date(date_time),
                                                                           campaign_id=campaign.id,
-                                                                          measured_hs=measured_hs,
-                                                                          measured_tp=measured_tp,
+                                                                          # measured_hs=measured_hs,
+                                                                          # measured_tp=measured_tp,
                                                                           wave_spectrum=wave_spectrum,
                                                                           wave_period=wave_period,
                                                                           wave_height=wave_height,
@@ -83,8 +83,8 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         wind_condition_calibration = client.wind_condition_calibration.create(description=calib,
                                                                               test_date=get_datetime_date(date_time),
                                                                               campaign_id=campaign.id,
-                                                                              measured_hs=10,  # random verdi
-                                                                              measured_tp=10,  # random verdi
+                                                                              # measured_hs=10,  # random verdi
+                                                                              # measured_tp=10,  # random verdi
                                                                               wind_spectrum="None",
                                                                               zref=0,
                                                                               wind_velocity=0,
@@ -118,7 +118,7 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
 
 def main():
     client = SDKclient()
-    campaign_dir = "C:/Users/nbu/Documents/SWACH"
+    campaign_dir = "C:/Users/jen/Documents/STT"
     campaign = client.campaign.create(name=campaign_dir.split("/")[-1],
                                       description="Modeltest for SWACH",
                                       date=get_datetime_date("180120120000"),

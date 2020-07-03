@@ -25,17 +25,42 @@ campaigns = client.campaign.get_all()
 
 tic = time.perf_counter()
 
-stt = client.campaign.get("49627a4c-9b8e-4eb4-816a-2d252be6b961")
+#print(campaigns)
 
+#campaign_id = client.campaign.get_id("STT")
+stt = client.campaign.get_by_name("STT")
+print(stt.get_tests())
 
+#test_id = client.floater.get_id("waveIrreg_2101")
+test2 = client.floater.get_by_name("waveIrreg_2102")
+stt.populate(test2)
+test = client.floater.get_by_name("waveIrreg_2103")
+stt.populate(test)
 
-test = client.floater.get("eb4e6456-4a85-472b-91fe-21689c5201a2")
+print(stt.test)
 
-print(test.get_timeseries())
+#print(client.wave_current_calibration.get(test.wave_id))
 
-ts = client.timeseries.get_data_points("bdef448e-d924-4cce-9ca5-cfb601e5f0a8")
+#print(test.get_timeseries())
+'''
+timeseries = test.get_timeseries().to_pandas()
 
-timeseries = client.timeseries.get("bdef448e-d924-4cce-9ca5-cfb601e5f0a8")
+data =[]
+sensors = []
+for i in range(5):
+    timeseries_id = timeseries["id"][i]
+    ts = client.timeseries.get(timeseries_id)
+    timeseries_data = ts.get_data_points().to_pandas()
+    sensor = client.sensor.get(ts.sensor_id)
+    data.append(timeseries_data)
+    sensors.append(sensor)
+
+plot_timeseries(data, test, sensors)
+'''
+'''
+ts = client.timeseries.get_data_points("b377256e-665b-41f9-be97-942f99ec7524")
+
+timeseries = client.timeseries.get("b377256e-665b-41f9-be97-942f99ec7524")
 
 sensor1 = client.sensor.get(timeseries.sensor_id)
 
@@ -43,9 +68,9 @@ data1 = ts.to_pandas()#.head(5000)
 
 toc1 = time.perf_counter()
 
-ts = client.timeseries.get_data_points("ea1a2f9b-bc65-4ed6-8d96-25090768e7d3")
+ts = client.timeseries.get_data_points("ff253475-dd0f-4b0b-9eeb-f548d2700885")
 
-timeseries = client.timeseries.get("ea1a2f9b-bc65-4ed6-8d96-25090768e7d3")
+timeseries = client.timeseries.get("ff253475-dd0f-4b0b-9eeb-f548d2700885")
 
 sensor2 = client.sensor.get(timeseries.sensor_id)
 
@@ -60,7 +85,7 @@ plot_timeseries([data1,data2], test, [sensor1,sensor2])
 
 #stt.test[10].timeseries[0].to_pandas()
 
-
+'''
 
 '''
 #timeseries = client.timeseries.get(id="14ec6b18-a4b0-4d69-941b-602c6641d98b")
