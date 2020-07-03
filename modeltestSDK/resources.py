@@ -211,8 +211,8 @@ class TestList(ResourceList):
 class Floater(Test):
     type = "floater"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-                 measured_tp: str, category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None,
+    def __init__(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+                 category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None,
                  id: str = None, client=None):
 
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
@@ -275,8 +275,8 @@ class WaveCurrentCalibrationList(ResourceList):
 class WindConditionCalibration(Test):
     type = "windConditionCalibration"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-                 measured_tp: str, wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
+    def __init__(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+                 wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
                  wind_direction: float = None, id: str = None, client=None):
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
                          type=self.type, id=id, client=client)  # , measured_hs=measured_hs, measured_tp=measured_tp
