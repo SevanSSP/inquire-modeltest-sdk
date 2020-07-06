@@ -350,6 +350,23 @@ class Timeseries(BaseResource):
     def post_data_points(self):
         self._client.timeseries.post_data_points(body=self.data_points.dump(), id=self.id)
 
+
+    def standard_deviation(self):
+        #return self._client.timeseries.standard_deviation(self, id=self.id)
+        return self._client.timeseries.get_standard_deviation(id=self.id)
+
+    def get_max_value(self):
+        return self._client.timeseries.get_max_value(id=self.id)
+
+    def get_min_value(self):
+        return self._client.timeseries.get_min_value(id=self.id)
+
+    def get_measured_hs(self):
+        return self._client.timeseries.get_measured_hs(id=self.id)
+
+    def get_measured_tp(self):
+        return self._client.timeseries.get_measured_tp(id=self.id)
+
     @classmethod
     def from_dict(cls, data: dict, client = None):
         return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], id=data['id'], client=client)

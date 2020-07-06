@@ -86,7 +86,7 @@ plot_timeseries([data1,data2], test, [sensor1,sensor2])
 #timeseries = client.timeseries.get(id="14ec6b18-a4b0-4d69-941b-602c6641d98b")
 #print(timeseries.get_data_points(), "TEST")
 
-test = client.test.get(id="3d311a2b-86d0-4a9f-a8d3-ad6c92532554")
+'''test = client.test.get(id="3d311a2b-86d0-4a9f-a8d3-ad6c92532554")
 timeseriesList = test.get_timeseries()
 
 
@@ -98,7 +98,7 @@ for timeseries in timeseriesList:
     full_time = (time2 - time1) * 1000.0
     print(f'function took {full_time} milliseconds')
 
-print(timeseriesList[0].data_points[0:20])
+print(timeseriesList[0].data_points[0:20])'''
 
 '''
 
@@ -121,3 +121,11 @@ time2 = time.time()
 full_time = (time2 - time1) * 1000.0
 print(f'function took {full_time} milliseconds')
 '''
+
+
+
+# Nicolai prøver ut SDK:
+
+timeseries = client.timeseries.get("0101bd9d-3fe1-44dc-91e5-fcb90ef57285")
+stddev = timeseries.standard_deviation()
+print(stddev)

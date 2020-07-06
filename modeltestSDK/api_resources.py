@@ -287,6 +287,27 @@ class TimeseriesAPI(BaseAPI):
     def post_data_points(self, id, body):
         data = self.client.post(resource="datapoint", endpoint="list", body=body)
 
+    def get_standard_deviation(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/datapoints/standarddeviation")
+        return data
+
+    def get_max_value(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/datapoints/maxvalue")
+        return data
+
+    def get_min_value(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/datapoints/minvalue")
+        return data
+
+    def get_measured_hs(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/datapoints/measured_hs")
+        return data
+
+    def get_measured_tp(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/datapoints/measured_tp")
+        return data
+
+
 '''
 class DatapointAPI(BaseAPI):
 
