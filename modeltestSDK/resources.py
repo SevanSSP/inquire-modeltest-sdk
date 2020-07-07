@@ -367,6 +367,9 @@ class Timeseries(BaseResource):
     def get_measured_tp(self):
         return self._client.timeseries.get_measured_tp(id=self.id)
 
+    def get_sensor(self):
+        return self._client.timeseries.get_sensor(id=self.id)
+
     @classmethod
     def from_dict(cls, data: dict, client = None):
         return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], id=data['id'], client=client)
@@ -406,6 +409,13 @@ class DataPoint(BaseResource):
     def from_dict(cls, data: str, client = None):
         # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE
         time, value = data.replace("\n", "").split("\t")
+        time_string = time.split(" ")[1]
+        if len(time_string) == 8:
+            # If timestamp is at whole second, ex. "09:00:00"
+            time = datetime.datetime.strptime(time_string, "%H:%M:%S")
+        else:
+            # Timestamp, ex. "09:00:00.592"
+            time = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
         return cls(time=time, value=float(value),
                    client=client)
 

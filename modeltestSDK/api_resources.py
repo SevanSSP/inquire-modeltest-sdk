@@ -307,6 +307,11 @@ class TimeseriesAPI(BaseAPI):
         data = self.client.get(self._resource_path, f"{id}/datapoints/measured_tp")
         return data
 
+    def get_sensor(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/sensor")
+        return Sensor.from_dict(data=data, client=self.client)
+
+
 
 '''
 class DatapointAPI(BaseAPI):

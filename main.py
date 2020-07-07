@@ -126,6 +126,6 @@ print(f'function took {full_time} milliseconds')
 
 # Nicolai prøver ut SDK:
 
-timeseries = client.timeseries.get("0101bd9d-3fe1-44dc-91e5-fcb90ef57285")
+timeseries = client.timeseries.get("000998a6-dac6-4c51-ab46-9359518e5878")
 stddev = timeseries.standard_deviation()
 print(stddev)
