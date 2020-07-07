@@ -27,4 +27,4 @@ jobs:
     - name: Build and publish
       run: |
         python setup.py sdist bdist_wheel
-        twine upload --repository-url https://api.packagr.app/EYvhW6SyL/ * -u "" --password ${{secrets.PACKAGR_KEY}}
+        twine upload --repository-url https://api.packagr.app/EYvhW6SyL/ dist/* -u "" --password ${{secrets.PACKAGR_KEY}}
