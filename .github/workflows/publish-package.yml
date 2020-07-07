@@ -25,9 +25,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
     - name: Build and publish
-      env:
-        TWINE_USERNAME: github
-        TWINE_PASSWORD: ${{ secrets.PACKAGR_KEY }}
       run: |
         python setup.py sdist bdist_wheel
-        twine upload --repository-url https://api.packagr.app/EYvhW6SyL/ * -u "" --password ${{secrets,}}
+        twine upload --repository-url https://api.packagr.app/EYvhW6SyL/ * -u "" --password ${{secrets.PACKAGR_KEY}}
