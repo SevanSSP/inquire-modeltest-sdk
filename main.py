@@ -109,7 +109,7 @@ timeseries = client.timeseries.create(test_id="bee124c3-3d25-4fdd-8e22-e33ef8ecd
 time1 = time.time()
 lst=()
 print(timeseries.id, "TIMESERIESID")
-for i in range130000):
+for i in range(130000):
     timeseries.data_points.append(DataPoint(timeseries_id=timeseries.id, time=str(datetime.datetime.now()),
                           value=random.uniform(0, 10000), client=client))
 
