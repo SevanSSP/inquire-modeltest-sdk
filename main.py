@@ -18,7 +18,7 @@ mplstyle.use('fast')
 
 client = SDKclient()
 
-'''
+
 campaigns = client.campaign.get_all()
 
 
@@ -43,7 +43,7 @@ timeseries = timeseries.to_pandas()
 
 data =[]
 sensors = []
-for i in range(5):
+for i in range(3):
     timeseries_id = timeseries["id"][i]
     ts = client.timeseries.get(timeseries_id)
     timeseries_data = ts.get_data_points().to_pandas()
@@ -52,7 +52,7 @@ for i in range(5):
     sensors.append(sensor)
 
 plot_timeseries(data, test, sensors)
-
+'''
 ts = client.timeseries.get_data_points("b377256e-665b-41f9-be97-942f99ec7524")
 
 timeseries = client.timeseries.get("b377256e-665b-41f9-be97-942f99ec7524")
@@ -77,6 +77,7 @@ print(f"Query 1 took {toc1-tic:0.4f} seconds")
 print(f"Query 2 took {toc2-toc1:0.4f} seconds")
 
 plot_timeseries([data1,data2], test, [sensor1,sensor2])
+'''
 '''
 #stt.test[10].timeseries[0].to_pandas()
 
@@ -118,7 +119,7 @@ time2 = time.time()
 full_time = (time2 - time1) * 1000.0
 print(f"FINISHED IN {full_time}")
 '''
-
+'''
 timeseries = client.timeseries.create(test_id="bee124c3-3d25-4fdd-8e22-e33ef8ecd17c",
                                       sensor_id="0c0e130d-d370-4cd2-8709-961c8dd74b8c")
 
