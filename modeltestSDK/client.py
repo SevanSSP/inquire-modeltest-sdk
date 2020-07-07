@@ -73,6 +73,7 @@ class SDKclient:
             response = method(query_url, json=body)
             response.raise_for_status()
         except HTTPError as http_err:
+            print(response)
             print(f'HTTP error occurred: {http_err}')
             parse_response(response.json()) #TODO: parse errors
             raise Exception(http_err) #(response.json()['detail'][0]['msg'])

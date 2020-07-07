@@ -5,6 +5,7 @@ from typing import List, Union
 from .utils import make_serializable, from_datetime_string
 import datetime
 from typing import Optional
+import warnings
 
 class BaseResource(object):
     def __str__(self):
@@ -387,10 +388,15 @@ class DataPoint(BaseResource):
 
     @classmethod
     def from_dict(cls, data: str, client = None):
-        # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE
-        time, value = data.replace("\n", "").split("\t")
-        return cls(time=time, value=float(value),
-                   client=client)
+        # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE. Object sent as text file
+        if data.find("\n") and data.find("\t"):
+            time, value = data.replace("\n", "").split("\t")
+            return cls(time=time, value=float(value),
+                       client=client)
+        else:
+            warnings.warn("Imported an empty datapoint.")
+            return cls(time=None, value=float(None),
+                       client=client)
 
 class DataPointList(ResourceList):
 

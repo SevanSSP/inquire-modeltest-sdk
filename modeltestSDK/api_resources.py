@@ -215,25 +215,26 @@ class SensorAPI(NamedBaseAPI):
         resources = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
         return TimeseriesList(resources=resources, client=self.client)
 
+from .config import Config
 
-# async def fetch(session, url):
-#     async with session.get(url) as response:
-#         print("STARTED")
-#         return await response.json()
-#
-#
-# async def multiple_tasks(resource, endpoint, entries):
-#     url = "http://127.0.0.1:8000/api/" + "/".join([p for p in [resource, endpoint] if p.strip()])
-#     limit = 12000
-#     print(entries)
-#     tasks = []
-#     async with aiohttp.ClientSession() as session:
-#         for offset in range(0, entries, limit):
-#             url_query = url + f"?offset={offset}&limit={limit}"
-#             tasks.append(fetch(session, url_query))
-#         res = await asyncio.gather(*tasks)
-#         print(len(res))
-#     return res
+async def fetch(session, url):
+    async with session.get(url) as response:
+        print("STARTED")
+        return await response.json()
+
+async def multiple_tasks(resource, endpoint, entries):
+    url = Config().host + "/" + "/".join([p for p in [Config().base_url, resource, endpoint] if p.strip()])
+    limit = 12000
+    print(entries)
+    tasks = []
+    async with aiohttp.ClientSession() as session:
+        for offset in range(0, entries, limit):
+            url_query = url + f"?offset={offset}&limit={limit}"
+            print(url_query, " ", offset, " ", limit)
+            tasks.append(fetch(session, url_query))
+        res = await asyncio.gather(*tasks)
+        print(len(res))
+    return res
 #
 #
 # async def post(session, url, body):
@@ -278,6 +279,9 @@ class TimeseriesAPI(BaseAPI):
 
     def get_data_points(self, id: str):
         data = self.client.get(resource=self._resource_path,  endpoint=f"{id}/datapoints" )
+        #data = asyncio.get_event_loop().run_until_complete(
+        #    multiple_tasks(resource=self._resource_path, endpoint=f"{id}/datapoints", entries=entries)
+        #)
         if not data:
             return DataPointList(resources=[], client=self.client)
 
