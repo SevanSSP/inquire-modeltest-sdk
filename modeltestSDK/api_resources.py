@@ -2,17 +2,17 @@ import datetime
 from typing import List
 from .utils import format_class_name
 import warnings
+import asyncio
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
                         DataPoint, DataPointList, Floater, FloaterList, WaveCurrentCalibration, WaveCurrentCalibrationList,
                         WindConditionCalibration, WindConditionCalibrationList )
+import requests
 
 def get_id_from_response(response):
     return response[0]["id"]
 
 
 class BaseAPI:
-
-
     def __init__(self, client):
         self._resource_path = format_class_name(self.__class__.__name__)
         self.client = client
@@ -45,6 +45,16 @@ class CampaignAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, id)
         return Campaign.from_dict(data=data, client=self.client)
 
+    def get_by_name(self, name: str):
+        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
+        if response:
+            if len(response) != 1:
+                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
+                              f" first was returned")
+            return Campaign.from_dict(data=response[0],client=self.client)
+        else:
+            raise Exception(f"Could not find any object with name {name}")
+
     def get_all(self):
         data = self.client.get(self._resource_path, "all")
         obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
@@ -69,6 +79,10 @@ class CampaignAPI(NamedBaseAPI):
 
 class TestAPI(NamedBaseAPI):
 
+    def get(self, id: str):
+        data = self.client.get(self._resource_path, id)
+        return Test.from_dict(data=data, client=self.client)
+
     def delete(self, item_id: str):
         self.client.delete(self._resource_path, item_id)
 
@@ -83,10 +97,10 @@ class TestAPI(NamedBaseAPI):
 
 class FloaterAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, type: str, measured_hs: str,
-                 measured_tp: str, category: str, orientation: float, draft: float, wave_id: str=None, wind_id: str=None):
+    def create(self, description: str, test_date: str, campaign_id: str, type: str, # measured_hs: str, measured_tp: str,
+               category: str, orientation: float, draft: float, wave_id: str=None, wind_id: str=None):
         body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
-                   type=type, measured_hs=measured_hs, measured_tp=measured_tp,
+                   type=type,   # measured_hs=measured_hs, measured_tp=measured_tp,
                    category=category, orientation =orientation, draft =draft, wave_id =wave_id,
                    wind_id =wind_id)
         data = self.client.post(self._resource_path, body=body)
@@ -96,6 +110,16 @@ class FloaterAPI(TestAPI):
         data = self.client.get(self._resource_path, id)
         return Floater.from_dict(data=data, client=self.client)
 
+    def get_by_name(self, description: str):
+        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'description': description})
+        if response:
+            if len(response) != 1:
+                warnings.warn(f"Searching {self.__class__.__name__} for name {description} returned several objects,"
+                              f" first was returned")
+            return Floater.from_dict(data=response[0],client=self.client)
+        else:
+            raise Exception(f"Could not find any object with name {description}")
+
     def get_all(self):
         data = self.client.get(self._resource_path, "all")
         obj_list = [Floater.from_dict(data=obj, client=self.client) for obj in data]
@@ -103,12 +127,12 @@ class FloaterAPI(TestAPI):
 
 class WaveCurrentCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-               measured_tp: str, wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
+    def create(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+               wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float, id: str = None):
 
         body = dict(description=description, type="waveCurrentCalibration", test_date=test_date,
-                    campaign_id=campaign_id,measured_hs=measured_hs, measured_tp=measured_tp,
+                    campaign_id=campaign_id, # measured_hs=measured_hs, measured_tp=measured_tp,
                     wave_spectrum=wave_spectrum,wave_period=wave_period, wave_height=wave_height,
                     gamma=gamma, wave_direction=wave_direction,current_velocity=current_velocity,
                     current_direction=current_direction, id=id)
@@ -127,11 +151,12 @@ class WaveCurrentCalibrationAPI(TestAPI):
 
 class WindConditionCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-                 measured_tp: str, wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
+    def create(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+               wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
                  id: str = None):
-        body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
-                    measured_hs=measured_hs, measured_tp=measured_tp, wind_spectrum=wind_spectrum,
+        body = dict(description=description, test_date=test_date, type="windConditionCalibration", campaign_id=campaign_id,
+                    # measured_hs=measured_hs, measured_tp=measured_tp,
+                    wind_spectrum=wind_spectrum,
                     wind_velocity=wind_velocity, zref=zref, wind_direction=wind_direction, id=id)
 
         data = self.client.post(self._resource_path, body=body)
@@ -159,6 +184,16 @@ class SensorAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, id)
         return Sensor.from_dict(data=data, client=self.client)
 
+    def get_by_name(self, name: str):
+        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
+        if response:
+            if len(response) != 1:
+                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
+                              f" first was returned")
+            return Sensor.from_dict(data=response[0], client=self.client)
+        else:
+            raise Exception(f"Could not find any object with name {name}")
+
     def get_all(self):
         data = self.client.get(self._resource_path, "all")
         obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
@@ -181,6 +216,44 @@ class SensorAPI(NamedBaseAPI):
         return TimeseriesList(resources=resources, client=self.client)
 
 
+# async def fetch(session, url):
+#     async with session.get(url) as response:
+#         print("STARTED")
+#         return await response.json()
+#
+#
+# async def multiple_tasks(resource, endpoint, entries):
+#     url = "http://127.0.0.1:8000/api/" + "/".join([p for p in [resource, endpoint] if p.strip()])
+#     limit = 12000
+#     print(entries)
+#     tasks = []
+#     async with aiohttp.ClientSession() as session:
+#         for offset in range(0, entries, limit):
+#             url_query = url + f"?offset={offset}&limit={limit}"
+#             tasks.append(fetch(session, url_query))
+#         res = await asyncio.gather(*tasks)
+#         print(len(res))
+#     return res
+#
+#
+# async def post(session, url, body):
+#     async with session.post(url, json=body) as response:
+#         return await response.text()
+#
+#
+# async def multiple_tasks_post(entries, body):
+#     url = "http://127.0.0.1:8000/api/datapoint/list/"
+#     tasks = []
+#     limit = 10000
+#     async with aiohttp.ClientSession() as session:
+#         for offset in range(0, entries, limit):
+#             data = body[offset:(offset + limit)]
+#             tasks.append(post(session, url, data))
+#         res = await asyncio.gather(*tasks)
+#
+#
+# import gzip
+
 class TimeseriesAPI(BaseAPI):
 
     def create(self, sensor_id: str, test_id: str):
@@ -190,7 +263,7 @@ class TimeseriesAPI(BaseAPI):
 
     def get(self, id: str):
         data = self.client.get(self._resource_path, id)
-        return Sensor.from_dict(data=data, client=self.client)
+        return Timeseries.from_dict(data=data, client=self.client)
 
     def get_all(self):
         data = self.client.get(self._resource_path, "all")
@@ -204,12 +277,15 @@ class TimeseriesAPI(BaseAPI):
         return self.client.patch(resource=self._resource_path, endpoint=f"{id}", body=body)
 
     def get_data_points(self, id: str):
-        data = self.client.get(self._resource_path, f"{id}/datapoints")
-        obj_list = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
-        return DataPointList(resources=obj_list, client=None)
+        data = self.client.get(resource=self._resource_path,  endpoint=f"{id}/datapoints" )
+        if not data:
+            return DataPointList(resources=[], client=self.client)
+
+        resources = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
+        return DataPointList(resources=resources, client=self.client)
 
     def post_data_points(self, id, body):
-        data = self.client.post(self._resource_path, f"{id}/datapoints", body=body)
+        data = self.client.post(resource="datapoint", endpoint="list", body=body)
 
 '''
 class DatapointAPI(BaseAPI):

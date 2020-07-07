@@ -103,6 +103,8 @@ class Campaign(BaseResource):
         self.water_depth = water_depth
         self.transient = transient
         self._client = client
+        self.test = dict()
+        self.sensor = dict()
 
     def __str__(self):
         return f"<Campaign {self.name}: \n{self.to_pandas()}>"
@@ -119,6 +121,14 @@ class Campaign(BaseResource):
         if not self.id:
             raise Exception(f'Cannot get tests for {self.name}. Campaign has not yet been created')
         return self._client.campaign.get_tests(id=self.id, type=type)
+
+    def populate_test(self, child):
+        self.test[child.description] = child
+
+    def populate_sensor(self, child):
+        self.sensor[child.name] = child
+
+
 
     @classmethod
     def from_dict(cls, data: dict, client = None):
@@ -176,17 +186,18 @@ class SensorList(ResourceList):
         self._client = client
 
 class Test(BaseResource):
-    def __init__(self, description: str, test_date: str, type: str,campaign_id: str = None, measured_hs: str = None,
-                 measured_tp: str = None, id: str = None, client=None):
+    def __init__(self, description: str, test_date: str, type: str,campaign_id: str = None, id: str = None, client=None):   # measured_hs: str = None, measured_tp: str = None,
 
         self.description = description
         self.test_date = test_date
         self.campaign_id = campaign_id
         self.type = type
-        self.measured_hs = measured_hs
-        self.measured_tp = measured_tp
+        # self.measured_hs = measured_hs
+        # self.measured_tp = measured_tp
         self.id = id
         self._client = client
+
+        self.timeseries = dict()
 
     def __str__(self):
         return f"<Test: \n{self.to_pandas()}>"
@@ -197,10 +208,14 @@ class Test(BaseResource):
     def get_timeseries(self):
         return self._client.test.get_timeseries(id=self.id)
 
+    def populate_timeseries(self, child):
+        for ts in child:
+            self.timeseries[self._client.sensor.get(ts.sensor_id).name] = ts
+
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   type=data['type'], id=data['id'], measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
+                   type=data['type'], id=data['id'],    # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    client=client)
 
 class TestList(ResourceList):
@@ -212,12 +227,12 @@ class TestList(ResourceList):
 class Floater(Test):
     type = "floater"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-                 measured_tp: str, category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None,
+    def __init__(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+                 category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None,
                  id: str = None, client=None):
 
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                        type=self.type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
+                        type=self.type, id=id, client=client)   # , measured_hs=measured_hs, measured_tp=measured_tp
 
         self.category=category
         self.orientation=orientation
@@ -228,7 +243,7 @@ class Floater(Test):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
+                   # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    category=data['category'], orientation =data['orientation'], draft =data['draft'],
                    wave_id = data['wave_id'], wind_id = data['wind_id'], id= data['id'], client=client)
 
@@ -241,13 +256,13 @@ class FloaterList(ResourceList):
 class WaveCurrentCalibration(Test):
     type = "waveCurrentCalibration"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-                 measured_tp: str, wave_spectrum: str = None, wave_height: float = None, wave_period: float = None,
+    def __init__(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+                 wave_spectrum: str = None, wave_height: float = None, wave_period: float = None,
                  gamma: float = None, wave_direction: float = None, current_velocity: float = None,
                  current_direction: float = None, id: str = None, client=None):
 
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=self.type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
+                         type=self.type, id=id, client=client)  # , measured_hs=measured_hs, measured_tp=measured_tp
 
         self.wave_spectrum = wave_spectrum
         self.wave_height = wave_height
@@ -260,7 +275,7 @@ class WaveCurrentCalibration(Test):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
+                   # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    wave_spectrum = data['wave_spectrum'], wave_height = data['wave_height'],
                    wave_period = data['wave_period'], gamma = data['gamma'],
                    wave_direction = data['wave_direction'], current_velocity = data['current_velocity'],
@@ -276,11 +291,11 @@ class WaveCurrentCalibrationList(ResourceList):
 class WindConditionCalibration(Test):
     type = "windConditionCalibration"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str, measured_hs: str,
-                 measured_tp: str, wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
+    def __init__(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+                 wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
                  wind_direction: float = None, id: str = None, client=None):
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=self.type, measured_hs=measured_hs, measured_tp=measured_tp, id=id, client=client)
+                         type=self.type, id=id, client=client)  # , measured_hs=measured_hs, measured_tp=measured_tp
 
         self.wind_spectrum = wind_spectrum
         self.wind_velocity = wind_velocity
@@ -290,7 +305,7 @@ class WindConditionCalibration(Test):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
+                   # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    wind_spectrum=data['wind_spectrum'], wind_velocity=data['wind_velocity'],
                    zref=data['zref'], wind_direction=data['wind_direction'], id=data['id'],  client=client)
 
@@ -313,6 +328,18 @@ class Timeseries(BaseResource):
     def __str__(self):
         return f"<Timeseries: \n{self.to_pandas()}>"
 
+    def to_pandas(self, ignore: List[str]=None):
+        ignore = list() if ignore is None else ignore
+        dumped = self.dump()
+
+        df = pd.DataFrame(columns=["value"])
+        for name, value in dumped.items():
+            if name == "sensor_id":
+                df.loc[name] = self._client.sensor.get(value).name
+            elif name not in ignore:
+                df.loc[name] = [value]
+        return df
+
     def update(self):
         self._client.timeseries.patch(body=self.dump(), id=self.id)
 
@@ -333,9 +360,23 @@ class TimeseriesList(ResourceList):
         self.resources = resources
         self._client = client
 
+    def to_pandas(self, ignore: List[str]=None):
+        df = pd.DataFrame(self.dump())
+        df = df.drop(columns=['test_id','data_points'])
+        for i in df.index:
+            df.at[i, "sensor_id"] = self._client.sensor.get(df["sensor_id"][i]).name
+        return df
+
+
+    def __str__(self):
+        return f"<Test: \n{self.to_pandas()}>"
+
+
+
 class DataPoint(BaseResource):
 
-    def __init__(self, timeseries_id: str, time: str, value: float, client=None):
+    def __init__(self, time: str, value: float, timeseries_id: str = None, client=None):
+
         self.timeseries_id = timeseries_id
         self.time = time
         self.value = value
@@ -345,8 +386,10 @@ class DataPoint(BaseResource):
         return f"<DataPoint: \n{self.to_pandas()}>"
 
     @classmethod
-    def from_dict(cls, data: dict, client = None):
-        return cls(timeseries_id=data['timeseries_id'], time=data['time'], value=data['value'],
+    def from_dict(cls, data: str, client = None):
+        # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE
+        time, value = data.replace("\n", "").split("\t")
+        return cls(time=time, value=float(value),
                    client=client)
 
 class DataPointList(ResourceList):
