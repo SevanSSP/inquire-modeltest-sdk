@@ -1,6 +1,9 @@
 # inquire-modeltest-sdk
 SDK for the modeltest API
 
+### Status
+![Python testing](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Python%20testing/badge.svg)![Upload Python Package](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Upload%20Python%20Package/badge.svg)
+
 ## General
 ### About
 SDK for inquire-modeltest API.
@@ -33,3 +36,48 @@ python -m venv /path/to/new/virtual/environment
 ```console
 pip install -r requirements.txt
 ```
+
+### Build and run application and database locally
+
+Create a Postgres database (local or cloud) and note its *URI*.
+
+Store the the database URI as environmental variable *MODELTESTDB_URI* in the relevant developer environment.
+
+In a command/bash script or directly in terminal execute the below commands to migrate database to head state and start
+the web application.
+
+```
+uvicorn app.main:app --reload
+```
+
+### Run the tests
+To run all tests:
+
+```
+tests-start.sh 
+```
+
+This requires an enviorment variable *TEST_MODELTESTDB_URI* 
+
+### Deployment
+The application is published as a package to Sevans packagr site. To use this library in other projects use:
+
+```
+pip install modeltestSDK -i https://api.packagr.app/EYvhW6SyL/
+```
+
+Continue by logging in to the packagr server with your credentials.
+
+### Versioning
+
+
+## Authors
+* **Jørgen Engelsen** - [joreng2607](https://github.com/joreng2607)
+* **Nicolai Brummenæs** - [nicolai-sevan](https://github.com/nicolai-sevan)
+* **Haakon Lyngstad** - [haakoly](https://github.com/haakoly)
+
+## License
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## See also
+* [modeltest API](https://github.com/SevanSSP/inquire-modeltest)
