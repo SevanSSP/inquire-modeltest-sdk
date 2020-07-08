@@ -1,12 +1,8 @@
-import os
-import sys
-import json
-import datetime
 import urllib.parse
 
 import requests
 from requests.exceptions import HTTPError
-from .utils import to_snake_case, to_camel_case
+from .utils import to_camel_case
 from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterAPI, WindConditionCalibrationAPI,
                             WaveCurrentCalibrationAPI)
 from .exceptions import parse_response
@@ -75,7 +71,7 @@ class SDKclient:
         except HTTPError as http_err:
             print(f'HTTP error occurred: {http_err}')
             parse_response(response.json()) #TODO: parse errors
-            raise Exception(http_err) #(response.json()['detail'][0]['msg'])
+            raise Exception(http_err)
         except Exception as err:
             print(f'Other error occurred: {err}')
             raise Exception(err)

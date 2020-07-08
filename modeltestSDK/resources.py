@@ -1,6 +1,5 @@
 import json
 import pandas as pd
-import matplotlib.pyplot as plt
 from typing import List, Union
 from .utils import make_serializable, from_datetime_string
 import datetime
@@ -104,8 +103,8 @@ class Campaign(BaseResource):
         self.water_depth = water_depth
         self.transient = transient
         self._client = client
-        self.test = dict()
-        self.sensor = dict()
+        self.test = TestList(resources=[], client=client)
+        self.sensor = SensorList(resources=[], client=client)
 
     def __str__(self):
         return f"<Campaign {self.name}: \n{self.to_pandas()}>"
@@ -124,10 +123,26 @@ class Campaign(BaseResource):
         return self._client.campaign.get_tests(id=self.id, type=type)
 
     def populate_test(self, child):
-        self.test[child.description] = child
-
+        if isinstance(child, list):
+            for item in child:
+                self.test.append(item)
+        else:
+            self.test.append(child)
+    '''
+    def find_test(self, name):
+        try:
+            for t in self.test:
+                if t.description == name:
+                    return t
+        except:
+            raise Exception(f"Test not found under {self.name} campaign ")
+    '''
     def populate_sensor(self, child):
-        self.sensor[child.name] = child
+        if isinstance(child, list):
+            for item in child:
+                self.sensor.append(item)
+        else:
+            self.sensor.append(child)
 
 
 
@@ -186,6 +201,17 @@ class SensorList(ResourceList):
         self.resources = resources
         self._client = client
 
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.resources[key]
+        if isinstance(key,str):
+            try:
+                for item in self:
+                    if item.name == key:
+                        return item
+            except:
+                raise Exception(f"Sensor {key} not found under campaign ")
+
 class Test(BaseResource):
     def __init__(self, description: str, test_date: str, type: str,campaign_id: str = None, id: str = None, client=None):   # measured_hs: str = None, measured_tp: str = None,
 
@@ -198,7 +224,7 @@ class Test(BaseResource):
         self.id = id
         self._client = client
 
-        self.timeseries = dict()
+        self.timeseries = TimeseriesList(resources=[],client=client)
 
     def __str__(self):
         return f"<Test: \n{self.to_pandas()}>"
@@ -210,8 +236,11 @@ class Test(BaseResource):
         return self._client.test.get_timeseries(id=self.id)
 
     def populate_timeseries(self, child):
-        for ts in child:
-            self.timeseries[self._client.sensor.get(ts.sensor_id).name] = ts
+        if isinstance(child, TimeseriesList):
+            for item in child:
+                self.timeseries.append(item)
+        else:
+            self.timeseries.append(child)
 
     @classmethod
     def from_dict(cls, data: dict, client=None):
@@ -219,11 +248,23 @@ class Test(BaseResource):
                    type=data['type'], id=data['id'],    # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    client=client)
 
+
 class TestList(ResourceList):
 
     def __init__(self, resources: List[Test], client=None):
         self.resources = resources
         self._client = client
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.resources[key]
+        if isinstance(key,str):
+            try:
+                for t in self:
+                    if t.description == key:
+                        return t
+            except:
+                raise Exception(f"Test {key} not found under campaign ")
 
 class Floater(Test):
     type = "floater"
@@ -411,6 +452,8 @@ class Timeseries(BaseResource):
     def post_data_points(self):
         self._client.timeseries.post_data_points(body=self.data_points.dump(), id=self.id)
 
+    def __len__(self):
+        return len(self.data_points)
 
     def standard_deviation(self):
         #return self._client.timeseries.standard_deviation(self, id=self.id)
@@ -441,17 +484,17 @@ class TimeseriesList(ResourceList):
         self.resources = resources
         self._client = client
 
+
     def to_pandas(self, ignore: List[str]=None):
         df = pd.DataFrame(self.dump())
-        df = df.drop(columns=['test_id','data_points'])
+
+        df.rename(columns={'sensor_id': 'sensor', 'data_points':'length'},inplace=True)
+        if 'test_id' in df:
+            df.drop(columns={'test_id'},inplace=True)
         for i in df.index:
-            df.at[i, "sensor_id"] = self._client.sensor.get(df["sensor_id"][i]).name
+            df.at[i, 'sensor'] = self._client.sensor.get(df['sensor'][i]).name
+            df.at[i, 'length'] = len(self.resources[i])
         return df
-
-
-    def __str__(self):
-        return f"<Test: \n{self.to_pandas()}>"
-
 
 
 class DataPoint(BaseResource):
@@ -485,6 +528,8 @@ class DataPointList(ResourceList):
     def __init__(self, resources: List[DataPoint], client=None):
         self.resources = resources
         self._client = client
+
+
 
 
 
