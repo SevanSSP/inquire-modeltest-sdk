@@ -403,6 +403,7 @@ class TimeseriesList(ResourceList):
     def __init__(self, resources: List[Timeseries], client=None):
         self.resources = resources
         self._client = client
+        #self._sensor_names = []
 
 
     def to_pandas(self, ignore: List[str]=None):
@@ -416,6 +417,17 @@ class TimeseriesList(ResourceList):
             df.at[i, 'length'] = len(self.resources[i])
         return df
 
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return self.resources[key]
+        if isinstance(key, str):
+            key_id = self._client.sensor.get_by_name(key).id
+            try:
+                for item in self:
+                    if item.sensor_id == key_id:
+                        return item
+            except:
+                raise Exception(f"Timeseries {key} not found under campaign ")
 
 class DataPoint(BaseResource):
 
