@@ -92,6 +92,7 @@ print(f"Query 2 took {toc2-toc1:0.4f} seconds")
 
 plot_timeseries([data1,data2], test, [sensor1,sensor2])
 '''
+
 '''
 #stt.test[10].timeseries[0].to_pandas()
 
@@ -101,7 +102,7 @@ plot_timeseries([data1,data2], test, [sensor1,sensor2])
 #timeseries = client.timeseries.get(id="14ec6b18-a4b0-4d69-941b-602c6641d98b")
 #print(timeseries.get_data_points(), "TEST")
 
-'''test = client.test.get(id="3d311a2b-86d0-4a9f-a8d3-ad6c92532554")
+test = client.test.get(id="3d311a2b-86d0-4a9f-a8d3-ad6c92532554")
 timeseriesList = test.get_timeseries()
 
 
@@ -113,10 +114,9 @@ for timeseries in timeseriesList:
     full_time = (time2 - time1) * 1000.0
     print(f'function took {full_time} milliseconds')
 
-print(timeseriesList[0].data_points[0:20])'''
+print(timeseriesList[0].data_points[0:20])
 
-'''
-'''
+
 timeseries = client.timeseries.create(test_id="bee124c3-3d25-4fdd-8e22-e33ef8ecd17c",
                                       sensor_id="0c0e130d-d370-4cd2-8709-961c8dd74b8c")
 
@@ -134,13 +134,5 @@ print(timeseries.post_data_points())
 time2 = time.time()
 
 full_time = (time2 - time1) * 1000.0
-print(f'function took {full_time} milliseconds')
-'''
+print(f'function took {full_time} milliseconds')'''
 
-
-
-# Nicolai prøver ut SDK:
-
-timeseries = client.timeseries.get("000998a6-dac6-4c51-ab46-9359518e5878")
-stddev = timeseries.standard_deviation()
-print(stddev)
