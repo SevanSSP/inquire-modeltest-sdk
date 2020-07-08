@@ -24,7 +24,10 @@ waveCalibDict["waveReg_1108"] = "Reg_Hs10_Tp15"
 
 def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, concept_id: str, client: SDKclient):
     orientation = 0  # for alle i SWACH
-    draft = 29.5  # Fra Specs
+    if concept_id == "M206":
+        draft = 29.5  # Fra Specs
+    if concept_id == "M207":
+        draft = 18
 
     x = testname.split("_")[0]
     # hardkoding av category basert på filnavn
