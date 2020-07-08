@@ -80,9 +80,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 # M206_acc sensors. Målte verdier fra akselerometer har akselerometeret som origo.
 
     client.sensor.create(name="M206_acc_pos X",
-                         description="Surge position of 6DOF",
+                         description="Surge acceleration of 6DOF",
                          unit="mm",
-                         kind="length",
+                         kind="acceleration",
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+deck_height+(60/1000)*75,
@@ -90,9 +90,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_acc_pos Y",
-                         description="Sway position of 6DOF",
+                         description="Sway acceleration of 6DOF",
                          unit="mm",
-                         kind="length",
+                         kind="acceleration",
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+deck_height+(60/1000)*75,
@@ -100,9 +100,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     client.sensor.create(name="M206_acc_pos Z",
-                         description="heave position of 6DOF",
+                         description="heave acceleration of 6DOF",
                          unit="mm",
-                         kind="length",
+                         kind="acceleration",
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+deck_height+(60/1000)*75,
