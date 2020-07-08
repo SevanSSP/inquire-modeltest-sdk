@@ -134,7 +134,7 @@ def to_camel_case(d):
         return dd
 
 
-def to_datetime_string(d):
+'''def to_datetime_string(d):
     """
     Convert date time object to formatted date time string.
     Parameters
@@ -148,7 +148,7 @@ def to_datetime_string(d):
     """
     assert isinstance(d, datetime)
 
-    return d.strftime(Config.datetime_format)
+    return d.strftime(Config.datetime_format)'''
 
 
 def from_datetime_string(s):
