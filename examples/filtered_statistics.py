@@ -18,7 +18,6 @@ from pipeline.plot_timeseries import plot_timeseries
 import time
 import matplotlib.pyplot as plt
 import matplotlib.style as mplstyle
-from modeltestSDK.utils import to_datetime_string
 mplstyle.use('fast')
 
 
@@ -45,7 +44,7 @@ for test_name in tests:
         # To alternative metoder for å få datapunktene som arrays
         # tt, XX = ts.get_data_points_as_arrays()
         tt, XX = ts.to_arrays(ts.data_points)
-        # t, X = ts.get_froude_scaled_arrays(tt, XX, stt.scale_factor)
+        # t, X = ts.get_froude_scaled_arrays(tt, XX, campaign.scale_factor)
         # Nå ligger noen sensorer i databasen med feil 'kind' så automatisk froude skalering går ikke før det er fikset
 
         # Froude skalering hardkodet:
