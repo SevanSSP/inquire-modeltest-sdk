@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 from typing import List, Union
-from .utils import make_serializable, from_datetime_string
+from .utils import make_serializable
 import datetime
 import numpy
 from typing import Optional
