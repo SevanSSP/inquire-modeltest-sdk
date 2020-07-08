@@ -92,6 +92,7 @@ print(f"Query 2 took {toc2-toc1:0.4f} seconds")
 
 plot_timeseries([data1,data2], test, [sensor1,sensor2])
 '''
+
 '''
 #stt.test[10].timeseries[0].to_pandas()
 
@@ -115,8 +116,7 @@ for timeseries in timeseriesList:
 
 print(timeseriesList[0].data_points[0:20])
 
-'''
-'''
+
 timeseries = client.timeseries.create(test_id="bee124c3-3d25-4fdd-8e22-e33ef8ecd17c",
                                       sensor_id="0c0e130d-d370-4cd2-8709-961c8dd74b8c")
 
@@ -134,5 +134,5 @@ print(timeseries.post_data_points())
 time2 = time.time()
 
 full_time = (time2 - time1) * 1000.0
-print(f'function took {full_time} milliseconds')
-'''
+print(f'function took {full_time} milliseconds')'''
+
