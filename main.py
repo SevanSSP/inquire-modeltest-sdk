@@ -12,7 +12,6 @@ from pipeline.plot_timeseries import plot_timeseries
 import time
 import matplotlib.pyplot as plt
 import matplotlib.style as mplstyle
-from modeltestSDK.utils import to_datetime_string
 mplstyle.use('fast')
 
 
@@ -45,7 +44,7 @@ stt.test['waveIrreg_2101'].populate_timeseries(timeseries)
 
 toc3 = time.perf_counter()
 
-#print(stt.test["waveIrreg_2101"].timeseries)
+print(stt.test["waveIrreg_2101"].timeseries)
 
 toc4 = time.perf_counter()
 

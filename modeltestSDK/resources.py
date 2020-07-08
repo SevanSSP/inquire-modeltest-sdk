@@ -1,10 +1,11 @@
 import json
 import pandas as pd
 from typing import List, Union
-from .utils import make_serializable, from_datetime_string
+from .utils import make_serializable
 import datetime
 import numpy
 from typing import Optional
+import warnings
 
 class BaseResource(object):
     def __str__(self):
@@ -144,8 +145,6 @@ class Campaign(BaseResource):
         else:
             self.sensor.append(child)
 
-
-
     @classmethod
     def from_dict(cls, data: dict, client = None):
         return cls(name=data['name'], description=data['description'], location=data['location'],
@@ -153,11 +152,13 @@ class Campaign(BaseResource):
             water_density=data['water_density'], water_depth=data['water_depth'],
             transient=data['transient'], id=data['id'], client=client)
 
+
 class CampaignList(ResourceList):
 
     def __init__(self, resources: List[Campaign], client=None):
         self.resources = resources
         self._client = client
+
 
 class Sensor(BaseResource):
 
@@ -266,6 +267,7 @@ class TestList(ResourceList):
             except:
                 raise Exception(f"Test {key} not found under campaign ")
 
+
 class Floater(Test):
     type = "floater"
 
@@ -289,11 +291,13 @@ class Floater(Test):
                    category=data['category'], orientation =data['orientation'], draft =data['draft'],
                    wave_id = data['wave_id'], wind_id = data['wind_id'], id= data['id'], client=client)
 
+
 class FloaterList(ResourceList):
 
     def __init__(self, resources: List[Floater], client=None):
         self.resources = resources
         self._client = client
+
 
 class WaveCurrentCalibration(Test):
     type = "waveCurrentCalibration"
@@ -323,6 +327,7 @@ class WaveCurrentCalibration(Test):
                    wave_direction = data['wave_direction'], current_velocity = data['current_velocity'],
                    current_direction = data['current_direction'], id=data['id'], client=client)
 
+
 class WaveCurrentCalibrationList(ResourceList):
 
     def __init__(self, resources: List[WaveCurrentCalibration], client=None):
@@ -351,11 +356,13 @@ class WindConditionCalibration(Test):
                    wind_spectrum=data['wind_spectrum'], wind_velocity=data['wind_velocity'],
                    zref=data['zref'], wind_direction=data['wind_direction'], id=data['id'],  client=client)
 
+
 class WindConditionCalibrationList(ResourceList):
 
     def __init__(self, resources: List[WindConditionCalibration], client=None):
         self.resources = resources
         self._client = client
+
 
 class Timeseries(BaseResource):
 
@@ -478,13 +485,13 @@ class Timeseries(BaseResource):
     def from_dict(cls, data: dict, client = None):
         return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], id=data['id'], client=client)
 
+
 class TimeseriesList(ResourceList):
 
     def __init__(self, resources: List[Timeseries], client=None):
         self.resources = resources
         self._client = client
         #self._sensor_names = []
-
 
     def to_pandas(self, ignore: List[str]=None):
         df = pd.DataFrame(self.dump())
@@ -509,6 +516,10 @@ class TimeseriesList(ResourceList):
             except:
                 raise Exception(f"Timeseries {key} not found under campaign ")
 
+    def __str__(self):
+        return f"<Test: \n{self.to_pandas()}>"
+
+
 class DataPoint(BaseResource):
 
     def __init__(self, time: str, value: float, timeseries_id: str = None, client=None):
@@ -523,25 +534,27 @@ class DataPoint(BaseResource):
 
     @classmethod
     def from_dict(cls, data: str, client = None):
-        # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE
-        time, value = data.replace("\n", "").split("\t")
-        time_string = time.split(" ")[1]
-        if len(time_string) == 8:
-            # If timestamp is at whole second, ex. "09:00:00"
-            time = datetime.datetime.strptime(time_string, "%H:%M:%S")
+        # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE. Object sent as text file
+        if data.find("\n") and data.find("\t"):
+            time, value = data.replace("\n", "").split("\t")
+            time_string = time.split(" ")[1]
+            if len(time_string) == 8:
+                # If timestamp is at whole second, ex. "09:00:00"
+                time = datetime.datetime.strptime(time_string, "%H:%M:%S")
+            else:
+                # Timestamp, ex. "09:00:00.592"
+                time = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
+            return cls(time=time, value=float(value),
+                       client=client)
         else:
-            # Timestamp, ex. "09:00:00.592"
-            time = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
-        return cls(time=time, value=float(value),
-                   client=client)
+            warnings.warn("Imported an empty datapoint.")
+            return cls(time=None, value=float(None),
+                       client=client)
+
 
 class DataPointList(ResourceList):
 
     def __init__(self, resources: List[DataPoint], client=None):
         self.resources = resources
         self._client = client
-
-
-
-
 

@@ -27,5 +27,5 @@ def plot_timeseries(datas, test, sensors):
         labels.append(sensor.name)
 
     plt.title(f"Test: {test.description}")
-    plt.legend(labels)
+    plt.legend(labels, loc='upper right')
     plt.show()
