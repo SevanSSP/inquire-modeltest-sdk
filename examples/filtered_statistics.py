@@ -24,7 +24,7 @@ mplstyle.use('fast')
 
 client = SDKclient()
 
-stt = client.campaign.get_by_name("STT")
+campaign = client.campaign.get_by_name("STT")
 tests = ["waveIrreg_2101", "waveIrreg_2102", "waveIrreg_2103", "waveIrreg_2104", "waveIrreg_2105"]
 sensor_names = ["M206_COF X", "M206_COF Z", "M206_COF Pitch", "M206_acc_pos X", "M206_acc_pos Z"]
 coherence = 0.7
@@ -33,12 +33,12 @@ print_path = os.path.join(os.path.split(os.getcwd())[0], results_file)
 
 for test_name in tests:
     test = client.floater.get_by_name(test_name)
-    stt.populate_test(test)
+    campaign.populate_test(test)
     timeseries = test.get_timeseries()
-    stt.test[test_name].populate_timeseries(timeseries)
+    campaign.test[test_name].populate_timeseries(timeseries)
 
     for sensor_name in sensor_names:
-        ts = stt.test[test_name].timeseries[sensor_name]
+        ts = campaign.test[test_name].timeseries[sensor_name]
         ts.get_data_points()
         print("Hentet datapoints for", sensor_name)
 
@@ -60,11 +60,11 @@ for test_name in tests:
         if sensor_name == "M206_acc_pos Z":
             power = 0
 
-        t = tt * (stt.scale_factor ** 0.5)
+        t = tt * (campaign.scale_factor ** 0.5)
         if power == 0:
             X = XX
         else:
-            X = XX * (stt.scale_factor ** power) / 1000
+            X = XX * (campaign.scale_factor ** power) / 1000
 
         # TimeSeries fra qatz
         w = TimeSeries('Full Scale' + sensor_name, t, X)
