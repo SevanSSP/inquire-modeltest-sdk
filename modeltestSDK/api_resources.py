@@ -1,12 +1,10 @@
-import datetime
-from typing import List
 from .utils import format_class_name
 import warnings
-import asyncio
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
-                        DataPoint, DataPointList, Floater, FloaterList, WaveCurrentCalibration, WaveCurrentCalibrationList,
-                        WindConditionCalibration, WindConditionCalibrationList )
-import requests
+                        DataPoint, DataPointList, Floater, FloaterList, WaveCurrentCalibration,
+                        WaveCurrentCalibrationList,
+                        WindConditionCalibration, WindConditionCalibrationList)
+
 
 def get_id_from_response(response):
     return response[0]["id"]
@@ -17,10 +15,12 @@ class BaseAPI:
         self._resource_path = format_class_name(self.__class__.__name__)
         self.client = client
 
+
 class NamedBaseAPI(BaseAPI):
     '''
     Only for database items with names. To retrieve id from name
     '''
+
     def get_id(self, name: str):
         response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
         if response:
@@ -30,6 +30,7 @@ class NamedBaseAPI(BaseAPI):
             return response[0]['id']
         else:
             raise Exception(f"Could not find any object with name {name}")
+
 
 class CampaignAPI(NamedBaseAPI):
 
@@ -51,7 +52,7 @@ class CampaignAPI(NamedBaseAPI):
             if len(response) != 1:
                 warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
                               f" first was returned")
-            return Campaign.from_dict(data=response[0],client=self.client)
+            return Campaign.from_dict(data=response[0], client=self.client)
         else:
             raise Exception(f"Could not find any object with name {name}")
 
@@ -77,6 +78,7 @@ class CampaignAPI(NamedBaseAPI):
         resources = [Test.from_dict(data=obj, client=self.client) for obj in data]
         return TestList(resources=resources, client=self.client)
 
+
 class TestAPI(NamedBaseAPI):
 
     def get(self, id: str):
@@ -85,24 +87,26 @@ class TestAPI(NamedBaseAPI):
 
     def delete(self, item_id: str):
         self.client.delete(self._resource_path, item_id)
-
+    '''
     def get_campaign(self, id: str):
         data = self.client.get(self._resource_path, f"{id}/campaign")
         return Campaign.from_dict(data=data, client=self.client)
-
+    '''
     def get_timeseries(self, id: str):
         data = self.client.get(self._resource_path, f"{id}/timeseries")
         resources = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
         return TimeseriesList(resources=resources, client=self.client)
 
+
 class FloaterAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, type: str, # measured_hs: str, measured_tp: str,
-               category: str, orientation: float, draft: float, wave_id: str=None, wind_id: str=None):
+    def create(self, description: str, test_date: str, campaign_id: str, type: str,
+               # measured_hs: str, measured_tp: str,
+               category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None):
         body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
-                   type=type,   # measured_hs=measured_hs, measured_tp=measured_tp,
-                   category=category, orientation =orientation, draft =draft, wave_id =wave_id,
-                   wind_id =wind_id)
+                    type=type,  # measured_hs=measured_hs, measured_tp=measured_tp,
+                    category=category, orientation=orientation, draft=draft, wave_id=wave_id,
+                    wind_id=wind_id)
         data = self.client.post(self._resource_path, body=body)
         return Floater.from_dict(data=data, client=self.client)
 
@@ -111,12 +115,13 @@ class FloaterAPI(TestAPI):
         return Floater.from_dict(data=data, client=self.client)
 
     def get_by_name(self, description: str):
-        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'description': description})
+        response = self.client.get(format_class_name(self.__class__.__name__), "all",
+                                   parameters={'description': description})
         if response:
             if len(response) != 1:
                 warnings.warn(f"Searching {self.__class__.__name__} for name {description} returned several objects,"
                               f" first was returned")
-            return Floater.from_dict(data=response[0],client=self.client)
+            return Floater.from_dict(data=response[0], client=self.client)
         else:
             raise Exception(f"Could not find any object with name {description}")
 
@@ -125,16 +130,16 @@ class FloaterAPI(TestAPI):
         obj_list = [Floater.from_dict(data=obj, client=self.client) for obj in data]
         return FloaterList(resources=obj_list, client=None)
 
+
 class WaveCurrentCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+    def create(self, description: str, test_date: str, campaign_id: str,  # measured_hs: str, measured_tp: str,
                wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float, id: str = None):
-
         body = dict(description=description, type="waveCurrentCalibration", test_date=test_date,
-                    campaign_id=campaign_id, # measured_hs=measured_hs, measured_tp=measured_tp,
-                    wave_spectrum=wave_spectrum,wave_period=wave_period, wave_height=wave_height,
-                    gamma=gamma, wave_direction=wave_direction,current_velocity=current_velocity,
+                    campaign_id=campaign_id,  # measured_hs=measured_hs, measured_tp=measured_tp,
+                    wave_spectrum=wave_spectrum, wave_period=wave_period, wave_height=wave_height,
+                    gamma=gamma, wave_direction=wave_direction, current_velocity=current_velocity,
                     current_direction=current_direction, id=id)
 
         data = self.client.post(self._resource_path, body=body)
@@ -149,12 +154,14 @@ class WaveCurrentCalibrationAPI(TestAPI):
         obj_list = [WaveCurrentCalibration.from_dict(data=obj, client=self.client) for obj in data]
         return WaveCurrentCalibrationList(resources=obj_list, client=None)
 
+
 class WindConditionCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, # measured_hs: str, measured_tp: str,
+    def create(self, description: str, test_date: str, campaign_id: str,  # measured_hs: str, measured_tp: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
-                 id: str = None):
-        body = dict(description=description, test_date=test_date, type="windConditionCalibration", campaign_id=campaign_id,
+               id: str = None):
+        body = dict(description=description, test_date=test_date, type="windConditionCalibration",
+                    campaign_id=campaign_id,
                     # measured_hs=measured_hs, measured_tp=measured_tp,
                     wind_spectrum=wind_spectrum,
                     wind_velocity=wind_velocity, zref=zref, wind_direction=wind_direction, id=id)
@@ -171,10 +178,11 @@ class WindConditionCalibrationAPI(TestAPI):
         obj_list = [WindConditionCalibration.from_dict(data=obj, client=self.client) for obj in data]
         return WindConditionCalibrationList(resources=obj_list, client=None)
 
+
 class SensorAPI(NamedBaseAPI):
 
     def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-                 is_local: bool, campaign_id: str):
+               is_local: bool, campaign_id: str):
         body = dict(name=name, description=description, unit=unit, kind=kind, x=x,
                     y=y, z=z, is_local=is_local, campaign_id=campaign_id)
         data = self.client.post(self._resource_path, body=body)
@@ -205,7 +213,7 @@ class SensorAPI(NamedBaseAPI):
     def patch(self, body: dict, sensor_id: str):
         data = self.client.patch(self._resource_path, endpoint=f"{sensor_id}", body=body)
         return Sensor.from_dict(data=data, client=self.client)
-
+'''
     def get_campaign(self, id: str):
         data = self.client.get(self._resource_path, f"{id}/campaign")
         return Campaign.from_dict(data=data, client=self.client)
@@ -214,7 +222,7 @@ class SensorAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, f"{id}/timeseries")
         resources = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
         return TimeseriesList(resources=resources, client=self.client)
-
+'''
 
 # async def fetch(session, url):
 #     async with session.get(url) as response:
@@ -277,7 +285,7 @@ class TimeseriesAPI(BaseAPI):
         return self.client.patch(resource=self._resource_path, endpoint=f"{id}", body=body)
 
     def get_data_points(self, id: str):
-        data = self.client.get(resource=self._resource_path,  endpoint=f"{id}/datapoints" )
+        data = self.client.get(resource=self._resource_path, endpoint=f"{id}/datapoints")
         if not data:
             return DataPointList(resources=[], client=self.client)
 
@@ -287,11 +295,4 @@ class TimeseriesAPI(BaseAPI):
     def post_data_points(self, id, body):
         data = self.client.post(resource="datapoint", endpoint="list", body=body)
 
-'''
-class DatapointAPI(BaseAPI):
 
-    def create(self, timeseries_id: str, time: str, value: float):
-        body = dict(timeseries_id=timeseries_id, time=time, value=value)
-        data = self.client.post(self._resource_path, body=body)
-        return DataPoint.from_dict(data=data, client=self.client)
-'''
