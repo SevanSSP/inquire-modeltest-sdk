@@ -55,6 +55,9 @@ class SDKclient:
                The full request url is like
                    'https://{host}/{base_url}/{resource}/{endpoint}?firstparameter=value&anotherparameter=value
                """
+        if not isinstance(endpoint, str):
+            endpoint = str(endpoint)
+
         url = self.config.host +"/" + "/".join([p for p in [self.config.base_url, resource, endpoint] if p.strip()])
 
         if parameters is not None and isinstance(parameters, dict):
