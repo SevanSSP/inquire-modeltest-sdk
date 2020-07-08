@@ -11,7 +11,7 @@ from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, Floa
                             WaveCurrentCalibrationAPI)
 from .exceptions import parse_response
 from .config import Config
-
+from .exceptions import ClientException
 
 class SDKclient:
     '''
@@ -69,19 +69,16 @@ class SDKclient:
 
         query_url = f"{url}/?{enc_parameters}"
 
+        response = None
         try:
             response = method(query_url, json=body)
             response.raise_for_status()
-        except HTTPError as http_err:
-            print(response)
-            print(f'HTTP error occurred: {http_err}')
-            parse_response(response.json()) #TODO: parse errors
-            raise Exception(http_err) #(response.json()['detail'][0]['msg'])
-        except Exception as err:
-            print(f'Other error occurred: {err}')
-            raise Exception(err)
+        except Exception as inst:
+            ClientException(exception=inst, response=response)
         else:
             return response.json()
+
+
 
     def get(self, resource: str, endpoint: str = "", parameters: dict = None):
         return self.do_request(requests.get, resource, endpoint, parameters=parameters)
