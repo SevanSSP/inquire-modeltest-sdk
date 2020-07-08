@@ -153,24 +153,10 @@ for test_name in tests:
     for sensor_name in sensor_names:
         ts = stt.test[test_name].timeseries[sensor_name]
         print("Hentet datapoints for", sensor_name)
-        times = []
-        XX = []
-        ts.data_points
-        # Fyller inn tid og verdi fra datapunkter til en tidsvektor og verdivektor
-        for datapoint in ts.data_points:
-            times.append(datapoint.time)
-            XX.append(datapoint.value)
 
-        # Må konvertere t-vektor til antall sekunder fra testen startet
-        times_in_array = numpy.array(times)
-        start_time = times_in_array[0]
-        tt = []
-        for Time in times_in_array:
-            tt.append((Time - start_time).total_seconds())
-        tt = numpy.array(tt)
-        XX = numpy.array(XX)
+        tt, XX = ts.get_data_points_as_arrays()
 
-        # Froude skalering
+        # Froude skalering:
         if sensor_name == "M206_COF X":
             power = 1
         if sensor_name == "M206_COF Z":
@@ -181,7 +167,6 @@ for test_name in tests:
             power = 0
         if sensor_name == "M206_acc_pos Z":
             power = 0
-
 
         t = tt * (stt.scale_factor ** 0.5)
         if power == 0:
