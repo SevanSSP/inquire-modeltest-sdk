@@ -21,8 +21,8 @@ client = SDKclient()
 
 campaigns = client.campaign.get_all()
 
-
 tic = time.perf_counter()
+
 
 #print(campaigns)
 
@@ -30,20 +30,34 @@ tic = time.perf_counter()
 stt = client.campaign.get_by_name("STT")
 print(stt.get_tests())
 
+toc1 = time.perf_counter()
+
 #test_id = client.floater.get_id("waveIrreg_2101")
 test = client.floater.get_by_name("waveIrreg_2101")
 stt.populate_test(test)
 
-timeseries = test.get_timeseries()
-stt.test["waveIrreg_2101"].populate_timeseries(timeseries)
+toc2 = time.perf_counter()
 
-print(stt.test["waveIrreg_2101"].timeseries["M206_COG X"])
+#print(stt.test)
+
+timeseries = test.get_timeseries()
+stt.test['waveIrreg_2101'].populate_timeseries(timeseries)
+
+toc3 = time.perf_counter()
+
+print(stt.test["waveIrreg_2101"].timeseries)
+
+toc4 = time.perf_counter()
+
+print(f"Query of timeseries took {toc4-toc3:0.4f} seconds")
+
+#print(stt.test["waveIrreg_2101"].timeseries["M206_COG X"])
 
 timeseries = timeseries.to_pandas()
 
 data =[]
 sensors = []
-for i in range(3):
+for i in range(1):
     timeseries_id = timeseries["id"][i]
     ts = client.timeseries.get(timeseries_id)
     timeseries_data = ts.get_data_points().to_pandas()
@@ -51,7 +65,7 @@ for i in range(3):
     data.append(timeseries_data)
     sensors.append(sensor)
 
-plot_timeseries(data, test, sensors)
+#plot_timeseries(data, test, sensors)
 '''
 ts = client.timeseries.get_data_points("b377256e-665b-41f9-be97-942f99ec7524")
 
