@@ -1,4 +1,4 @@
-# This workflows will upload a Python Package using Twine when a release is created
+# This workflows will upload a Python Package to packagr using Twine when master is pushed
 # For more information see: https://help.github.com/en/actions/language-and-framework-guides/using-python-with-github-actions#publishing-to-package-registries
 
 name: Upload Python Package
@@ -25,9 +25,6 @@ jobs:
         python -m pip install --upgrade pip
         pip install setuptools wheel twine
     - name: Build and publish
-      env:
-        TWINE_USERNAME: github
-        TWINE_PASSWORD: ${{ secrets.PACKAGR_KEY }}
       run: |
         python setup.py sdist bdist_wheel
-        twine upload --repository-url https://api.packagr.app/EYvhW6SyL/ * -u "" --password ${{secrets,}}
+        twine upload --repository-url https://api.packagr.app/EYvhW6SyL/ dist/* -u "" --password ${{secrets.PACKAGR_KEY}}

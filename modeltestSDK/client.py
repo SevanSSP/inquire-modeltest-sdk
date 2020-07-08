@@ -1,12 +1,8 @@
-import os
-import sys
-import json
-import datetime
 import urllib.parse
 
 import requests
 from requests.exceptions import HTTPError
-from .utils import to_snake_case, to_camel_case
+from .utils import to_camel_case
 from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterAPI, WindConditionCalibrationAPI,
                             WaveCurrentCalibrationAPI)
 from .exceptions import parse_response
@@ -77,8 +73,6 @@ class SDKclient:
             ClientException(exception=inst, response=response)
         else:
             return response.json()
-
-
 
     def get(self, resource: str, endpoint: str = "", parameters: dict = None):
         return self.do_request(requests.get, resource, endpoint, parameters=parameters)

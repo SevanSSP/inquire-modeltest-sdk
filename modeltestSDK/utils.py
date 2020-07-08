@@ -220,3 +220,12 @@ class TwoWayDict(dict):
         """Returns the number of connections"""
         return dict.__len__(self) // 2
 
+
+def from_string_to_time(s):
+    time_string = s.split(" ")[1]
+    if len(time_string) == 8:
+        # If timestamp is at whole second, ex. "09:00:00"
+        return datetime.datetime.strptime(time_string, "%H:%M:%S")
+    else:
+        # Timestamp, ex. "09:00:00.592"
+        return datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
