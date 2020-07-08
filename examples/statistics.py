@@ -142,6 +142,7 @@ tests = ["waveIrreg_2101", "waveIrreg_2102", "waveIrreg_2103", "waveIrreg_2104",
 sensor_names = ["M206_COF X", "M206_COF Z", "M206_COF Pitch", "M206_acc_pos X", "M206_acc_pos Z"]
 coherence = 0.7
 results_file = "statistics_SWACH.txt"
+print_path = os.path.join(os.path.split(os.getcwd())[0], results_file)
 
 for test_name in tests:
     test = client.floater.get_by_name(test_name)
@@ -152,9 +153,12 @@ for test_name in tests:
 
     for sensor_name in sensor_names:
         ts = stt.test[test_name].timeseries[sensor_name]
+        ts.get_data_points()
         print("Hentet datapoints for", sensor_name)
 
-        tt, XX = ts.get_data_points_as_arrays()
+        # To alternative metoder for å få datapunktene som arrays
+        # tt, XX = ts.get_data_points_as_arrays()
+        tt, XX = ts.to_arrays(ts.data_points)
 
         # Froude skalering:
         if sensor_name == "M206_COF X":
@@ -210,8 +214,7 @@ for test_name in tests:
     newSurge = TimeSeries("New Surge", newSurge_t, newSurge_x)
     newPitch = TimeSeries("New Pitch", fullPitch_t, fullPitch_x)
 
-    print_path = os.path.join(os.path.split(os.getcwd())[0], results_file)
-    print(print_path)
+
     a = newSurge.stats(statsdur=10800.)
     b = newPitch.stats(statsdur=10800.)
     # c = fullAcc.stats(statsdur=10800.)
@@ -228,6 +231,8 @@ for test_name in tests:
     print(''.join(column.rjust(15) for column in header), file=open(print_path, "a"))
     for row in table:
         print(''.join(f'{column:.3f}'.rjust(15) for column in row), file=open(print_path, "a"))
+
+print("Resulter ligger i", print_path)
 
 
 

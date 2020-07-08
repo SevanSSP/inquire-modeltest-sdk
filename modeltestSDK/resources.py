@@ -348,12 +348,29 @@ class Timeseries(BaseResource):
         self.data_points = self._client.timeseries.get_data_points(id=self.id)
         return self.data_points
 
-    # Denne funksjonen returnerer datapunktene i to arrays. Tiden er gitt som antall sekunder etter testen startet
+    # De to følgende metodene returnerer datapunktene i to arrays. Begge variantene kan brukes, vet ikke hvilken som er best.
+    # Tiden er gitt som antall sekunder etter testen startet
     def get_data_points_as_arrays(self):
         self.data_points = self._client.timeseries.get_data_points(id=self.id)
         times_in_tuples = []
         values = []
         for data_point in self.data_points:
+            times_in_tuples.append(data_point.time)
+            values.append(data_point.value)
+        times_in_array = numpy.array(times_in_tuples)
+        start_time = times_in_array[0]
+        times = []
+        for Time in times_in_array:
+            times.append((Time - start_time).total_seconds())
+
+        times = numpy.array(times)
+        values = numpy.array(values)
+        return times, values
+
+    def to_arrays(self, data_points):
+        times_in_tuples = []
+        values = []
+        for data_point in data_points:
             times_in_tuples.append(data_point.time)
             values.append(data_point.value)
         times_in_array = numpy.array(times_in_tuples)
