@@ -17,7 +17,6 @@ from pipeline.plot_timeseries import plot_timeseries
 import time
 import matplotlib.pyplot as plt
 import matplotlib.style as mplstyle
-from modeltestSDK.utils import to_datetime_string
 
 
 client = SDKclient()

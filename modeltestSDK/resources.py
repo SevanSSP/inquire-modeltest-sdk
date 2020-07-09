@@ -117,6 +117,13 @@ class Campaign(BaseResource):
     def update(self):
         return self._client.campaign.patch(body=self.dump(), campaign_id=self.id)
 
+    def delete(self):
+        warnings.warn("\nDeleting a campaign cascade deletes all underlying data.\n"
+                      "If the campaign is large this can take several minutes.\n")
+        ans = input("\nAre you sure you still want to continue the delete? [y/N] ")
+        if ans == "y":
+            self._client.campaign.delete(id=self.id)
+
     def get_sensors(self):
         if not self.id:
             raise Exception(f'Cannot get sensor for {self.name}. Campaign has not yet been created')
@@ -128,7 +135,7 @@ class Campaign(BaseResource):
         return self._client.campaign.get_tests(id=self.id, type=type)
 
     def populate_test(self, child):
-        if isinstance(child, list):
+        if isinstance(child, TestList):
             for item in child:
                 self.test.append(item)
         else:
@@ -145,7 +152,7 @@ class Campaign(BaseResource):
     '''
 
     def populate_sensor(self, child):
-        if isinstance(child, list):
+        if isinstance(child, SensorList):
             for item in child:
                 self.sensor.append(item)
         else:
@@ -434,7 +441,6 @@ class Timeseries(BaseResource):
     def get_froude_scaled_arrays(self, times, values, scale_factor):
         t = times * (scale_factor ** 0.5)
         sensor = self.get_sensor()
-        print(sensor.kind)
         if sensor.kind == "length":
             v = values * (scale_factor ** 1) / 1000
         if sensor.kind == "velocity":
@@ -475,7 +481,7 @@ class Timeseries(BaseResource):
     def get_measured_tp(self):
         return self._client.timeseries.get_measured_tp(id=self.id)
 
-    def get_sensor(self):
+    def get_sensor(self) -> Sensor:
         return self._client.timeseries.get_sensor(id=self.id)
 
     @classmethod
