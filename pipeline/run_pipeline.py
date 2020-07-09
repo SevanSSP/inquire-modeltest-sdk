@@ -8,10 +8,17 @@ import time
 
 
 def main():
+
+    ans = input("You are about to run the pipeline for the STT SWACH model test.\nIf this is already imported you "
+          "will experience issues with data duplicates.\nAre you sure you want to import? [y/N] ")
+
+    if ans != "y":
+        return
+
     tic = time.perf_counter()
 
     client = SDKclient()
-    campaign_dir = "C:/Users/nbu/Documents/STT"
+    campaign_dir = "C:/Users/hly/Documents/STT"
     campaign = client.campaign.create(name=campaign_dir.split("/")[-1],
                                       description="Modeltest for SWACH",
                                       date=get_datetime_date("180120120000"),
