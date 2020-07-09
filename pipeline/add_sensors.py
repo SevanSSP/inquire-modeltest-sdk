@@ -371,8 +371,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name='MTI 2 rate X',
                          description='Accelerometer - E',
-                         unit='m/s^2',
-                         kind='acceleration',
+                         unit='deg/s',
+                         kind='angular velocity',
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+(60/1000)*75,
@@ -381,8 +381,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name='MTI 2 rate Y',
                          description='Accelerometer - E',
-                         unit='m/s^2',
-                         kind='acceleration',
+                         unit='deg/s',
+                         kind='angular velocity',
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+(60/1000)*75,
@@ -391,8 +391,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name='MTI 2 rate Z',
                          description='Accelerometer - E',
-                         unit='m/s^2',
-                         kind='acceleration',
+                         unit='deg/s',
+                         kind='angular velocity',
                          x=0,
                          y=(372.5/1000)*75,
                          z=draft_M206+(60/1000)*75,
@@ -413,8 +413,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     client.sensor.create(name='Wagon Master Speed',
                          description='Accelerometer - E',
-                         unit='m/s^2',
-                         kind='acceleration',
+                         unit='m/s',
+                         kind='velocity',
                          x=0,
                          y=372.5,
                          z=(47.5 * 1000) / 75 + 60,
