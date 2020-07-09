@@ -9,7 +9,7 @@ def plot_timeseries(datas, test, sensors):
     for data, sensor in zip(datas, sensors):
 
         time = []
-        start_time = data["time"].iloc[0]
+        start_time = data["time"].iloc[-1]
 
         for i in data.index:
             time.append((data["time"][i] - start_time).total_seconds())
@@ -19,6 +19,7 @@ def plot_timeseries(datas, test, sensors):
 
         plt.plot(x2, y2, markerfacecolor='none', alpha=0.8, markersize=2, label=sensor.name)
         #plt.gcf().autofmt_xdate()
+        plt.xlabel('seconds')
         plt.ylabel(sensor.unit)
         labels.append(sensor.name)
 

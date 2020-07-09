@@ -35,6 +35,11 @@ ts = campaign.test[test_name].timeseries[sensor_name]
 ts.get_data_points()
 print("Hentet datapoints for", sensor_name)
 
+data = []
+sensors = []
+data.append(ts.data_points.to_pandas())
+sensors.append(ts.get_sensor())
+plot_timeseries(data, campaign.test[0], sensors)
 
 times, values = ts.to_arrays(ts.data_points)
 
@@ -44,14 +49,6 @@ print("Datapoint values are")
 print(values)
 
 maxima, indices = find_maxima(values, retind=True)
-plt.figure(1, figsize=(20, 6), facecolor='w', edgecolor='k')
-plt.title('Timeseries')
-plt.plot(times, values)
-plt.xlabel('Time [s]')
-plt.ylabel("Amplitude (mm)")
-plt.legend(['Free Decay Test sample'], loc='upper left')
-plt.grid()
-plt.show()
 
 Tn = []
 t_dur = 15
