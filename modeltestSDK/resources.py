@@ -17,22 +17,22 @@ class BaseResource(object):
 
     def dump(self):
         '''
-         Dump the instance into a json serializable Python data type.
+        Dump the instance into a json serializable Python data type.
 
-         Parameters
-         ----------
-         camel_case : bool, optional
-             Use camelCase for attribute names. Defaults to False.
+        Parameters
+        ----------
+        camel_case : bool, optional
+            Use camelCase for attribute names. Defaults to False.
 
-         Returns
-         -------
-         Dict[str, Any]
-             A dictionary representation of the instance.
+        Returns
+        -------
+        Dict[str, Any]
+            A dictionary representation of the instance.
         '''
         d = {key: value for key, value in self.__dict__.items() if value is not None and not key.startswith("_")}
         return d
 
-    def to_pandas(self, ignore: List[str] = None):
+    def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
         """
         Convert the instance into a pandas DataFrame.
 
@@ -79,7 +79,7 @@ class ResourceList(BaseResource):
     def dump(self):
         return [_.dump() for _ in self]
 
-    def to_pandas(self, ignore: List[str] = None):
+    def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
         return pd.DataFrame(self.dump())
 
     def append(self, data: any):
@@ -117,12 +117,12 @@ class Campaign(BaseResource):
     def update(self):
         return self._client.campaign.patch(body=self.dump(), campaign_id=self.id)
 
-    def get_sensors(self):
+    def get_sensors(self) -> SensorList:
         if not self.id:
             raise Exception(f'Cannot get sensor for {self.name}. Campaign has not yet been created')
         return self._client.campaign.get_sensors(id=self.id)
 
-    def get_tests(self, type: str = None):
+    def get_tests(self, type: str = None) -> TestList:
         if not self.id:
             raise Exception(f'Cannot get tests for {self.name}. Campaign has not yet been created')
         return self._client.campaign.get_tests(id=self.id, type=type)
@@ -188,12 +188,6 @@ class Sensor(BaseResource):
     def update(self):
         return self._client.sensor.patch(body=self.dump(), sensor_id=self.id)
 
-    def get_campaign(self):
-        return self._client.sensor.get_campaign(id=self.id)
-
-    def get_timeseries(self):
-        return self._client.sensor.get_timeseries(id=self.id)
-
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'], unit=data['unit'],
@@ -207,7 +201,7 @@ class SensorList(ResourceList):
         self.resources = resources
         self._client = client
 
-    def __getitem__(self, key):
+    def __getitem__(self, key) -> Sensor:
         if isinstance(key, int):
             return self.resources[key]
         if isinstance(key, str):
@@ -237,10 +231,7 @@ class Test(BaseResource):
     def __str__(self):
         return f"<Test: \n{self.to_pandas()}>"
 
-    def get_campaign(self):
-        return self._client.test.get_campaign(id=self.id)
-
-    def get_timeseries(self):
+    def get_timeseries(self) -> TimeseriesList:
         return self._client.test.get_timeseries(id=self.id)
 
     def populate_timeseries(self, child):
@@ -383,7 +374,7 @@ class Timeseries(BaseResource):
     def __str__(self):
         return f"<Timeseries: \n{self.to_pandas()}>"
 
-    def to_pandas(self, ignore: List[str] = None):
+    def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
         ignore = list() if ignore is None else ignore
         dumped = self.dump()
 
@@ -499,7 +490,7 @@ class TimeseriesList(ResourceList):
         self._client = client
         # self._sensor_names = []
 
-    def to_pandas(self, ignore: List[str] = None):
+    def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
         df = pd.DataFrame(self.dump())
 
         df.rename(columns={'sensor_id': 'sensor', 'data_points': 'length'}, inplace=True)

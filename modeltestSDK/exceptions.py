@@ -1,6 +1,6 @@
 class ClientException(Exception):
     def __init__(self, exception, response):
-        prefix = "\n____________________________ COSTUM ERROR ____________________________\n"
+        prefix = "\n____________________________ CUSTOM ERROR ____________________________\n"
 
         if exception.response is not None and exception.response.status_code == 403:
             raise ConnectionRefusedError(
