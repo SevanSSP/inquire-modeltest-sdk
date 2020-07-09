@@ -5,13 +5,13 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="modeltestSDK",
-    version="0.0.2",
+    version="1.0.0",
     author="Jørgen",
     author_email="jen@sevanssp.com",
-    description="A small example package",
+    description="Python SDK for inquire-modeltest",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/SevanSSP/inquire-modeltest",
+    url="https://github.com/SevanSSP/inquire-modeltest-sdk",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",

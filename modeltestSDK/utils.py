@@ -134,7 +134,7 @@ def to_camel_case(d):
         return dd
 
 
-def to_datetime_string(d):
+'''def to_datetime_string(d):
     """
     Convert date time object to formatted date time string.
     Parameters
@@ -148,7 +148,7 @@ def to_datetime_string(d):
     """
     assert isinstance(d, datetime)
 
-    return d.strftime(Config.datetime_format)
+    return d.strftime(Config.datetime_format)'''
 
 
 def from_datetime_string(s):
@@ -174,8 +174,8 @@ def from_datetime_string(s):
     if "Z" in s or "+" in s:
         s = s.replace("Z", "+00:00")
 
-        # datetime.fromisoformat() and .strptime() does only handle 0, 3 or 6 decimal places (microseconds) but I frequently
-        # encounter deviations like 7 decimals. Truncate datetime string to 26 characters (6 decimals).
+        # datetime.fromisoformat() and .strptime() does only handle 0, 3 or 6 decimal places (microseconds) but
+        # I frequently encounter deviations like 7 decimals. Truncate datetime string to 26 characters (6 decimals).
         dt, tz = s.split("+")
         s = "+".join([dt[:26], tz])
 
@@ -220,3 +220,12 @@ class TwoWayDict(dict):
         """Returns the number of connections"""
         return dict.__len__(self) // 2
 
+
+def from_string_to_time(s):
+    time_string = s.split(" ")[1]
+    if len(time_string) == 8:
+        # If timestamp is at whole second, ex. "09:00:00"
+        return datetime.datetime.strptime(time_string, "%H:%M:%S")
+    else:
+        # Timestamp, ex. "09:00:00.592"
+        return datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
