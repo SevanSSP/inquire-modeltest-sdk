@@ -434,7 +434,6 @@ class Timeseries(BaseResource):
     def get_froude_scaled_arrays(self, times, values, scale_factor):
         t = times * (scale_factor ** 0.5)
         sensor = self.get_sensor()
-        print(sensor.kind)
         if sensor.kind == "length":
             v = values * (scale_factor ** 1) / 1000
         if sensor.kind == "velocity":
