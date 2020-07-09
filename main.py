@@ -18,11 +18,14 @@ mplstyle.use('fast')
 client = SDKclient()
 
 
-campaigns = client.campaign.get_all()
+campaign = client.campaign.get(id='0e79b067-ff9e-4df7-a282-3f57dfce74c5')
+campaign.delete()
+
+
 
 tic = time.perf_counter()
 
-
+'''
 #print(campaigns)
 
 #campaign_id = client.campaign.get_id("STT")
@@ -65,7 +68,7 @@ for i in range(1):
     sensors.append(sensor)
 
 #plot_timeseries(data, test, sensors)
-'''
+
 ts = client.timeseries.get_data_points("b377256e-665b-41f9-be97-942f99ec7524")
 
 timeseries = client.timeseries.get("b377256e-665b-41f9-be97-942f99ec7524")
@@ -90,9 +93,7 @@ print(f"Query 1 took {toc1-tic:0.4f} seconds")
 print(f"Query 2 took {toc2-toc1:0.4f} seconds")
 
 plot_timeseries([data1,data2], test, [sensor1,sensor2])
-'''
 
-'''
 #stt.test[10].timeseries[0].to_pandas()
 
 
@@ -133,5 +134,6 @@ print(timeseries.post_data_points())
 time2 = time.time()
 
 full_time = (time2 - time1) * 1000.0
-print(f'function took {full_time} milliseconds')'''
+print(f'function took {full_time} milliseconds')
+'''
 

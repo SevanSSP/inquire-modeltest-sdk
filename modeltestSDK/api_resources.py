@@ -61,8 +61,8 @@ class CampaignAPI(NamedBaseAPI):
         obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
         return CampaignList(resources=obj_list, client=None)
 
-    def delete(self, item_id: str):
-        self.client.delete(self._resource_path, item_id)
+    def delete(self, id: str):
+        self.client.delete(self._resource_path, id)
 
     def patch(self, body: dict, id: str):
         data = self.client.patch(self._resource_path, endpoint=f"{id}", body=body)
