@@ -1,13 +1,11 @@
 import urllib.parse
-
 import requests
-from requests.exceptions import HTTPError
 from .utils import to_camel_case
 from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterAPI, WindConditionCalibrationAPI,
                             WaveCurrentCalibrationAPI)
-from .exceptions import parse_response
 from .config import Config
 from .exceptions import ClientException
+
 
 class SDKclient:
     '''
