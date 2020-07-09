@@ -34,9 +34,9 @@ class NamedBaseAPI(BaseAPI):
 
 class CampaignAPI(NamedBaseAPI):
 
-    def create(self, name: str, description: str, location: str, date: any, diameter: float,
+    def create(self, name: str, description: str, location: str, date: any, waterline_diameter: float,
                scale_factor: float, water_density: float, water_depth: float, transient: float) -> Campaign:
-        body = dict(name=name, description=description, location=location, date=date, diameter=diameter,
+        body = dict(name=name, description=description, location=location, date=date, waterline_diameter=waterline_diameter,
                     scale_factor=scale_factor, water_density=water_density, water_depth=water_depth,
                     transient=transient)
         data = self.client.post(self._resource_path, body=body)
