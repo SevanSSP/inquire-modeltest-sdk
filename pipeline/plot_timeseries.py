@@ -2,7 +2,6 @@ import matplotlib.pyplot as plt
 import datetime
 
 
-
 def plot_timeseries(datas, test, sensors):
 
     plt.figure(1, figsize=(20, 6), facecolor='w', edgecolor='k')

@@ -6,6 +6,7 @@ from .add_campaign import fill_campaign
 
 import time
 
+
 def main():
 
     ans = input("You are about to run the pipeline for the STT SWACH model test.\nIf this is already imported you "
@@ -39,6 +40,7 @@ def main():
     all_sensors = client.sensor.get_all()
     for sensor in all_sensors:
         sensorDict.setdefault(sensor.name, sensor.name)
+
 
 if __name__ == "__main__":
     main()

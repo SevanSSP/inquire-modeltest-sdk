@@ -3,7 +3,7 @@ from modeltestSDK.client import SDKclient
 import datetime
 
 
-def demo_campaign(client):
+def demo_campaign(client: SDKclient):
     client.campaign.create(name="SWATCH",
                            description="Development of floating electrical substation for harsh environment.",
                            date=(datetime.datetime.utcnow()).isoformat(),
