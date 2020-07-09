@@ -63,4 +63,5 @@ print("Periods between maximas are: ")
 print(times[indices2[0:-2]] - times[indices2[1:-1]])
 print("Number of oscillations observed is", len(times[indices2[0:-2]] - times[indices2[1:-1]]))
 
-print("Natural period is", Tn)
+print("Natural period for modeltest is", Tn)
+print("Full scale natural period is", Tn * numpy.sqrt(campaign.scale_factor))
