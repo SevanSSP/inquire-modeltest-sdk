@@ -88,7 +88,7 @@ class ResourceList(BaseResource):
 
 class Campaign(BaseResource):
 
-    def __init__(self, name: str, description: str, location: str, date: any, diameter: float,
+    def __init__(self, name: str, description: str, location: str, date: any, waterline_diameter: float,
                  scale_factor: float, water_density: float, water_depth: float, transient: float, id: str = None,
                  client=None):
         # if not isinstance(date, datetime.datetime):
@@ -102,7 +102,7 @@ class Campaign(BaseResource):
         self.description = description
         self.location = location
         self.date = date
-        self.diameter = diameter
+        self.waterline_diameter = waterline_diameter
         self.scale_factor = scale_factor
         self.water_density = water_density
         self.water_depth = water_depth
@@ -154,7 +154,7 @@ class Campaign(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'], location=data['location'],
-                   date=data['date'], diameter=data['diameter'], scale_factor=data['scale_factor'],
+                   date=data['date'], waterline_diameter=data['waterline_diameter'], scale_factor=data['scale_factor'],
                    water_density=data['water_density'], water_depth=data['water_depth'],
                    transient=data['transient'], id=data['id'], client=client)
 

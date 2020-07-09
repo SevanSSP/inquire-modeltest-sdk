@@ -9,7 +9,7 @@ def new_campaign():
         description = "sdh dfgh rghh",
         date = datetime.utcnow(),
         location= "Ålesund",
-        diameter= 2.2,
+        waterline_diameter= 2.2,
         scale_factor= 1,
         water_density= 1024,
         water_depth= 1200,
