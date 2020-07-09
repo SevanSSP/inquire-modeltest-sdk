@@ -192,6 +192,9 @@ class SensorAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, id)
         return Sensor.from_dict(data=data, client=self.client)
 
+    def get_multiple_by_name(self, ids):
+        return self.client.post(self._resource_path, "ids", body=ids)
+
     def get_by_name(self, name: str):
         response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
         if response:

@@ -48,7 +48,7 @@ print(stt.test["waveIrreg_2101"].timeseries)
 
 toc4 = time.perf_counter()
 
-#print(f"Query of timeseries took {toc4-toc3:0.4f} seconds")
+print(f"Query of timeseries took {toc4-toc3:0.4f} seconds")
 
 print(stt.test["waveIrreg_2101"].timeseries["M206_COG X"])
 

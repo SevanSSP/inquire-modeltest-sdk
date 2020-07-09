@@ -499,8 +499,10 @@ class TimeseriesList(ResourceList):
         df.rename(columns={'sensor_id': 'sensor', 'data_points':'length'},inplace=True)
         if 'test_id' in df:
             df.drop(columns={'test_id'},inplace=True)
+
+        names = self._client.sensor.get_multiple_by_name(df['sensor'].tolist())
         for i in df.index:
-            df.at[i, 'sensor'] = self._client.sensor.get(df['sensor'][i]).name
+            df.at[i, 'sensor'] = names[i]
             df.at[i, 'length'] = len(self.resources[i])
         return df
 
