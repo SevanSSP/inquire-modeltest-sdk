@@ -19,7 +19,8 @@ def plot_timeseries(datas, test, sensors):
 
         plt.plot(x2, y2, markerfacecolor='none', alpha=0.8, markersize=2, label=sensor.name)
         #plt.gcf().autofmt_xdate()
-        plt.ylabel(sensor.unit)
+        plt.xlabel('Time [s]')
+        plt.ylabel(sensor.kind + ' [' + sensor.unit + ']')
         labels.append(sensor.name)
 
     plt.title(f"Test: {test.description}")

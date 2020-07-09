@@ -442,11 +442,11 @@ class Timeseries(BaseResource):
         t = times * (scale_factor ** 0.5)
         sensor = self.get_sensor()
         if sensor.kind == "length":
-            v = values * (scale_factor ** 1) / 1000
+            v = values * (scale_factor ** 1)
         if sensor.kind == "velocity":
-            v = values * (scale_factor ** 0.5) / 1000
+            v = values * (scale_factor ** 0.5)
         if sensor.kind == "acceleration":
-            v = values * (scale_factor ** 0) / 1000
+            v = values * (scale_factor ** 0)
         if sensor.kind == "force":
             v = values * (scale_factor ** 3)
         if sensor.kind == "pressure":
