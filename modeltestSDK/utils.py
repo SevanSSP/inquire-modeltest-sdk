@@ -174,8 +174,8 @@ def from_datetime_string(s):
     if "Z" in s or "+" in s:
         s = s.replace("Z", "+00:00")
 
-        # datetime.fromisoformat() and .strptime() does only handle 0, 3 or 6 decimal places (microseconds) but I frequently
-        # encounter deviations like 7 decimals. Truncate datetime string to 26 characters (6 decimals).
+        # datetime.fromisoformat() and .strptime() does only handle 0, 3 or 6 decimal places (microseconds) but
+        # I frequently encounter deviations like 7 decimals. Truncate datetime string to 26 characters (6 decimals).
         dt, tz = s.split("+")
         s = "+".join([dt[:26], tz])
 
