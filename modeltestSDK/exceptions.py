@@ -1,7 +1,3 @@
-
-
-
-
 class ClientException(Exception):
     def __init__(self, exception, response):
         prefix = "\n____________________________ COSTUM ERROR ____________________________\n"
@@ -31,7 +27,7 @@ class ClientException(Exception):
                 self.message = f"{prefix}{response.text}"
                 raise ConnectionError(f"{prefix}{response.text}")
 
-        if (response == None) and (exception.response == None):
+        if (response is None) and (exception.response is None):
             raise ConnectionError(
                     f"{prefix}Connection failed when retrieving data. Make sure server is running and url is correct")
 

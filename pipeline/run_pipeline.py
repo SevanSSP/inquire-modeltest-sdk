@@ -6,6 +6,7 @@ from .add_campaign import fill_campaign
 
 import time
 
+
 def main():
     tic = time.perf_counter()
 
@@ -32,6 +33,7 @@ def main():
     all_sensors = client.sensor.get_all()
     for sensor in all_sensors:
         sensorDict.setdefault(sensor.name, sensor.name)
+
 
 if __name__ == "__main__":
     main()

@@ -216,54 +216,7 @@ class SensorAPI(NamedBaseAPI):
     def patch(self, body: dict, sensor_id: str):
         data = self.client.patch(self._resource_path, endpoint=f"{sensor_id}", body=body)
         return Sensor.from_dict(data=data, client=self.client)
-'''
-    def get_campaign(self, id: str):
-        data = self.client.get(self._resource_path, f"{id}/campaign")
-        return Campaign.from_dict(data=data, client=self.client)
 
-    def get_timeseries(self, id: str):
-        data = self.client.get(self._resource_path, f"{id}/timeseries")
-        resources = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
-        return TimeseriesList(resources=resources, client=self.client)
-'''
-
-# async def fetch(session, url):
-#     async with session.get(url) as response:
-#         print("STARTED")
-#         return await response.json()
-#
-#
-# async def multiple_tasks(resource, endpoint, entries):
-#     url = "http://127.0.0.1:8000/api/" + "/".join([p for p in [resource, endpoint] if p.strip()])
-#     limit = 12000
-#     print(entries)
-#     tasks = []
-#     async with aiohttp.ClientSession() as session:
-#         for offset in range(0, entries, limit):
-#             url_query = url + f"?offset={offset}&limit={limit}"
-#             tasks.append(fetch(session, url_query))
-#         res = await asyncio.gather(*tasks)
-#         print(len(res))
-#     return res
-#
-#
-# async def post(session, url, body):
-#     async with session.post(url, json=body) as response:
-#         return await response.text()
-#
-#
-# async def multiple_tasks_post(entries, body):
-#     url = "http://127.0.0.1:8000/api/datapoint/list/"
-#     tasks = []
-#     limit = 10000
-#     async with aiohttp.ClientSession() as session:
-#         for offset in range(0, entries, limit):
-#             data = body[offset:(offset + limit)]
-#             tasks.append(post(session, url, data))
-#         res = await asyncio.gather(*tasks)
-#
-#
-# import gzip
 
 class TimeseriesAPI(BaseAPI):
 
@@ -321,5 +274,3 @@ class TimeseriesAPI(BaseAPI):
     def get_sensor(self, id: str):
         data = self.client.get(self._resource_path, f"{id}/sensor")
         return Sensor.from_dict(data=data, client=self.client)
-
-
