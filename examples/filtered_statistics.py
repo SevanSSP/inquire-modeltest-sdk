@@ -44,26 +44,26 @@ for test_name in tests:
         # To alternative metoder for å få datapunktene som arrays
         # tt, XX = ts.get_data_points_as_arrays()
         tt, XX = ts.to_arrays(ts.data_points)
-        # t, X = ts.get_froude_scaled_arrays(tt, XX, campaign.scale_factor)
+        t, X = ts.get_froude_scaled_arrays(tt, XX, campaign.scale_factor)
         # Nå ligger noen sensorer i databasen med feil 'kind' så automatisk froude skalering går ikke før det er fikset
-
-        # Froude skalering hardkodet:
-        if sensor_name == "M206_COF X":
-            power = 1
-        if sensor_name == "M206_COF Z":
-            power = 1
-        if sensor_name == "M206_COF Pitch":
-            power = 0
-        if sensor_name == "M206_acc_pos X":
-            power = 0
-        if sensor_name == "M206_acc_pos Z":
-            power = 0
-
-        t = tt * (campaign.scale_factor ** 0.5)
-        if power == 0:
-            X = XX
-        else:
-            X = XX * (campaign.scale_factor ** power) / 1000
+        #
+        # # Froude skalering hardkodet:
+        # if sensor_name == "M206_COF X":
+        #     power = 1
+        # if sensor_name == "M206_COF Z":
+        #     power = 1
+        # if sensor_name == "M206_COF Pitch":
+        #     power = 0
+        # if sensor_name == "M206_acc_pos X":
+        #     power = 0
+        # if sensor_name == "M206_acc_pos Z":
+        #     power = 0
+        #
+        # t = tt * (campaign.scale_factor ** 0.5)
+        # if power == 0:
+        #     X = XX
+        # else:
+        #     X = XX * (campaign.scale_factor ** power) / 1000
 
         # TimeSeries fra qatz
         w = TimeSeries('Full Scale' + sensor_name, t, X)
