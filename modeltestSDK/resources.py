@@ -117,12 +117,12 @@ class Campaign(BaseResource):
     def update(self):
         return self._client.campaign.patch(body=self.dump(), campaign_id=self.id)
 
-    def get_sensors(self) -> SensorList:
+    def get_sensors(self):
         if not self.id:
             raise Exception(f'Cannot get sensor for {self.name}. Campaign has not yet been created')
         return self._client.campaign.get_sensors(id=self.id)
 
-    def get_tests(self, type: str = None) -> TestList:
+    def get_tests(self, type: str = None):
         if not self.id:
             raise Exception(f'Cannot get tests for {self.name}. Campaign has not yet been created')
         return self._client.campaign.get_tests(id=self.id, type=type)
@@ -231,7 +231,7 @@ class Test(BaseResource):
     def __str__(self):
         return f"<Test: \n{self.to_pandas()}>"
 
-    def get_timeseries(self) -> TimeseriesList:
+    def get_timeseries(self):
         return self._client.test.get_timeseries(id=self.id)
 
     def populate_timeseries(self, child):
