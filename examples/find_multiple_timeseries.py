@@ -4,7 +4,7 @@ from pipeline.plot_timeseries import plot_timeseries
 client = SDKclient()
 
 campaign_name = "STT"
-test_names = ["waveReg_1102", "waveReg_1103", "waveReg_1104", "waveReg_1105"]
+test_names = ["waveReg_1102"]
 sensor_name = "M206_COG Z"
 
 campaign = client.campaign.get_by_name(campaign_name)

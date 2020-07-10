@@ -389,6 +389,8 @@ class Timeseries(BaseResource):
         for name, value in dumped.items():
             if name == "sensor_id":
                 df.loc[name] = self._client.sensor.get(value).name
+            elif name == "data_points":
+                df.loc[name] = len(self.data_points)
             elif name not in ignore:
                 df.loc[name] = [value]
         return df
@@ -462,9 +464,6 @@ class Timeseries(BaseResource):
     def post_data_points(self):
         self._client.timeseries.post_data_points(body=self.data_points.dump(), id=self.id)
 
-    def __len__(self):
-        return len(self.data_points)
-
     def standard_deviation(self):
         # return self._client.timeseries.standard_deviation(self, id=self.id)
         return self._client.timeseries.get_standard_deviation(id=self.id)
@@ -506,7 +505,7 @@ class TimeseriesList(ResourceList):
         names = self._client.sensor.get_multiple_by_name(df['sensor'].tolist())
         for i in df.index:
             df.at[i, 'sensor'] = names[i]
-            df.at[i, 'length'] = len(self.resources[i])
+            df.at[i, 'length'] = len(self.resources[i].data_points)
         return df
 
     def __getitem__(self, key):
@@ -522,7 +521,7 @@ class TimeseriesList(ResourceList):
                 raise Exception(f"Timeseries {key} not found under campaign ")
 
     def __str__(self):
-        return f"<Test: \n{self.to_pandas()}>"
+        return f"<Timeseries: \n{self.to_pandas()}>"
 
 
 class DataPoint(BaseResource):
