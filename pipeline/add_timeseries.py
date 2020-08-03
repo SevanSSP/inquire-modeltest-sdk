@@ -6,7 +6,7 @@ import time as timer
 
 
 def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
-    df = pd.read_csv(file, sep=';', nrows=1000)     # fjern nrows=1000
+    df = pd.read_csv(file, sep=';')
 
     col_names = list(df.columns)
     for sensor in col_names[1:]:
