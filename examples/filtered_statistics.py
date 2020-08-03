@@ -60,10 +60,7 @@ for test_name in tests:
         #     power = 0
         #
         # t = tt * (campaign.scale_factor ** 0.5)
-        # if power == 0:
-        #     X = XX
-        # else:
-        #     X = XX * (campaign.scale_factor ** power) / 1000
+        # X = XX * (campaign.scale_factor ** power)
 
         # TimeSeries fra qatz
         w = TimeSeries('Full Scale' + sensor_name, t, X)
@@ -78,16 +75,6 @@ for test_name in tests:
         if sensor_name == "M206_acc_pos Z":
             fullZacc = w
 
-        # Plotting
-        # plt.figure(1, figsize=(20, 6), facecolor='w', edgecolor='k')
-        # plt.title('Timeseries')
-        # plt.plot(t, X)
-        # plt.xlabel('Time [s]')
-        # sens = ts.get_sensor()    # kan dette gjøres på en penere måte?
-        # plt.ylabel(sens.kind, '[', sens.unit, ']')
-        # plt.legend(['Free Decay Test sample'], loc='upper left')
-        # plt.grid()
-        # plt.show()
 
         print("Test er", test.description, "og sensor er", sensor_name)
 

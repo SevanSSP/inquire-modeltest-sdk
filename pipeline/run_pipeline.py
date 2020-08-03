@@ -23,7 +23,7 @@ def main():
                                       description="Modeltest for SWACH",
                                       date=get_datetime_date("180120120000"),
                                       location="STADT TOWING TANK",
-                                      diameter=70,  # main hull cylinder
+                                      waterline_diameter=70,  # main hull cylinder
                                       scale_factor=75,  # står i rapporten
                                       water_density=1025,  # usikkert
                                       water_depth=4.1 * 75,  # står kun >300

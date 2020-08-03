@@ -88,7 +88,7 @@ class ResourceList(BaseResource):
 
 class Campaign(BaseResource):
 
-    def __init__(self, name: str, description: str, location: str, date: any, diameter: float,
+    def __init__(self, name: str, description: str, location: str, date: any, waterline_diameter: float,
                  scale_factor: float, water_density: float, water_depth: float, transient: float, id: str = None,
                  client=None):
         # if not isinstance(date, datetime.datetime):
@@ -102,7 +102,7 @@ class Campaign(BaseResource):
         self.description = description
         self.location = location
         self.date = date
-        self.diameter = diameter
+        self.waterline_diameter = waterline_diameter
         self.scale_factor = scale_factor
         self.water_density = water_density
         self.water_depth = water_depth
@@ -161,7 +161,7 @@ class Campaign(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'], location=data['location'],
-                   date=data['date'], diameter=data['diameter'], scale_factor=data['scale_factor'],
+                   date=data['date'], waterline_diameter=data['waterline_diameter'], scale_factor=data['scale_factor'],
                    water_density=data['water_density'], water_depth=data['water_depth'],
                    transient=data['transient'], id=data['id'], client=client)
 
@@ -389,6 +389,8 @@ class Timeseries(BaseResource):
         for name, value in dumped.items():
             if name == "sensor_id":
                 df.loc[name] = self._client.sensor.get(value).name
+            elif name == "data_points":
+                df.loc[name] = len(self.data_points)
             elif name not in ignore:
                 df.loc[name] = [value]
         return df
@@ -442,11 +444,11 @@ class Timeseries(BaseResource):
         t = times * (scale_factor ** 0.5)
         sensor = self.get_sensor()
         if sensor.kind == "length":
-            v = values * (scale_factor ** 1) / 1000
+            v = values * (scale_factor ** 1)
         if sensor.kind == "velocity":
-            v = values * (scale_factor ** 0.5) / 1000
+            v = values * (scale_factor ** 0.5)
         if sensor.kind == "acceleration":
-            v = values * (scale_factor ** 0) / 1000
+            v = values * (scale_factor ** 0)
         if sensor.kind == "force":
             v = values * (scale_factor ** 3)
         if sensor.kind == "pressure":
@@ -461,9 +463,6 @@ class Timeseries(BaseResource):
 
     def post_data_points(self):
         self._client.timeseries.post_data_points(body=self.data_points.dump(), id=self.id)
-
-    def __len__(self):
-        return len(self.data_points)
 
     def standard_deviation(self):
         # return self._client.timeseries.standard_deviation(self, id=self.id)
@@ -506,7 +505,7 @@ class TimeseriesList(ResourceList):
         names = self._client.sensor.get_multiple_by_name(df['sensor'].tolist())
         for i in df.index:
             df.at[i, 'sensor'] = names[i]
-            df.at[i, 'length'] = len(self.resources[i])
+            df.at[i, 'length'] = len(self.resources[i].data_points)
         return df
 
     def __getitem__(self, key):
@@ -522,7 +521,7 @@ class TimeseriesList(ResourceList):
                 raise Exception(f"Timeseries {key} not found under campaign ")
 
     def __str__(self):
-        return f"<Test: \n{self.to_pandas()}>"
+        return f"<Timeseries: \n{self.to_pandas()}>"
 
 
 class DataPoint(BaseResource):

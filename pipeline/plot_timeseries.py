@@ -1,12 +1,13 @@
 import matplotlib.pyplot as plt
+from typing import Any, List
 import datetime
 
 
-def plot_timeseries(datas, test, sensors):
+def plot_timeseries(datas: list, test: Any, sensorList: list):
 
     plt.figure(1, figsize=(20, 6), facecolor='w', edgecolor='k')
     labels = []
-    for data, sensor in zip(datas, sensors):
+    for data, sensor in zip(datas, sensorList):
 
         time = []
         start_time = data["time"].iloc[0]
