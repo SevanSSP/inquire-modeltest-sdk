@@ -431,7 +431,7 @@ class Timeseries(BaseResource):
         #start_time = times_in_array[0]
         times = []
         for Time in times_in_array:
-            times.append(Time)
+            times.append(float(Time))
             #times.append((Time - start_time).total_seconds())
 
         times = numpy.array(times)
@@ -540,10 +540,14 @@ class DataPoint(BaseResource):
 
     @classmethod
     def from_dict(cls, data: str, client=None):
-        # Skjønner ikke hva dette gjør men måtte ha det med
-        time, value = data.replace("\n", "").split("\t")
-        return cls(time=time, value=float(value),
-                   client=client)
+        if data.find("\n") and data.find("\t"):
+            time, value = data.replace("\n", "").split("\t")
+            return cls(time=time, value=float(value),
+                       client=client)
+        else:
+            warnings.warn("Imported an empty datapoint.")
+            return cls(time=None, value=float(None),
+                       client=client)
         # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE. Object sent as text file
         '''if data.find("\n") and data.find("\t"):
             time, value = data.replace("\n", "").split("\t")
