@@ -413,7 +413,8 @@ class Timeseries(BaseResource):
         start_time = times_in_array[0]
         times = []
         for Time in times_in_array:
-            times.append((Time - start_time).total_seconds())
+            times.append(float(Time))
+            #times.append((Time - start_time).total_seconds())
 
         times = numpy.array(times)
         values = numpy.array(values)
