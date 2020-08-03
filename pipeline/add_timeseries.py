@@ -6,7 +6,7 @@ import time as timer
 
 
 def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
-    df = pd.read_csv(file, sep=';')
+    df = pd.read_csv(file, sep=';', nrows=1000)     # fjern nrows=1000
 
     col_names = list(df.columns)
     for sensor in col_names[1:]:
@@ -16,11 +16,36 @@ def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
         timeseries = client.timeseries.create(sensor_id=sensor_id,
                                               test_id=test_id)
         datapoints = df[[col_names[0], sensor]].values.tolist()
+        start_time = datapoints[0]
+        start_time = start_time[0]
+        start_time = datetime.datetime.strptime(start_time, "%H:%M %S.%f").isoformat()
+
+        time_string = start_time.split("T")[1]
+        if len(time_string) == 8:
+            # If timestamp is at whole second, ex. "09:00:00"
+            time_start = datetime.datetime.strptime(time_string, "%H:%M:%S")
+        else:
+            # Timestamp, ex. "09:00:00.592"
+            time_start = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
+
         for time, value in datapoints:
             if pd.isna(value):
                 continue
+
+            datapoint_time = datetime.datetime.strptime(time, "%H:%M %S.%f").isoformat()
+
+            time_string = datapoint_time.split("T")[1]
+            if len(time_string) == 8:
+                # If timestamp is at whole second, ex. "09:00:00"
+                time_point = datetime.datetime.strptime(time_string, "%H:%M:%S")
+            else:
+                # Timestamp, ex. "09:00:00.592"
+                time_point = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
+
+            #print("Time: ", time_point, "Start time: ", time_start, "Total seconds: ", (time_point-time_start).total_seconds())
+
             datapoint = DataPoint(timeseries_id=timeseries.id,
-                                  time=datetime.datetime.strptime(time, "%H:%M %S.%f").isoformat(),
+                                  time=(time_point - time_start).total_seconds(),
                                   value=value,
                                   client=client)
             timeseries.data_points.append(datapoint)

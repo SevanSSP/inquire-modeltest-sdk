@@ -400,7 +400,7 @@ class Timeseries(BaseResource):
         self.data_points = self._client.timeseries.get_data_points(id=self.id)
         return self.data_points
 
-    # De to følgende metodene returnerer datapunktene i to arrays. Begge variantene kan brukes, vet ikke hvilken som er best.
+    # De to følgende metodene returnerer datapunktene i to arrays. Begge variantene kan brukes, forskjellen er kun input.
     # Tiden er gitt som antall sekunder etter testen startet
     def get_data_points_as_arrays(self):
         self.data_points = self._client.timeseries.get_data_points(id=self.id)
@@ -428,10 +428,11 @@ class Timeseries(BaseResource):
             times_in_tuples.append(data_point.time)
             values.append(data_point.value)
         times_in_array = numpy.array(times_in_tuples)
-        start_time = times_in_array[0]
+        #start_time = times_in_array[0]
         times = []
         for Time in times_in_array:
-            times.append((Time - start_time).total_seconds())
+            times.append(Time)
+            #times.append((Time - start_time).total_seconds())
 
         times = numpy.array(times)
         values = numpy.array(values)
@@ -539,8 +540,12 @@ class DataPoint(BaseResource):
 
     @classmethod
     def from_dict(cls, data: str, client=None):
+        # Skjønner ikke hva dette gjør men måtte ha det med
+        time, value = data.replace("\n", "").split("\t")
+        return cls(time=time, value=float(value),
+                   client=client)
         # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE. Object sent as text file
-        if data.find("\n") and data.find("\t"):
+        '''if data.find("\n") and data.find("\t"):
             time, value = data.replace("\n", "").split("\t")
             time_string = time.split(" ")[1]
             if len(time_string) == 8:
@@ -554,7 +559,7 @@ class DataPoint(BaseResource):
         else:
             warnings.warn("Imported an empty datapoint.")
             return cls(time=None, value=float(None),
-                       client=client)
+                       client=client)'''
 
 
 class DataPointList(ResourceList):

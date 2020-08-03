@@ -12,7 +12,8 @@ def plot_timeseries(datas, test, sensors):
         start_time = data["time"].iloc[0]
 
         for i in data.index:
-            time.append((data["time"][i] - start_time).total_seconds())
+            time.append(data["time"][i])
+            #time.append((data["time"][i] - start_time).total_seconds())
 
         # Temporary fix to issue where points are not delivered in order.
         x2, y2 = zip(*sorted(zip(time, data["value"]), key=lambda x: x[0]))
