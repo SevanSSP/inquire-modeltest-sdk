@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="modeltestSDK",
-    version="1.0.0",
+    version="1.0.3",
     author="Jørgen",
     author_email="jen@sevanssp.com",
     description="Python SDK for inquire-modeltest",
@@ -18,5 +18,5 @@ setuptools.setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.7',
+    python_requires='>=3.6.9',
 )
