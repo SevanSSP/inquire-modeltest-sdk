@@ -49,7 +49,6 @@ for test_name in tests:
         sorted_pairs = sorted(zipped_lists)
         tuples = zip(*sorted_pairs)
         t, X = [numpy.array(tuple) for tuple in tuples]
-        print(min(X))
         # Nå ligger noen sensorer i databasen med feil 'kind' så automatisk froude skalering går ikke før det er fikset
         #
         # # Froude skalering hardkodet:
