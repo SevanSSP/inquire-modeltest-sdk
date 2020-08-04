@@ -529,7 +529,7 @@ class TimeseriesList(ResourceList):
 
 class DataPoint(BaseResource):
 
-    def __init__(self, time: str, value: float, timeseries_id: str = None, client=None):
+    def __init__(self, time: float, value: float, timeseries_id: str = None, client=None):
 
         self.timeseries_id = timeseries_id
         self.time = time
@@ -543,7 +543,7 @@ class DataPoint(BaseResource):
     def from_dict(cls, data: str, client=None):
         if data.find("\n") and data.find("\t"):
             time, value = data.replace("\n", "").split("\t")
-            return cls(time=time, value=float(value),
+            return cls(time=float(time), value=float(value),
                        client=client)
         else:
             warnings.warn("Imported an empty datapoint.")

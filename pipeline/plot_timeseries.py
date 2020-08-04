@@ -10,7 +10,7 @@ def plot_timeseries(datas, test, sensors):
         # Temporary fix to issue where points are not delivered in order.
         x2, y2 = zip(*sorted(zip(data["time"], data["value"]), key=lambda x: x[0]))
         # x-verdiene gis som en liste med strings istedet for floats. det burde fikses så man slipper å endre det her
-        x3 = []
+        '''x3 = []
         for x in x2:
             x3.append(float(x))
         j=-1
@@ -21,8 +21,8 @@ def plot_timeseries(datas, test, sensors):
         zipped_lists = zip(x3, y2)
         sorted_pairs = sorted(zipped_lists)
         tuples = zip(*sorted_pairs)
-        times, values = [numpy.array(tuple) for tuple in tuples]
-        plt.plot(times, values, markerfacecolor='none', alpha=0.8, markersize=2, label=sensor.name)
+        times, values = [numpy.array(tuple) for tuple in tuples]'''
+        plt.plot(x2, y2, markerfacecolor='none', alpha=0.8, markersize=2, label=sensor.name)
         # plt.gcf().autofmt_xdate()
         plt.xlabel('Time [s]')
         plt.ylabel(sensor.kind + ' [' + sensor.unit + ']')
