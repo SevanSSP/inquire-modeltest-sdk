@@ -243,6 +243,7 @@ class TimeseriesAPI(BaseAPI):
             return DataPointList(resources=[], client=self.client)
 
         resources = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
+        resources = sorted(resources, key=lambda x: x.time)
         return DataPointList(resources=resources, client=self.client)
 
     def post_data_points(self, id, body):

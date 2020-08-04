@@ -41,13 +41,8 @@ data.append(ts.data_points.to_pandas())
 sensors.append(ts.get_sensor())
 plot_timeseries(data, campaign.test[0], sensors)
 
-times0, values0 = ts.to_arrays(ts.data_points)
+times, values = ts.to_arrays(ts.data_points)
 
-# Temporary fix to unsorted arrays
-zipped_lists = zip(times0, values0)
-sorted_pairs = sorted(zipped_lists)
-tuples = zip(*sorted_pairs)
-times, values = [ numpy.array(tuple) for tuple in  tuples]
 
 print("Datapoint times are")
 print(times)

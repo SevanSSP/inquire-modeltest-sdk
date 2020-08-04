@@ -549,22 +549,6 @@ class DataPoint(BaseResource):
             warnings.warn("Imported an empty datapoint.")
             return cls(time=None, value=float(None),
                        client=client)
-        # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE. Object sent as text file
-        '''if data.find("\n") and data.find("\t"):
-            time, value = data.replace("\n", "").split("\t")
-            time_string = time.split(" ")[1]
-            if len(time_string) == 8:
-                # If timestamp is at whole second, ex. "09:00:00"
-                time = datetime.datetime.strptime(time_string, "%H:%M:%S")
-            else:
-                # Timestamp, ex. "09:00:00.592"
-                time = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
-            return cls(time=time, value=float(value),
-                       client=client)
-        else:
-            warnings.warn("Imported an empty datapoint.")
-            return cls(time=None, value=float(None),
-                       client=client)'''
 
 
 class DataPointList(ResourceList):
