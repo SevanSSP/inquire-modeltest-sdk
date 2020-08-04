@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-import numpy as np
+import numpy
 
 
 def plot_timeseries(datas, test, sensors):
@@ -13,7 +13,16 @@ def plot_timeseries(datas, test, sensors):
         x3 = []
         for x in x2:
             x3.append(float(x))
-        plt.plot(x3, y2, markerfacecolor='none', alpha=0.8, markersize=2, label=sensor.name)
+        j=-1
+        for i in x3:
+            if i < j:
+                print(i)
+            j = i
+        zipped_lists = zip(x3, y2)
+        sorted_pairs = sorted(zipped_lists)
+        tuples = zip(*sorted_pairs)
+        times, values = [numpy.array(tuple) for tuple in tuples]
+        plt.plot(times, values, markerfacecolor='none', alpha=0.8, markersize=2, label=sensor.name)
         # plt.gcf().autofmt_xdate()
         plt.xlabel('Time [s]')
         plt.ylabel(sensor.kind + ' [' + sensor.unit + ']')
