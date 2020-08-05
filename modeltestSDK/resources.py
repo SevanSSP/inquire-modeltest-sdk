@@ -424,8 +424,7 @@ class Timeseries(BaseResource):
 
     # Fordelen med denne metoden er at det kan være enklere å bruke hvis man i tillegg til tidsseriens datapunkter
     # har et sett med froude-skalerte datapunkter, så man får spesifisert hvilke datapunkter som skal brukes
-    def to_arrays(self):
-        data_points = self.get_data_points()
+    def to_arrays(self, data_points):
         times_in_tuples = []
         values = []
         for data_point in data_points:

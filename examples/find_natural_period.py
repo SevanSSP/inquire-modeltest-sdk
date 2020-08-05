@@ -33,7 +33,7 @@ campaign.test[test_name].populate_timeseries(timeseries)
 
 ts = campaign.test[test_name].timeseries[sensor_name]
 ts.get_data_points()
-print("Hentet datapoints for", sensor_name)
+print("Fetched datapoints for", sensor_name)
 
 data = []
 sensors = []
@@ -64,5 +64,5 @@ print("Periods between maximas are: ")
 print(times[indices2[0:-2]] - times[indices2[1:-1]])
 print("Number of oscillations observed is", len(times[indices2[0:-2]] - times[indices2[1:-1]]))
 
-print("Natural period for modeltest is", Tn)
-print("Full scale natural period is", Tn * numpy.sqrt(campaign.scale_factor))
+print("Natural period for modeltest is", Tn, "seconds")
+print("Full scale natural period is", Tn * numpy.sqrt(campaign.scale_factor), "seconds")
