@@ -12,7 +12,7 @@ from qats import TsDB
 from qats.ts import TimeSeries
 import os
 
-from pipeline.plot_timeseries import plot_timeseries
+from modeltestSDK.plot_timeseries import plot_timeseries
 
 import time
 import matplotlib.pyplot as plt
@@ -33,7 +33,7 @@ campaign.test[test_name].populate_timeseries(timeseries)
 
 ts = campaign.test[test_name].timeseries[sensor_name]
 ts.get_data_points()
-print("Hentet datapoints for", sensor_name)
+print("Fetched datapoints for", sensor_name)
 
 data = []
 sensors = []
@@ -42,6 +42,7 @@ sensors.append(ts.get_sensor())
 plot_timeseries(data, campaign.test[0], sensors)
 
 times, values = ts.to_arrays(ts.data_points)
+
 
 print("Datapoint times are")
 print(times)
@@ -63,5 +64,5 @@ print("Periods between maximas are: ")
 print(times[indices2[0:-2]] - times[indices2[1:-1]])
 print("Number of oscillations observed is", len(times[indices2[0:-2]] - times[indices2[1:-1]]))
 
-print("Natural period for modeltest is", Tn)
-print("Full scale natural period is", Tn * numpy.sqrt(campaign.scale_factor))
+print("Natural period for modeltest is", Tn, "seconds")
+print("Full scale natural period is", Tn * numpy.sqrt(campaign.scale_factor), "seconds")

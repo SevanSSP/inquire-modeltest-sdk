@@ -1,5 +1,5 @@
 from modeltestSDK import SDKclient
-from pipeline.plot_timeseries import plot_timeseries
+from modeltestSDK.plot_timeseries import plot_timeseries
 
 client = SDKclient()
 

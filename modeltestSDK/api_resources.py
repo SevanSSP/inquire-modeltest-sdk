@@ -260,7 +260,7 @@ class TimeseriesAPI(BaseAPI):
         #         warnings.warn("Imported an empty datapoint.")
         #         resources.append(DataPoint(time=None, value=None))
         #resources = [DataPoint.from_dict(data=obj, client=self.client) for obj in decompressed_data]
-
+        resources = sorted(resources, key=lambda x: x.time)
         return DataPointList(resources=resources, client=self.client)
 
     def post_data_points(self, id, body):
