@@ -5,7 +5,7 @@ from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, Floa
                             WaveCurrentCalibrationAPI)
 from .config import Config
 from .exceptions import ClientException
-
+import time
 
 class SDKclient:
     '''
@@ -68,7 +68,12 @@ class SDKclient:
 
         response = None
         try:
-            response = method(query_url, json=body)
+            start = time.perf_counter()
+            response = method(query_url, json=body, stream=True, headers=headers)
+            end = time.perf_counter()
+            print(response.headers)
+            print("REsponse time ", end-start)
+            print("LEn content" ,len(response.content))
             response.raise_for_status()
         except Exception as inst:
             ClientException(exception=inst, response=response)
