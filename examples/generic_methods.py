@@ -1,6 +1,6 @@
 from modeltestSDK import SDKclient
 from modeltestSDK.plot_timeseries import plot_timeseries
-
+import time
 client = SDKclient()
 
 
@@ -18,7 +18,7 @@ Both versions below print same result
 V1: with populate
 
 """
-
+start = time.perf_counter()
 # Get overarching campaign
 v1_campaign = client.campaign.get_by_name(campaign_name)
 
@@ -34,7 +34,9 @@ v1_campaign.test[test_name].populate_timeseries(timeseries)
 v1_campaign.test[test_name].timeseries[sensor_name].get_data_points()
 # campaign.test[0].timeseries[0].get_data_points()
 
-
+end = time.perf_counter()
+print("FINAL RES: ",end-start)
+exit()
 """
 V2: Without populate
 

@@ -7,7 +7,7 @@ from typing import List
 import time
 import asyncio
 
-from pipeline.plot_timeseries import plot_timeseries
+from modeltestSDK.plot_timeseries import plot_timeseries
 
 import time
 import matplotlib.pyplot as plt
@@ -41,7 +41,8 @@ v2_timeseries.get_data_points()
 end = time.perf_counter()
 
 print(end-start)
-print(len(v2_timeseries.data_points))
+
+plot_timeseries(datas=[v2_timeseries.data_points.to_pandas()], test=v2_test, sensorList=[v2_timeseries.get_sensor()])
 
 '''
 #print(campaigns)
