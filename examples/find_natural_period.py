@@ -12,7 +12,7 @@ from qats import TsDB
 from qats.ts import TimeSeries
 import os
 
-from pipeline.plot_timeseries import plot_timeseries
+from modeltestSDK.plot_timeseries import plot_timeseries
 
 import time
 import matplotlib.pyplot as plt
