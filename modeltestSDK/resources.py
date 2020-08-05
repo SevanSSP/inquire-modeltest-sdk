@@ -402,27 +402,6 @@ class Timeseries(BaseResource):
         self.data_points = self._client.timeseries.get_data_points(id=self.id)
         return self.data_points
 
-    # De to følgende metodene returnerer datapunktene i to arrays. Begge variantene kan brukes, vet ikke hvilken som er best.
-    # Tiden er gitt som antall sekunder etter testen startet
-    def get_data_points_as_arrays(self):
-        self.data_points = self._client.timeseries.get_data_points(id=self.id)
-        times_in_tuples = []
-        values = []
-        for data_point in self.data_points:
-            times_in_tuples.append(data_point.time)
-            values.append(data_point.value)
-        times_in_array = numpy.array(times_in_tuples)
-        start_time = times_in_array[0]
-        times = []
-        for Time in times_in_array:
-            times.append((Time - start_time).total_seconds())
-
-        times = numpy.array(times)
-        values = numpy.array(values)
-        return times, values
-
-    # Fordelen med denne metoden er at det kan være enklere å bruke hvis man i tillegg til tidsseriens datapunkter
-    # har et sett med froude-skalerte datapunkter, så man får spesifisert hvilke datapunkter som skal brukes
     def to_arrays(self):
         data_points = self.get_data_points()
         times_in_tuples = []
@@ -431,10 +410,11 @@ class Timeseries(BaseResource):
             times_in_tuples.append(data_point.time)
             values.append(data_point.value)
         times_in_array = numpy.array(times_in_tuples)
-        start_time = times_in_array[0]
+        #start_time = times_in_array[0]
         times = []
         for Time in times_in_array:
-            times.append((Time - start_time).total_seconds())
+            times.append(float(Time))
+            #times.append((Time - start_time).total_seconds())
 
         times = numpy.array(times)
         values = numpy.array(values)
@@ -527,7 +507,7 @@ class TimeseriesList(ResourceList):
 
 class DataPoint(BaseResource):
 
-    def __init__(self, time: str, value: float, timeseries_id: str = None, client=None):
+    def __init__(self, time: float, value: float, timeseries_id: str = None, client=None):
 
         self.timeseries_id = timeseries_id
         self.time = time
@@ -539,17 +519,9 @@ class DataPoint(BaseResource):
 
     @classmethod
     def from_dict(cls, data: str, client=None):
-        # VERY BAD PRACTICE; BUT DONE FOR INCREASED PERFORMANCE. Object sent as text file
         if data.find("\n") and data.find("\t"):
             time, value = data.replace("\n", "").split("\t")
-            time_string = time.split(" ")[1]
-            if len(time_string) == 8:
-                # If timestamp is at whole second, ex. "09:00:00"
-                time = datetime.datetime.strptime(time_string, "%H:%M:%S")
-            else:
-                # Timestamp, ex. "09:00:00.592"
-                time = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
-            return cls(time=time, value=float(value),
+            return cls(time=float(time), value=float(value),
                        client=client)
         else:
             warnings.warn("Imported an empty datapoint.")

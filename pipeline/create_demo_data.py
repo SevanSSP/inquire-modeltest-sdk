@@ -1,6 +1,7 @@
 from modeltestSDK.resources import Campaign, Test, DataPoint
 from modeltestSDK.client import SDKclient
 import datetime
+import random
 
 
 def demo_campaign(client: SDKclient):
@@ -38,7 +39,7 @@ if __name__ == "__main__":
     ts = client.timeseries.create(test_id=test.id, sensor_id=sensor.id)
 
     for i in range(100):
-        ts.data_points.append(DataPoint(timeseries_id=ts.id, time=str(datetime.datetime.now()),
+        ts.data_points.append(DataPoint(timeseries_id=ts.id, time=float(round(random.uniform(0, 100000), 8)),
                                         value=i, client=client))
     print(ts.post_data_points())
     print(ts.data_points)
