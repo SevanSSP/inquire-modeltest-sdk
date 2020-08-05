@@ -26,6 +26,7 @@ class SDKclient:
         self.floater = FloaterAPI(client=self)
         self.wind_condition_calibration = WindConditionCalibrationAPI(client=self)
         self.wave_current_calibration = WaveCurrentCalibrationAPI(client=self)
+        self.session = requests.Session()
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """
@@ -64,6 +65,7 @@ class SDKclient:
         else:
             enc_parameters = ""
 
+        headers = {"Accept-Encoding": "gzip"}
         query_url = f"{url}/?{enc_parameters}"
 
         response = None
@@ -78,6 +80,8 @@ class SDKclient:
         except Exception as inst:
             ClientException(exception=inst, response=response)
         else:
+            if "data'æasd   points" in endpoint:
+                return response.text
             return response.json()
 
     def get(self, resource: str, endpoint: str = "", parameters: dict = None):
@@ -87,7 +91,7 @@ class SDKclient:
         return self.do_request(requests.post, resource, endpoint, body=body)
 
     def patch(self, resource: str, endpoint: str = "", body: dict = None):
-        return self.do_request(requests.patch, resource, endpoint, body=body)
+        return self.do_request(self.session.patch, resource, endpoint, body=body)
 
     def delete(self, resource: str, endpoint: str):
-        return self.do_request(requests.delete, resource, endpoint)
+        return self.do_request(self.session.delete, resource, endpoint)

@@ -4,7 +4,9 @@ from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorLi
                         DataPoint, DataPointList, Floater, FloaterList, WaveCurrentCalibration,
                         WaveCurrentCalibrationList,
                         WindConditionCalibration, WindConditionCalibrationList)
-
+import gzip
+import zlib
+import datetime
 
 def get_id_from_response(response):
     return response[0]["id"]
@@ -242,7 +244,23 @@ class TimeseriesAPI(BaseAPI):
         if not data:
             return DataPointList(resources=[], client=self.client)
 
-        resources = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
+        resources = []
+        # for row in data:
+        #     if row.find("\n") and row.find("\t"):
+        #         time, value = row.replace("\n", "").split("\t")
+        #         time_string = time.split(" ")[1]
+        #         if len(time_string) == 8:
+        #             # If timestamp is at whole second, ex. "09:00:00"
+        #             time = datetime.datetime.strptime(time_string, "%H:%M:%S")
+        #         else:
+        #             # Timestamp, ex. "09:00:00.592"
+        #             time = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
+        #         resources.append(DataPoint(time=time, value=value))
+        #     else:
+        #         warnings.warn("Imported an empty datapoint.")
+        #         resources.append(DataPoint(time=None, value=None))
+        #resources = [DataPoint.from_dict(data=obj, client=self.client) for obj in decompressed_data]
+
         return DataPointList(resources=resources, client=self.client)
 
     def post_data_points(self, id, body):
