@@ -26,7 +26,6 @@ class SDKclient:
         self.floater = FloaterAPI(client=self)
         self.wind_condition_calibration = WindConditionCalibrationAPI(client=self)
         self.wave_current_calibration = WaveCurrentCalibrationAPI(client=self)
-        self.session = requests.Session()
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """
@@ -65,12 +64,11 @@ class SDKclient:
         else:
             enc_parameters = ""
 
-        headers = {"Accept-Encoding": "gzip"}
         query_url = f"{url}/?{enc_parameters}"
 
         response = None
         try:
-            response = method(query_url, json=body, stream=True, headers=headers)
+            response = method(query_url, json=body)
             print(response.headers)
             response.raise_for_status()
         except Exception as inst:
