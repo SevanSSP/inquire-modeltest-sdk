@@ -15,7 +15,7 @@ These instructions will get you a copy of the project up and running on your loc
 purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
-* Install Python version 3.6 or later from either https://www.python.org or https://www.anaconda.com.
+* Install Python version 3.6.9 or later from either https://www.python.org or https://www.anaconda.com.
 
 ### Clone the source code repository
 At the desired location, run:
@@ -36,6 +36,32 @@ python -m venv /path/to/new/virtual/environment
 ```console
 pip install -r requirements.txt
 ```
+
+### Deployment
+The application is published as a package to Sevans packagr site. To use this library in other projects use:
+
+```
+pip install modeltestSDK -i https://api.packagr.app/EYvhW6SyL/
+```
+
+Continue by logging in to the packagr server with your credentials.
+
+### Pipeline
+
+To perform a data import to either local or cloud hosted database you need to clone this repository.
+
+1. Update the api-url in modeltestSDK/config.py
+```
+ Local-host: host = "http://127.0.0.1:8000"
+ Azure: host = "https://inquire-modeltest-docker.azurewebsites.net"
+```
+2. Update campaign directory path in pipeline/run_pipeline.py
+
+3. Perform data import:
+```
+python -m pipeline.run:pipeline.py
+```
+
 
 ### Build and run application and database locally
 
@@ -59,14 +85,6 @@ tests-start.sh
 
 This requires an enviorment variable *TEST_MODELTESTDB_URI* 
 
-### Deployment
-The application is published as a package to Sevans packagr site. To use this library in other projects use:
-
-```
-pip install modeltestSDK -i https://api.packagr.app/EYvhW6SyL/
-```
-
-Continue by logging in to the packagr server with your credentials.
 
 ### Versioning
 
