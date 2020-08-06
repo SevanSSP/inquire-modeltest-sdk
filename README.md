@@ -95,7 +95,7 @@ Given a version number MAJOR.MINOR.PATCH, increment the:
 * MINOR version add functionality in a backwards compatible manner, and
 * PATCH version for backwards compatible bug fixes.
 
-**Important** Keep the API and SDK to the same major versioning
+**Important:** Keep the API and SDK to the same major versioning
 
 ## Authors
 * **Jørgen Engelsen** - [joreng2607](https://github.com/joreng2607)
