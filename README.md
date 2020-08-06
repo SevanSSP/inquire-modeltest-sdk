@@ -87,7 +87,15 @@ This requires an enviorment variable *TEST_MODELTESTDB_URI*
 
 
 ### Versioning
+This project uses semantic versioning. [More info](https://semver.org/)
 
+Given a version number MAJOR.MINOR.PATCH, increment the:
+
+* MAJOR version has incompatible API changes,
+* MINOR version add functionality in a backwards compatible manner, and
+* PATCH version for backwards compatible bug fixes.
+
+**Important** Keep the API and SDK to the same major versioning
 
 ## Authors
 * **Jørgen Engelsen** - [joreng2607](https://github.com/joreng2607)
