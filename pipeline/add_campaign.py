@@ -78,15 +78,15 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
 
         # TODO: Må kunne skille mellom en wind calibration og wave calibration, ønsker ikke nødvendigvis å legge inn samtidig
 
-        wind_condition_calibration = client.wind_condition_calibration.create(description=calib,
-                                                                              test_date=get_datetime_date(date_time),
-                                                                              campaign_id=campaign.id,
-                                                                              # measured_hs=10,  # random verdi
-                                                                              # measured_tp=10,  # random verdi
-                                                                              wind_spectrum="None",
-                                                                              zref=0,
-                                                                              wind_velocity=0,
-                                                                              wind_direction=0)
+        #wind_condition_calibration = client.wind_condition_calibration.create(description=calib,
+        #                                                                      test_date=get_datetime_date(date_time),
+        #                                                                      campaign_id=campaign.id,
+        #                                                                      # measured_hs=10,  # random verdi
+        #                                                                      # measured_tp=10,  # random verdi
+        #                                                                      wind_spectrum="None",
+        #                                                                      zref=0,
+        #                                                                      wind_velocity=0,
+        #                                                                      wind_direction=0)
 
     os.chdir(campaign_dir)
     for concept_id in concept_ids:
