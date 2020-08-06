@@ -4,7 +4,9 @@ from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorLi
                         DataPoint, DataPointList, Floater, FloaterList, WaveCurrentCalibration,
                         WaveCurrentCalibrationList,
                         WindConditionCalibration, WindConditionCalibrationList)
-
+import gzip
+import zlib
+import datetime
 
 def get_id_from_response(response):
     return response[0]["id"]
@@ -241,7 +243,8 @@ class TimeseriesAPI(BaseAPI):
         if not data:
             return DataPointList(resources=[], client=self.client)
 
-        resources = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
+        resources = [DataPoint(time=float(time), value=float(value)) for time, value in [row.replace("\n", "").split("\t") for row in data]]
+        resources = sorted(resources, key=lambda x: x.time)
         return DataPointList(resources=resources, client=self.client)
 
     def post_data_points(self, id, body):

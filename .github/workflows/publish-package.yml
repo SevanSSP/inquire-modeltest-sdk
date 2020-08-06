@@ -4,10 +4,8 @@
 name: Upload Python Package
 
 on:
-  push:
-    # Publish `master` as package to packagr
-    branches:
-      - master
+  release:
+    types: [published]
 
 jobs:
   deploy:
