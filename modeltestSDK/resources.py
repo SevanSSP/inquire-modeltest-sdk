@@ -445,7 +445,7 @@ class Timeseries(BaseResource):
     def post_data_points(self):
         self._client.timeseries.post_data_points(body=self.data_points.dump(), id=self.id)
 
-    def standard_deviation(self):
+    def get_standard_deviation(self):
         # return self._client.timeseries.standard_deviation(self, id=self.id)
         return self._client.timeseries.get_standard_deviation(id=self.id)
 
