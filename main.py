@@ -7,7 +7,7 @@ from typing import List
 import time
 import asyncio
 
-from pipeline.plot_timeseries import plot_timeseries
+from modeltestSDK.plot_timeseries import plot_timeseries
 
 import time
 import matplotlib.pyplot as plt
@@ -17,13 +17,32 @@ mplstyle.use('fast')
 
 client = SDKclient()
 
+campaign_name = "STT"
+test_name = "waveIrreg_2102"
+sensor_name = "M206_COG Z"
 
-campaign = client.campaign.get(id='0e79b067-ff9e-4df7-a282-3f57dfce74c5')
-campaign.delete()
+# Get overarching campaign
+campaign = client.campaign.get_by_name(campaign_name)
+
+# Find test. Notice the indexing by name.
+v2_test = campaign.get_tests()[test_name]
 
 
 
-tic = time.perf_counter()
+
+# Find timeseries
+v2_timeseries = v2_test.get_timeseries()[sensor_name]
+
+start = time.perf_counter()
+
+# Get datapoints for timeseries
+v2_timeseries.get_data_points()
+
+end = time.perf_counter()
+
+print(end-start)
+
+plot_timeseries(datas=[v2_timeseries.data_points.to_pandas()], test=v2_test, sensorList=[v2_timeseries.get_sensor()])
 
 '''
 #print(campaigns)
