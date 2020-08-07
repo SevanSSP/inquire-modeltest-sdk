@@ -107,8 +107,7 @@ campaign = client.campaign.get_by_name("STT")
 test_name = "waveIrreg_2102"
 test = campaign.get_tests(type='floater')[test_name]
 
-timeseriesList = test.get_timeseries()
-test.populate_timeseries(timeseriesList)
+test.populate_timeseries(test.get_timeseries())
 
 timeseries_list = []
 for sensor_name in sensor_names:
