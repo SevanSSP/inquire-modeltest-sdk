@@ -273,3 +273,7 @@ class TimeseriesAPI(BaseAPI):
     def get_sensor(self, id: str):
         data = self.client.get(self._resource_path, f"{id}/sensor")
         return Sensor.from_dict(data=data, client=self.client)
+
+    def get_test(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/test")
+        return Test.from_dict(data=data, client=self.client)
