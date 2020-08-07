@@ -32,38 +32,18 @@ print_path = os.path.join(os.path.split(os.getcwd())[0], results_file)
 for test_name in tests:
     test = client.floater.get_by_name(test_name)
     campaign.populate_test(test)
-    timeseries = test.get_timeseries()
-    campaign.test[test_name].populate_timeseries(timeseries)
+    test.populate_timeseries(test.get_timeseries())
 
     for sensor_name in sensor_names:
         ts = campaign.test[test_name].timeseries[sensor_name]
         ts.get_data_points()
         print("Hentet datapoints for", sensor_name)
 
-        # To alternative metoder for å få datapunktene som arrays
-        # tt, XX = ts.get_data_points_as_arrays()
-        tt, XX = ts.to_arrays(ts.data_points)
-        t0, X0 = ts.get_froude_scaled_arrays(tt, XX, campaign.scale_factor)
+        t0, X0 = ts.get_froude_scaled_arrays()
         zipped_lists = zip(t0, X0)
         sorted_pairs = sorted(zipped_lists)
         tuples = zip(*sorted_pairs)
         t, X = [numpy.array(tuple) for tuple in tuples]
-        # Nå ligger noen sensorer i databasen med feil 'kind' så automatisk froude skalering går ikke før det er fikset
-        #
-        # # Froude skalering hardkodet:
-        # if sensor_name == "M206_COF X":
-        #     power = 1
-        # if sensor_name == "M206_COF Z":
-        #     power = 1
-        # if sensor_name == "M206_COF Pitch":
-        #     power = 0
-        # if sensor_name == "M206_acc_pos X":
-        #     power = 0
-        # if sensor_name == "M206_acc_pos Z":
-        #     power = 0
-        #
-        # t = tt * (campaign.scale_factor ** 0.5)
-        # X = XX * (campaign.scale_factor ** power)
 
         # TimeSeries fra qatz
         w = TimeSeries('Full Scale' + sensor_name, t, X)
