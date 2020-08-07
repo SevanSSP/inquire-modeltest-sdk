@@ -420,26 +420,36 @@ class Timeseries(BaseResource):
         values = numpy.array(values)
         return times, values
 
-    # Eksempel på automatisk froude skalering. Bør kanskje flyttes til API. times og values er arrays i denne varianten.
-    def get_froude_scaled_arrays(self, times, values, scale_factor):
+    def get_froude_scaled_arrays(self):
+        times, values = self.to_arrays()
+
+        # Get the scale factor from the campaign that the timeseries belongs to
+        scale_factor = self._client.campaign.get(self._client.test.get(self.test_id).campaign_id).scale_factor
+
+        # Froude scaling
         t = times * (scale_factor ** 0.5)
         sensor = self.get_sensor()
         if sensor.kind == "length":
-            v = values * (scale_factor ** 1)
-        if sensor.kind == "velocity":
-            v = values * (scale_factor ** 0.5)
-        if sensor.kind == "acceleration":
-            v = values * (scale_factor ** 0)
-        if sensor.kind == "force":
-            v = values * (scale_factor ** 3)
-        if sensor.kind == "pressure":
-            v = values * (scale_factor ** 1)
-        if sensor.kind == "volume":
-            v = values * (scale_factor ** 3)
-        if sensor.kind == "mass":
-            v = values * (scale_factor ** 3)
-        if sensor.kind == "angle":
-            v = values * (scale_factor ** 0)
+            froude_factor = 1
+        elif sensor.kind == "velocity":
+            froude_factor = 0.5
+        elif sensor.kind == "acceleration":
+            froude_factor = 0
+        elif sensor.kind == "force":
+            froude_factor = 3
+        elif sensor.kind == "pressure":
+            froude_factor = 1
+        elif sensor.kind == "volume":
+            froude_factor = 3
+        elif sensor.kind == "mass":
+            froude_factor = 3
+        elif sensor.kind == "angle":
+            froude_factor = 0
+        else:
+            raise Exception(f"Automatic froude scaling for {sensor.kind} sensors is not supported.")
+
+        v = values * (scale_factor ** froude_factor)
+
         return t, v
 
     def post_data_points(self):
