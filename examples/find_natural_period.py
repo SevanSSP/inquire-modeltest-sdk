@@ -55,6 +55,10 @@ print(end-start)
 
 print("---------------------------------------------------------")
 
+
+
+# Endret versjon av siste metode i generic_methods
+
 sensor_names = ["M206_COG Z", "M206_COG Y", "M206_COG X"]
 
 # Get overarching campaign
@@ -67,15 +71,12 @@ test = campaign.get_tests(type='floater')[test_name]
 timeseriesList = test.get_timeseries()
 test.populate_timeseries(timeseriesList)
 
-datas_2 = []
-sensorList = []
 timeseries_list = []
 for sensor_name in sensor_names:
 
     timeseries = test.timeseries[sensor_name]
+    # Hvis ikke timeseries.get_data_points() kjøres her, gjør den det i plottefunksjonen, men med en advarsel
     # timeseries.get_data_points()
     timeseries_list.append(timeseries)
-    #datas_2.append(timeseries.data_points.to_pandas())
 
-#    sensorList.append(timeseries.get_sensor())
 plot_timeseries(timeseries_list)
