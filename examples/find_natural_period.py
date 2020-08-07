@@ -21,10 +21,7 @@ timeseries = test.get_timeseries()[sensor_name]
 
 timeseries.get_data_points()
 
-sensors = [timeseries.get_sensor()]
-data = [timeseries.data_points.to_pandas()]
-
-plot_timeseries(data, test, sensors)
+plot_timeseries([timeseries])
 
 times, values = timeseries.to_arrays()
 

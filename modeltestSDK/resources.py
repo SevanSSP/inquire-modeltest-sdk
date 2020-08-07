@@ -474,6 +474,9 @@ class Timeseries(BaseResource):
     def get_sensor(self) -> Sensor:
         return self._client.timeseries.get_sensor(id=self.id)
 
+    def get_test(self):
+        return self._client.timeseries.get_test(id=self.id)
+
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], id=data['id'], client=client)
