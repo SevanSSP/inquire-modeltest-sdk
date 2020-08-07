@@ -21,11 +21,7 @@ timeseries = test.get_timeseries()[sensor_name]
 
 timeseries.get_data_points()
 
-sensors = [timeseries.get_sensor()]
-data = [timeseries.data_points.to_pandas()]
-
-#plot_timeseries(data, test, sensors)
-plot_timeseries([timeseries])#, sensors)
+plot_timeseries([timeseries])
 
 times, values = timeseries.to_arrays()
 
@@ -52,31 +48,3 @@ print("Full scale natural period is", Tn * numpy.sqrt(campaign.scale_factor), "s
 end = time.perf_counter()
 
 print(end-start)
-
-print("---------------------------------------------------------")
-
-
-
-# Endret versjon av siste metode i generic_methods
-
-sensor_names = ["M206_COG Z", "M206_COG Y", "M206_COG X"]
-
-# Get overarching campaign
-campaign = client.campaign.get_by_name("STT")
-
-# Find test. Notice the indexing by name.
-test_name = "waveIrreg_2102"
-test = campaign.get_tests(type='floater')[test_name]
-
-timeseriesList = test.get_timeseries()
-test.populate_timeseries(timeseriesList)
-
-timeseries_list = []
-for sensor_name in sensor_names:
-
-    timeseries = test.timeseries[sensor_name]
-    # Hvis ikke timeseries.get_data_points() kjøres her, gjør den det i plottefunksjonen, men med en advarsel
-    # timeseries.get_data_points()
-    timeseries_list.append(timeseries)
-
-plot_timeseries(timeseries_list)
