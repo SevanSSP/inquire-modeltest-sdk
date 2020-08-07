@@ -9,7 +9,7 @@ with open('requirements.txt') as f:
 setuptools.setup(
     name="modeltestSDK",
     use_scm_version=True,
-    setup_requires=['setuptools_scm'],
+    setup_requires=['setuptools_scm'] + requirements,
     install_requires= requirements,
     author="Jørgen",
     author_email="jen@sevanssp.com",
