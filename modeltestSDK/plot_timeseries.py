@@ -1,11 +1,8 @@
 import matplotlib.pyplot as plt
 import warnings
-from typing import Any, List
-import datetime
-import numpy
 
 
-def plot_timeseries(timeseries_list: list):#, sensor_list: list):
+def plot_timeseries(timeseries_list: list):
 
     plt.figure(1, figsize=(20, 6), facecolor='w', edgecolor='k')
     plt.axhline(0, color='slategray')

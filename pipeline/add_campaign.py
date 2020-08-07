@@ -43,8 +43,6 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
         wave_height = float(wave_height.split("s")[1])
         wave_period = calib.split("_")[2]
         wave_period = float(wave_period.split("p")[1])
-        # measured_hs = wave_height  # midlertidig
-        # measured_tp = wave_period  # midlertidig #TODO: Lese inn calibration
         gamma = find_gamma(wave_height, wave_period)
 
         # find test date and time
@@ -102,7 +100,6 @@ def fill_campaign(campaign: Campaign, concept_ids, client: SDKclient, campaign_d
                 os.chdir(os.getcwd() + "\\" + time)
                 files = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if
                          x.split(" ")[0] == test]  # Only add to test files if start with test name
-                # print("FILES: ", files, campaign_id, get_datetime_date(date_time))
                 floater_test = add_floater_test(files=files,
                                                 campaign=campaign,
                                                 testname=test,
