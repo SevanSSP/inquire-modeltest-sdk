@@ -69,7 +69,6 @@ class SDKclient:
         response = None
         try:
             response = method(query_url, json=body)
-            print(response.headers)
             response.raise_for_status()
         except Exception as inst:
             ClientException(exception=inst, response=response)
