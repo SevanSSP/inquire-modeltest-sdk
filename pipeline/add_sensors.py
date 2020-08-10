@@ -14,6 +14,7 @@ deck_height = 47.5  # [m]
 VCG_M206 = 14.4     # [m]   I SWACH-specification er denne 17.5
 VCG_M207 = 18.2     # [m]   I HE MODU - specification er denne 18.4
 
+# Alle koordinater burde dobbeltsjekkes
 def add_sensors(campaign: Campaign, client: SDKclient):
 
     # M_206_COG sensors. Er usikker på om x og y er null for COG.

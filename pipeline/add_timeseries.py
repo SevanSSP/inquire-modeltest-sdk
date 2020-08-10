@@ -5,6 +5,20 @@ import pandas as pd
 import time as timer
 
 
+def str_to_datetime(s):
+    if len(s) == 8:
+        hour = int(s[0:2])
+        min = int(s[3:5])
+        sec = int(s[6:8])
+        return datetime.datetime(year=1900, month=1, day=1, hour=hour, minute=min, second=sec)
+    else:
+        hour = int(s[0:2])
+        min = int(s[3:5])
+        sec = int(s[6:8])
+        ms = int(s[9:15])
+        return datetime.datetime(year=1900, month=1, day=1, hour=hour, minute=min, second=sec, microsecond=ms)
+
+
 def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
     df = pd.read_csv(file, sep=';')
 
@@ -17,31 +31,13 @@ def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
                                               test_id=test_id)
         datapoints = df[[col_names[0], sensor]].values.tolist()
         start_time, start_value = datapoints[0]
-        start_time = datetime.datetime.strptime(start_time, "%H:%M %S.%f").isoformat()
 
-        time_string = start_time.split("T")[1]
-        if len(time_string) == 8:
-            # If timestamp is at whole second, ex. "09:00:00"
-            start_time = datetime.datetime.strptime(time_string, "%H:%M:%S")
-        else:
-            # Timestamp, ex. "09:00:00.592"
-            start_time = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
+        start_time = str_to_datetime(start_time)
 
         for time, value in datapoints:
             if pd.isna(value):
                 continue
-
-            datapoint_time = datetime.datetime.strptime(time, "%H:%M %S.%f").isoformat()
-
-            time_string = datapoint_time.split("T")[1]
-            if len(time_string) == 8:
-                # If timestamp is at whole second, ex. "09:00:00"
-                time_point = datetime.datetime.strptime(time_string, "%H:%M:%S")
-            else:
-                # Timestamp, ex. "09:00:00.592"
-                time_point = datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
-
-            # print("Time: ", time_point, "Start time: ", start_time, "Total seconds: ", (time_point-start_time).total_seconds())
+            time_point = str_to_datetime(time)
 
             datapoint = DataPoint(timeseries_id=timeseries.id,
                                   time=(time_point - start_time).total_seconds(),

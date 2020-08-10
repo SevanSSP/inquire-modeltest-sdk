@@ -4,7 +4,9 @@ from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorLi
                         DataPoint, DataPointList, Floater, FloaterList, WaveCurrentCalibration,
                         WaveCurrentCalibrationList,
                         WindConditionCalibration, WindConditionCalibrationList)
-
+import gzip
+import zlib
+import datetime
 
 def get_id_from_response(response):
     return response[0]["id"]
@@ -96,11 +98,10 @@ class TestAPI(NamedBaseAPI):
 
 class FloaterAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, type: str,
+    def create(self, description: str, test_date: str, campaign_id: str,
                # measured_hs: str, measured_tp: str,
                category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None) -> Floater:
-        body = dict(description=description, test_date=test_date, campaign_id=campaign_id,
-                    type=type,  # measured_hs=measured_hs, measured_tp=measured_tp,
+        body = dict(description=description, type="floater", test_date=test_date, campaign_id=campaign_id,
                     category=category, orientation=orientation, draft=draft, wave_id=wave_id,
                     wind_id=wind_id)
         data = self.client.post(self._resource_path, body=body)
@@ -134,7 +135,7 @@ class WaveCurrentCalibrationAPI(TestAPI):
                wave_direction: float, current_velocity: float, current_direction: float,
                id: str = None) -> WaveCurrentCalibration:
         body = dict(description=description, type="waveCurrentCalibration", test_date=test_date,
-                    campaign_id=campaign_id,  # measured_hs=measured_hs, measured_tp=measured_tp,
+                    campaign_id=campaign_id,
                     wave_spectrum=wave_spectrum, wave_period=wave_period, wave_height=wave_height,
                     gamma=gamma, wave_direction=wave_direction, current_velocity=current_velocity,
                     current_direction=current_direction, id=id)
@@ -154,12 +155,11 @@ class WaveCurrentCalibrationAPI(TestAPI):
 
 class WindConditionCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str,  # measured_hs: str, measured_tp: str,
+    def create(self, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
                id: str = None) -> WindConditionCalibration:
         body = dict(description=description, test_date=test_date, type="windConditionCalibration",
                     campaign_id=campaign_id,
-                    # measured_hs=measured_hs, measured_tp=measured_tp,
                     wind_spectrum=wind_spectrum,
                     wind_velocity=wind_velocity, zref=zref, wind_direction=wind_direction, id=id)
 
@@ -242,7 +242,7 @@ class TimeseriesAPI(BaseAPI):
         if not data:
             return DataPointList(resources=[], client=self.client)
 
-        resources = [DataPoint.from_dict(data=obj, client=self.client) for obj in data]
+        resources = [DataPoint(time=float(time), value=float(value)) for time, value in [row.replace("\n", "").split("\t") for row in data]]
         resources = sorted(resources, key=lambda x: x.time)
         return DataPointList(resources=resources, client=self.client)
 
@@ -272,3 +272,7 @@ class TimeseriesAPI(BaseAPI):
     def get_sensor(self, id: str):
         data = self.client.get(self._resource_path, f"{id}/sensor")
         return Sensor.from_dict(data=data, client=self.client)
+
+    def get_test(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/test")
+        return Test.from_dict(data=data, client=self.client)

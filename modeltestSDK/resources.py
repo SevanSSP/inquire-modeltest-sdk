@@ -222,14 +222,12 @@ class SensorList(ResourceList):
 
 class Test(BaseResource):
     def __init__(self, description: str, test_date: str, type: str, campaign_id: str = None, id: str = None,
-                 client=None):  # measured_hs: str = None, measured_tp: str = None,
+                 client=None):
 
         self.description = description
         self.test_date = test_date
         self.campaign_id = campaign_id
         self.type = type
-        # self.measured_hs = measured_hs
-        # self.measured_tp = measured_tp
         self.id = id
         self._client = client
 
@@ -252,7 +250,6 @@ class Test(BaseResource):
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
                    type=data['type'], id=data['id'],
-                   # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    client=client)
 
 
@@ -277,11 +274,11 @@ class TestList(ResourceList):
 class Floater(Test):
     type = "floater"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str,  # measured_hs: str, measured_tp: str,
+    def __init__(self, description: str, test_date: str, campaign_id: str,
                  category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None,
                  id: str = None, client=None):
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=self.type, id=id, client=client)  # , measured_hs=measured_hs, measured_tp=measured_tp
+                         type=self.type, id=id, client=client)
 
         self.category = category
         self.orientation = orientation
@@ -292,7 +289,6 @@ class Floater(Test):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    category=data['category'], orientation=data['orientation'], draft=data['draft'],
                    wave_id=data['wave_id'], wind_id=data['wind_id'], id=data['id'], client=client)
 
@@ -307,12 +303,12 @@ class FloaterList(ResourceList):
 class WaveCurrentCalibration(Test):
     type = "waveCurrentCalibration"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str,  # measured_hs: str, measured_tp: str,
+    def __init__(self, description: str, test_date: str, campaign_id: str,
                  wave_spectrum: str = None, wave_height: float = None, wave_period: float = None,
                  gamma: float = None, wave_direction: float = None, current_velocity: float = None,
                  current_direction: float = None, id: str = None, client=None):
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=self.type, id=id, client=client)  # , measured_hs=measured_hs, measured_tp=measured_tp
+                         type=self.type, id=id, client=client)
 
         self.wave_spectrum = wave_spectrum
         self.wave_height = wave_height
@@ -325,7 +321,6 @@ class WaveCurrentCalibration(Test):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    wave_spectrum=data['wave_spectrum'], wave_height=data['wave_height'],
                    wave_period=data['wave_period'], gamma=data['gamma'],
                    wave_direction=data['wave_direction'], current_velocity=data['current_velocity'],
@@ -342,11 +337,11 @@ class WaveCurrentCalibrationList(ResourceList):
 class WindConditionCalibration(Test):
     type = "windConditionCalibration"
 
-    def __init__(self, description: str, test_date: str, campaign_id: str,  # measured_hs: str, measured_tp: str,
+    def __init__(self, description: str, test_date: str, campaign_id: str,
                  wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
                  wind_direction: float = None, id: str = None, client=None):
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=self.type, id=id, client=client)  # , measured_hs=measured_hs, measured_tp=measured_tp
+                         type=self.type, id=id, client=client)
 
         self.wind_spectrum = wind_spectrum
         self.wind_velocity = wind_velocity
@@ -356,7 +351,6 @@ class WindConditionCalibration(Test):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   # measured_hs=data['measured_hs'], measured_tp=data['measured_tp'],
                    wind_spectrum=data['wind_spectrum'], wind_velocity=data['wind_velocity'],
                    zref=data['zref'], wind_direction=data['wind_direction'], id=data['id'], client=client)
 
@@ -410,43 +404,50 @@ class Timeseries(BaseResource):
             times_in_tuples.append(data_point.time)
             values.append(data_point.value)
         times_in_array = numpy.array(times_in_tuples)
-        #start_time = times_in_array[0]
         times = []
         for Time in times_in_array:
             times.append(float(Time))
-            #times.append((Time - start_time).total_seconds())
 
         times = numpy.array(times)
         values = numpy.array(values)
         return times, values
 
-    # Eksempel på automatisk froude skalering. Bør kanskje flyttes til API. times og values er arrays i denne varianten.
-    def get_froude_scaled_arrays(self, times, values, scale_factor):
+    def get_froude_scaled_arrays(self):
+        times, values = self.to_arrays()
+
+        # Get the scale factor from the campaign that the timeseries belongs to
+        scale_factor = self._client.campaign.get(self._client.test.get(self.test_id).campaign_id).scale_factor
+
+        # Froude scaling
         t = times * (scale_factor ** 0.5)
         sensor = self.get_sensor()
         if sensor.kind == "length":
-            v = values * (scale_factor ** 1)
-        if sensor.kind == "velocity":
-            v = values * (scale_factor ** 0.5)
-        if sensor.kind == "acceleration":
-            v = values * (scale_factor ** 0)
-        if sensor.kind == "force":
-            v = values * (scale_factor ** 3)
-        if sensor.kind == "pressure":
-            v = values * (scale_factor ** 1)
-        if sensor.kind == "volume":
-            v = values * (scale_factor ** 3)
-        if sensor.kind == "mass":
-            v = values * (scale_factor ** 3)
-        if sensor.kind == "angle":
-            v = values * (scale_factor ** 0)
+            froude_factor = 1
+        elif sensor.kind == "velocity":
+            froude_factor = 0.5
+        elif sensor.kind == "acceleration":
+            froude_factor = 0
+        elif sensor.kind == "force":
+            froude_factor = 3
+        elif sensor.kind == "pressure":
+            froude_factor = 1
+        elif sensor.kind == "volume":
+            froude_factor = 3
+        elif sensor.kind == "mass":
+            froude_factor = 3
+        elif sensor.kind == "angle":
+            froude_factor = 0
+        else:
+            raise Exception(f"Automatic froude scaling for {sensor.kind} sensors is not supported.")
+
+        v = values * (scale_factor ** froude_factor)
+
         return t, v
 
     def post_data_points(self):
         self._client.timeseries.post_data_points(body=self.data_points.dump(), id=self.id)
 
-    def standard_deviation(self):
-        # return self._client.timeseries.standard_deviation(self, id=self.id)
+    def get_standard_deviation(self):
         return self._client.timeseries.get_standard_deviation(id=self.id)
 
     def get_max_value(self):
@@ -463,6 +464,9 @@ class Timeseries(BaseResource):
 
     def get_sensor(self) -> Sensor:
         return self._client.timeseries.get_sensor(id=self.id)
+
+    def get_test(self):
+        return self._client.timeseries.get_test(id=self.id)
 
     @classmethod
     def from_dict(cls, data: dict, client=None):

@@ -1,68 +1,50 @@
-from modeltestSDK import SDKclient, Campaign, Sensor, DataPoint
-from modeltestSDK.resources import WaveCurrentCalibration, Timeseries, Sensor
-import datetime
-import random
-from modeltestSDK.utils import from_datetime_string
-from typing import List
-import time
-import asyncio
+from modeltestSDK import SDKclient
 import numpy
-from qats.signal import find_maxima, smooth, tfe, psd
-from qats import TsDB
-from qats.ts import TimeSeries
-import os
+from qats.signal import find_maxima
 
 from modeltestSDK.plot_timeseries import plot_timeseries
 
 import time
-import matplotlib.pyplot as plt
-import matplotlib.style as mplstyle
 
+start = time.perf_counter()
 
 client = SDKclient()
 
 campaign = client.campaign.get_by_name("STT")
-test_name = "X300"
-sensor_name = "M206_COG Z"
+test_name = "Y200"
+sensor_name = "M207_COF X"
+t_dur = 35
 
-test = client.floater.get_by_name(test_name)
+test = campaign.get_tests(type="floater")[test_name]
 
-campaign.populate_test(test)
-timeseries = test.get_timeseries()
-campaign.test[test_name].populate_timeseries(timeseries)
+timeseries = test.get_timeseries()[sensor_name]
 
-ts = campaign.test[test_name].timeseries[sensor_name]
-ts.get_data_points()
-print("Fetched datapoints for", sensor_name)
+timeseries.get_data_points()
 
-data = []
-sensors = []
-data.append(ts.data_points.to_pandas())
-sensors.append(ts.get_sensor())
-plot_timeseries(data, campaign.test[0], sensors)
+plot_timeseries([timeseries])
 
-times, values = ts.to_arrays(ts.data_points)
-
-
-print("Datapoint times are")
-print(times)
-print("Datapoint values are")
-print(values)
+times, values = timeseries.to_arrays()
 
 maxima, indices = find_maxima(values, retind=True)
 
 Tn = []
-t_dur = 15
 
 # Defines relevant durations for the decay tests. Also obtains an average Tn-value for the test in question.
 i = 1
 t1 = times[indices[-i]]
 t2 = t1 + t_dur
+
 maxima, indices2 = find_maxima(values[(t1 < times) & (times <= t2)], retind=True)
+
 Tn = numpy.mean(times[indices2[0:-2]] - times[indices2[1:-1]])
+
 print("Periods between maximas are: ")
 print(times[indices2[0:-2]] - times[indices2[1:-1]])
 print("Number of oscillations observed is", len(times[indices2[0:-2]] - times[indices2[1:-1]]))
 
 print("Natural period for modeltest is", Tn, "seconds")
 print("Full scale natural period is", Tn * numpy.sqrt(campaign.scale_factor), "seconds")
+
+end = time.perf_counter()
+
+print(end-start)
