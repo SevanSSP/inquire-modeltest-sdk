@@ -85,10 +85,10 @@ Plot a timeseries. (Timeseries found using example 1)
 
 """
 
-sensorList = [v2_timeseries.get_sensor()]
-datas = [v2_timeseries.data_points.to_pandas()]
+#sensorList = [v2_timeseries.get_sensor()]
+#datas = [v2_timeseries.data_points.to_pandas()]
 
-plot_timeseries(datas=datas, test=v2_test, sensorList=sensorList)
+plot_timeseries(v2_timeseries)  # datas=datas, test=v2_test, sensorList=sensorList)
 
 
 """
@@ -101,22 +101,19 @@ Plot multiple timeseries.
 sensor_names = ["M206_COG Z", "M206_COG Y", "M206_COG X"]
 
 # Get overarching campaign
-campaign = client.campaign.get_by_name(campaign_name)
+campaign = client.campaign.get_by_name("STT")
 
 # Find test. Notice the indexing by name.
+test_name = "waveIrreg_2102"
 test = campaign.get_tests(type='floater')[test_name]
 
-timeseriesList = test.get_timeseries()
-test.populate_timeseries(timeseriesList)
+test.populate_timeseries(test.get_timeseries())
 
-datas_2 = []
-sensorList = []
+timeseries_list = []
 for sensor_name in sensor_names:
 
     timeseries = test.timeseries[sensor_name]
     timeseries.get_data_points()
-    datas_2.append(timeseries.data_points.to_pandas())
+    timeseries_list.append(timeseries)
 
-    sensorList.append(timeseries.get_sensor())
-
-plot_timeseries(datas=datas_2, test=test, sensorList=sensorList)
+plot_timeseries(timeseries_list)

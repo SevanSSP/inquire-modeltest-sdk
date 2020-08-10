@@ -26,7 +26,7 @@ def main():
                                       waterline_diameter=70,  # main hull cylinder
                                       scale_factor=75,  # står i rapporten
                                       water_density=1025,  # usikkert
-                                      water_depth=4.1 * 75,  # står kun >300
+                                      water_depth=4.1 * 75,  # Kilde på at dybden i tanken er 4.1m er fisk.no, fant ikke noe annet offisielt tall
                                       transient=3 * 60 * 60)  # 3 hours in seconds)
     add_sensors(campaign=campaign, client=client)
 
