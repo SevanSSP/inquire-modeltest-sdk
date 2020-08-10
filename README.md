@@ -17,6 +17,19 @@ purposes. See deployment for notes on how to deploy the project on a live system
 ### Prerequisites
 * Install Python version 3.6.9 or later from either https://www.python.org or https://www.anaconda.com.
 
+### Use as Python package
+
+Pip-install package from packagr.
+```pip install modeltestSDK --extra-index-url https://api.packagr.app/EYvhW6Syl/ -U```
+
+Then enter packagr credentials to initiate install.
+
+### Code examples
+Code examples, methods and use cases are found in [here](https://drive.google.com/drive/folders/1pxj8WBCVMjnYU2tzklr1oJY3OqhwqBes?usp=sharing).
+
+These can either be opened in google Colab or downloaded and used with anacondas jupyter notebooks
+
+
 ### Clone the source code repository
 At the desired location, run:
 
