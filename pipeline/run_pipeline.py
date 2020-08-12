@@ -3,6 +3,7 @@ from modeltestSDK.utils import get_datetime_date
 
 from .add_sensors import add_sensors, sensorDict
 from .add_campaign import fill_campaign
+from .add_wave_calibrations import fill_campaign_with_wave_calibrations
 
 import time
 
@@ -37,7 +38,8 @@ def main():
     add_sensors(campaign=campaign, client=client)
 
     concept_ids = ["M206", "M207"]
-    fill_campaign(campaign, concept_ids, client, campaign_dir)
+    # fill_campaign(campaign, concept_ids, client, campaign_dir)
+    fill_campaign_with_wave_calibrations(campaign, client, campaign_dir)
 
     toc = time.perf_counter()
     print(f"Importing campaign took {toc - tic:0.4f} seconds")
