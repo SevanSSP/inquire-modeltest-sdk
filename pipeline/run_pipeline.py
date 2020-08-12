@@ -37,8 +37,10 @@ def main():
     # Add all the sensors that were used in STT campaign
     add_sensors(campaign=campaign, client=client)
 
+    # Add all the wave&current calibration tests from STT campaign
     fill_campaign_with_wave_calibrations(campaign, client, campaign_dir)
 
+    # Add all the floater tests for both concepts used in STT campaign
     concept_ids = ["M206", "M207"]
     fill_campaign_with_floater_tests(campaign, concept_ids, client, campaign_dir)
 
