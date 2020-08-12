@@ -17,6 +17,7 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, 
     for calibration in calibrations:
 
         # Find wave spectrum, wave height and wave period based on file names
+        # Example of file name: Irreg_Hs15_Tp16
         wave_spectrum = calibration.split("_")[0]
         if wave_spectrum == "Irreg":
             wave_spectrum = "jonswap"   # Jonswap is attempted to be created in STT campaign
@@ -30,8 +31,10 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, 
         # Find gamma based on hs and tp pairs, based on values given in modeltest report
         gamma = find_gamma_based_on_hs_tp_pairs(wave_height, wave_period)
 
-        # Find test date and time from file name
         os.chdir(os.getcwd() + "\\" + calibration)
+
+        # Find test date and time from file name
+        # Example of file name: WaveClibIrreg_Hs10_Tp16_nyTF 180120 145200
         times = os.listdir(path='.')
         date = times[0].split(" ")[1]
         timestamp = times[0].split(" ")[2]
@@ -54,7 +57,9 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, 
             os.chdir(os.getcwd() + "\\" + time)
 
             # The .csv files that should be read have the same name as the calibration test. Only read these files.
+            # Example of file name that should be read: WaveClibIrreg_Hs10_Tp16_nyTF Wagon 55
             files = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == time.split(" ")[0]]
+            
             for file in files:
                 read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id, client=client)
             os.chdir(get_parent_dir(os.getcwd()))
