@@ -37,7 +37,6 @@ def main():
     # Add all the sensors that were used in STT campaign
     add_sensors(campaign=campaign, client=client)
 
-    # fill_campaign(campaign, concept_ids, client, campaign_dir)
     fill_campaign_with_wave_calibrations(campaign, client, campaign_dir)
 
     concept_ids = ["M206", "M207"]
