@@ -28,13 +28,15 @@ def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
     # Iterate through sensor names that are found in the top row of the .csv file
     for sensor in col_names[1:]:
         sensor_strip = sensor.strip()
+
         tic = timer.perf_counter()
+
         sensor_id = client.sensor.get_id(sensor_strip)
         timeseries = client.timeseries.create(sensor_id=sensor_id,
                                               test_id=test_id)
+
         datapoints = df[[col_names[0], sensor]].values.tolist()
         start_time, start_value = datapoints[0]
-
         start_time = str_to_datetime(start_time)
 
         for time, value in datapoints:
