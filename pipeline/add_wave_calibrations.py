@@ -19,7 +19,7 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, 
         # Find wave spectrum, wave height and wave period based on file names
         wave_spectrum = calibration.split("_")[0]
         if wave_spectrum == "Irreg":
-            wave_spectrum = "jonswap"  # Jonswap is attempted to be created in STT campaign
+            wave_spectrum = "jonswap"   # Jonswap is attempted to be created in STT campaign
         if wave_spectrum == "Reg":
             wave_spectrum = "regular"
         wave_height = calibration.split("_")[1]
@@ -30,7 +30,7 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, 
         # Find gamma based on hs and tp pairs, based on values given in modeltest report
         gamma = find_gamma_based_on_hs_tp_pairs(wave_height, wave_period)
 
-        # Find test date and time
+        # Find test date and time from file name
         os.chdir(os.getcwd() + "\\" + calibration)
         times = os.listdir(path='.')
         date = times[0].split(" ")[1]
