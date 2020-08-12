@@ -19,10 +19,13 @@ def str_to_datetime(s):
         return datetime.datetime(year=1900, month=1, day=1, hour=hour, minute=min, second=sec, microsecond=ms)
 
 
+# Create timeseries for every sensor that was used for a test, by reading the .csv file
 def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
     df = pd.read_csv(file, sep=';')
 
     col_names = list(df.columns)
+
+    # Iterate through sensor names that are found in the top row of the .csv file
     for sensor in col_names[1:]:
         sensor_strip = sensor.strip()
         tic = timer.perf_counter()
@@ -35,6 +38,7 @@ def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
         start_time = str_to_datetime(start_time)
 
         for time, value in datapoints:
+            # Skip adding nan values in .csv file
             if pd.isna(value):
                 continue
             time_point = str_to_datetime(time)
@@ -44,6 +48,9 @@ def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
                                   value=value,
                                   client=client)
             timeseries.data_points.append(datapoint)
+
+        # Post all datapoints for a single timeseries at the same time with post_data_points() for faster uploading
         timeseries.post_data_points()
+
         toc = timer.perf_counter()
         print(f"Posting timeseries for sensor {sensor} in file {file} took  {toc - tic:0.4f} seconds")

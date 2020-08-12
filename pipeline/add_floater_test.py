@@ -23,14 +23,14 @@ waveCalibDict["waveReg_1108"] = "Reg_Hs10_Tp15"
 
 
 def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, concept_id: str, client: SDKclient):
-    orientation = 0  # for alle i SWACH
+    orientation = 0  # Standard for all floaters in SWACH modeltest
     if concept_id == "M206":
-        draft = 29.5  # Fra Specs
+        draft = 29.5
     if concept_id == "M207":
         draft = 18
 
     x = testname.split("_")[0]
-    # hardkoding av category basert på filnavn
+    # Hardcoding of category based on filename
     if x == "waveReg":
         category = "regular wave"
     elif x == "waveIrreg":
@@ -39,11 +39,14 @@ def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, c
         category = "decay"
     elif x[0:3] == "X10":
         category = "pull out"
+
+    # Connect floater test to the right wave calibration, if there is one.
     try:
         wave_id = client.wave_current_calibration.get_id(waveCalibDict[testname])
     except:
         wave_id = None
 
+    # Create floater test
     floater_test = client.floater.create(description=testname,
                                          test_date=date,
                                          campaign_id=campaign.id,
@@ -51,9 +54,9 @@ def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, c
                                          orientation=orientation,
                                          draft=draft,
                                          wave_id=wave_id,
-                                         wind_id=None)
+                                         wind_id=None)  # No wind in STT campaign
 
+    # Add every timeseries
     for file in files:
         read_datapoints_from_csv_with_pandas(file=file, test_id=floater_test.id, client=client)
 
-    return floater_test
