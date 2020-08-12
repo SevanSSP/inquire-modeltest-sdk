@@ -1,15 +1,14 @@
 import os
 import datetime
-from modeltestSDK.resources import Campaign, Test, DataPoint, WaveCurrentCalibration, WindConditionCalibration
+from modeltestSDK.resources import Campaign
 from modeltestSDK.client import SDKclient
 from modeltestSDK.utils import get_datetime_date, get_parent_dir
 from .add_timeseries import read_datapoints_from_csv_with_pandas
-from .add_floater_test import add_floater_test
-from .add_sensors import add_sensors
 
 # It is recommended to open the file system for the STT campaign, to understand how calibration tests are added in order
 
 def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, campaign_dir: str):
+
     # Add all wave_calibrations by iterating through wave calibration folders.
     os.chdir(campaign_dir)
     os.chdir(os.getcwd() + "\\" + "WaveCalib")
