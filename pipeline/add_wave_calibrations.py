@@ -59,7 +59,7 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, 
             # The .csv files that should be read have the same name as the calibration test. Only read these files.
             # Example of file name that should be read: WaveClibIrreg_Hs10_Tp16_nyTF Wagon 55
             files = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == time.split(" ")[0]]
-            
+
             for file in files:
                 read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id, client=client)
             os.chdir(get_parent_dir(os.getcwd()))

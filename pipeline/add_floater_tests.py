@@ -16,9 +16,12 @@ def fill_campaign_with_floater_tests(campaign: Campaign, concept_ids, client: SD
         os.chdir(campaign_dir + "\\" + concept_id)
         tests = os.listdir(path='.')
 
+        # tests is now a list with names of the folder for each test.
+        # Example of name for a test folder: waveReg_1110
         for test in tests:
             os.chdir(os.getcwd() + "\\" + test)
             times = [x for x in os.listdir(path='.') if os.path.isdir(x)]
+            # Example of name of folder that gives test date: waveReg_1110 220120 122654
             date = times[0].split(" ")[1]
             timestamp = times[0].split(" ")[2]
             date_time = date + timestamp
@@ -27,6 +30,7 @@ def fill_campaign_with_floater_tests(campaign: Campaign, concept_ids, client: SD
                 os.chdir(os.getcwd() + "\\" + time)
 
                 # Only add to test files if start with test name
+                # Example of file that should be added: waveReg_1110 Wagon 55
                 files = [os.getcwd() + "\\" + x for x in os.listdir(path='.') if x.split(" ")[0] == test]
 
                 # This method adds the floater test to the database, and also adds all timeseries for that test.
