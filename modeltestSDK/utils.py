@@ -133,24 +133,6 @@ def to_camel_case(d):
             dd[k] = v
         return dd
 
-
-'''def to_datetime_string(d):
-    """
-    Convert date time object to formatted date time string.
-    Parameters
-    ----------
-    d : datetime
-        Date time object
-    Returns
-    -------
-    str
-        Formatted date time string.
-    """
-    assert isinstance(d, datetime)
-
-    return d.strftime(Config.datetime_format)'''
-
-
 def from_datetime_string(s):
     """
     Convert formatted date time string to date time object.
@@ -203,6 +185,9 @@ def get_datetime_date(date):
 
 
 class TwoWayDict(dict):
+    '''
+    Special dict where index and value is searchable
+    '''
     def __setitem__(self, key, value):
         # Remove any previous connections with these values
         if key in self:
@@ -221,7 +206,7 @@ class TwoWayDict(dict):
         return dict.__len__(self) // 2
 
 
-def from_string_to_time(s):
+def from_string_to_time(s: str):
     time_string = s.split(" ")[1]
     if len(time_string) == 8:
         # If timestamp is at whole second, ex. "09:00:00"
