@@ -16,7 +16,8 @@ def str_to_datetime(s):
         min = int(s[3:5])
         sec = int(s[6:8])
         ms = int(s[9:15])
-        return datetime.datetime(year=1900, month=1, day=1, hour=hour, minute=min, second=sec, microsecond=ms)
+        # Since there are only 5 decimals behind each second in the timeseries, microsecond must be multiplied by 10
+        return datetime.datetime(year=1900, month=1, day=1, hour=hour, minute=min, second=sec, microsecond=10*ms)
 
 
 # Create timeseries for every sensor that was used for a test, by reading the .csv file
@@ -36,6 +37,8 @@ def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
                                               test_id=test_id)
 
         datapoints = df[[col_names[0], sensor]].values.tolist()
+
+        # Get the start time of timeseries, for inserting datapoints as seconds after this starting time
         start_time, start_value = datapoints[0]
         start_time = str_to_datetime(start_time)
 

@@ -1,18 +1,13 @@
 from modeltestSDK import SDKclient
 import numpy
 from qats.signal import find_maxima
-
 from modeltestSDK.plot_timeseries import plot_timeseries
-
-import time
-
-start = time.perf_counter()
 
 client = SDKclient()
 
 campaign = client.campaign.get_by_name("STT")
-test_name = "Y200"
-sensor_name = "M207_COF X"
+test_name = "X300"
+sensor_name = "M206_COF Z"
 t_dur = 35
 
 test = campaign.get_tests(type="floater")[test_name]
@@ -44,7 +39,3 @@ print("Number of oscillations observed is", len(times[indices2[0:-2]] - times[in
 
 print("Natural period for modeltest is", Tn, "seconds")
 print("Full scale natural period is", Tn * numpy.sqrt(campaign.scale_factor), "seconds")
-
-end = time.perf_counter()
-
-print(end-start)
