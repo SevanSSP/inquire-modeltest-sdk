@@ -264,6 +264,10 @@ class TimeseriesAPI(BaseAPI):
         data = self.client.get(self._resource_path, f"{id}/datapoints/minvalue")
         return data
 
+    def get_mean(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/datapoints/mean")
+        return data
+
     def get_measured_hs(self, id: str):
         data = self.client.get(self._resource_path, f"{id}/datapoints/measured_hs")
         return data

@@ -450,6 +450,9 @@ class Timeseries(BaseResource):
     def get_min_value(self):
         return self._client.timeseries.get_min_value(id=self.id)
 
+    def get_mean(self):
+        return self._client.timeseries.get_mean(id=self.id)
+
     def get_measured_hs(self):
         return self._client.timeseries.get_measured_hs(id=self.id)
 
