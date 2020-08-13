@@ -306,7 +306,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-#MTI 2 sensors (accelerometer)
+    #MTI 2 sensors (accelerometer)
 
     client.sensor.create(name='MIT 2 Roll (X)',
                          description='Accelerometer - E',
@@ -420,7 +420,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-# Sensor on the spring that is used for pull out test X100. Not sure what coordinates should be
+    # Sensor on the spring that is used for pull out test X100. Not sure what coordinates should be
 
     client.sensor.create(name='F_pullout Slot 8 AI2 (Single ended)',
                          description='Accelerometer - E',
@@ -434,8 +434,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
 
 
-    #M207 sensors
-    # M207_COG sensors. Usikker på om x- og y skal være 0
+    # M207 sensors
+    # M207_COG sensors. Not sure if x and y should be zero
 
     client.sensor.create(name="M207_COG X",
                          description="",
@@ -497,7 +497,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-# M207_acc_pos. Need coordinates
+    # M207_acc_pos. Need coordinates
     client.sensor.create(name="M207_acc_pos X",
                          description="",
                          unit="mm",
@@ -558,7 +558,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-# M207_COF. Needs coordinates
+    # M207_COF. Needs coordinates
 
     client.sensor.create(name="M207_COF X",
                          description="",

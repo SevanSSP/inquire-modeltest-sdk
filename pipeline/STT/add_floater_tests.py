@@ -3,7 +3,7 @@ import datetime
 from modeltestSDK.utils import get_datetime_date, get_parent_dir
 from modeltestSDK.resources import Campaign
 from modeltestSDK.client import SDKclient
-from pipeline.add_timeseries import read_datapoints_from_csv_with_pandas
+from pipeline.STT.add_timeseries import read_datapoints_from_csv_with_pandas
 from modeltestSDK.utils import TwoWayDict
 
 # It is recommended to open the file system for the STT campaign, to understand how floater tests are added in order
