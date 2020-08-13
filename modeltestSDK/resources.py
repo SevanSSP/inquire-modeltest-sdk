@@ -8,6 +8,10 @@ from typing import Optional
 import warnings
 
 
+'''
+User-side classes 
+'''
+
 class BaseResource(object):
     def __str__(self):
         return json.dumps(make_serializable(self.dump()), indent=2)
@@ -140,16 +144,6 @@ class Campaign(BaseResource):
                 self.test.append(item)
         else:
             self.test.append(child)
-
-    '''
-    def find_test(self, name):
-        try:
-            for t in self.test:
-                if t.description == name:
-                    return t
-        except:
-            raise Exception(f"Test not found under {self.name} campaign ")
-    '''
 
     def populate_sensor(self, child):
         if isinstance(child, SensorList):

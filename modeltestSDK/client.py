@@ -73,18 +73,44 @@ class SDKclient:
         except Exception as inst:
             ClientException(exception=inst, response=response)
         else:
-            if "data'æasd   points" in endpoint:
-                return response.text
             return response.json()
 
     def get(self, resource: str, endpoint: str = "", parameters: dict = None):
+        '''
+        Method to retrieve resource from db
+        :param resource:
+        :param endpoint:
+        :param parameters:
+        :return:
+        '''
         return self.do_request(requests.get, resource, endpoint, parameters=parameters)
 
     def post(self, resource: str, endpoint: str = "", body: dict = None):
+        '''
+        Method to create resource in db
+        :param resource:
+        :param endpoint:
+        :param body:
+        :return:
+        '''
         return self.do_request(requests.post, resource, endpoint, body=body)
 
     def patch(self, resource: str, endpoint: str = "", body: dict = None):
+        '''
+        Method to update resource in db
+        :param resource:
+        :param endpoint:
+        :param body:
+        :return:
+        '''
         return self.do_request(self.session.patch, resource, endpoint, body=body)
 
     def delete(self, resource: str, endpoint: str):
+        '''
+        Method for deleting a resource from db
+        WARNING: Not working in a intuitive way
+        :param resource:
+        :param endpoint:
+        :return:
+        '''
         return self.do_request(self.session.delete, resource, endpoint)

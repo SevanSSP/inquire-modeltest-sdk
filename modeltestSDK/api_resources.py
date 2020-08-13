@@ -12,7 +12,10 @@ def get_id_from_response(response):
     return response[0]["id"]
 
 
+'''Abstraction layer between client and resources'''
+
 class BaseAPI:
+
     def __init__(self, client):
         self._resource_path = format_class_name(self.__class__.__name__)
         self.client = client
