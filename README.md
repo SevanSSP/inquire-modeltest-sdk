@@ -99,6 +99,40 @@ tests-start.sh
 This requires an enviorment variable *TEST_MODELTESTDB_URI* 
 
 
+### File structure
+<pre>
+|-- .github  
+|   |-- workflows  
+|       |-- publish-package.yml # Github actions file to publish package of application to packagr  
+|       |-- pytest.yml         # Github actions file to run pytest on pull and push to dev / master 
+|
+|-- scripts  
+|   |-- test.sh        # Bash file to run pytest coverage  
+|
+|-- modeltestSDK  
+|   |-- config.py # Configure connection to API
+|   |-- client.py # Client handeling all HTTP-requests to API
+|   |-- exceptions.py # Handles error messages from failed HTTP-requests
+|   |-- api_resources.py # Abstraction layer betweem client and user-side
+|   |-- resources.py # Client-side classes and functions for campaign, timeseries ... etc
+|   |-- plot_timeseries # Function for plotting one or more timeseries using matplotlib
+|   |-- utils.py # Utility functions used in several parts of the SDK
+|
+|-- pipeline
+|   |-- run_pipeline.py # Script handeling pipeline of STT-campaign
+|   |-- add_campaign.py
+|   |-- add_sensors.py
+|   |-- add_floater_test.py
+|   |-- add_timeseries.py
+|
+|-- .gitignore
+|-- Requirements.txt   # File containing all python packages used
+|-- LICENSE
+|-- setup.py # Setup file configuring the python package uploaded to Packagr
+</pre>
+
+
+
 ### Versioning
 This project uses semantic versioning. [More info](https://semver.org/)
 
