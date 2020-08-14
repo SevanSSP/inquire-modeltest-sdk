@@ -391,10 +391,11 @@ class Timeseries(BaseResource):
         return self.data_points
 
     def to_arrays(self):
-        data_points = self.get_data_points()
+        if not self.data_points:
+            self.get_data_points()
         times_in_tuples = []
         values = []
-        for data_point in data_points:
+        for data_point in self.data_points:
             times_in_tuples.append(data_point.time)
             values.append(data_point.value)
         times_in_array = numpy.array(times_in_tuples)
