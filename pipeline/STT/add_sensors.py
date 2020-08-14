@@ -5,19 +5,20 @@ from modeltestSDK.utils import TwoWayDict
 sensorDict = TwoWayDict()
 sensorDict["Wave 1 Moonpool Slot 7 AI0-AI8"] = "wave2"
 
-# Koordinater til sensorene er i enheten meter, og for full skala
-# Alle er oppgitt lokalt, dvs. med origo for x- og y i midten av Moonpool, og z ved Base line, altså dypeste punkt på plattformen. (Baseline = vannlinje - draft)
-waterline = 0   # [m]
+# Coordinates for the sensors are give for full scale in meters
+# All coordinates are given with origo for x- and y in the center of the moonpool, and z at Base line (deepest point on platform)
+waterline = 0       # [m]
 draft_M206 = 29.5   # [m]
 draft_M207 = 18     # [m]
 deck_height = 47.5  # [m]
-VCG_M206 = 14.4     # [m]   I SWACH-specification er denne 17.5
-VCG_M207 = 18.2     # [m]   I HE MODU - specification er denne 18.4
+VCG_M206 = 14.4     # [m]   # This is 17.5 meters in SWACH-specification report
+VCG_M207 = 18.2     # [m]   # This is 18.4 meters in HE MODU specification report
 
-# Alle koordinater burde dobbeltsjekkes
+# TODO: Verify all coordinates
 def add_sensors(campaign: Campaign, client: SDKclient):
 
-    # M_206_COG sensors. Er usikker på om x og y er null for COG.
+    # M206 sensors
+    # M_206_COG sensors
 
     client.sensor.create(name="M206_COG X",
                          description="Surge COG",
@@ -77,8 +78,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-
-# M206_acc sensors. Målte verdier fra akselerometer har akselerometeret som origo.
+# M206_acc sensors. Accelerometer is origo for these sensors.
 
     client.sensor.create(name="M206_acc_pos X",
                          description="Surge position of 6DOF",
@@ -140,8 +140,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
+# M206_cof sensors. Not sure what coordinates are for centre of floatation
 
-# M206_cof sensors. Vet ikke hvor Centre of Floatation ligger
     client.sensor.create(name="M206_COF X",
                          description="Surge COF",
                          unit="mm",
@@ -204,7 +204,6 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
     # Wave sensors
 
-    # Denne skal kanskje være Moonpool istedet for Center. Vent på svar fra Einar
     client.sensor.create(name="Wave 1 Center Slot 7 AI0-AI8",
                          description="Relative wave probe for moonpool",
                          unit="mm",
@@ -222,8 +221,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          x=(-117/1000)*75,
                          y=0,
                          z=None,
-                         # 47.5 er høyden til dech på fullskala, i meter
-                         is_local=True,  # usikker
+                         is_local=True,     # Not sure if these are local or global
                          campaign_id=campaign.id)
 
     client.sensor.create(name='Wave 2 Front Model Slot 7 AI1-AI9',
@@ -266,8 +264,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-
 # Force sensors (in moorings placed on waterline)
+
     client.sensor.create(name='F_BB_Front_Slot 8 AI5',
                          description='Force BB Front',
                          unit='N',
@@ -308,8 +306,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
+    #MTI 2 sensors (accelerometer)
 
-#MTI 2 sensors (accelerometer)
     client.sensor.create(name='MIT 2 Roll (X)',
                          description='Accelerometer - E',
                          unit='m/s^2',
@@ -400,8 +398,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
+# Wagon sensors. Not sure what the coordinates should be for these
 
-# Wagon sensors. Usikker på hva koordinatene skal være
     client.sensor.create(name='Wagon Master Position',
                          description='Accelerometer - E',
                          unit='m/s^2',
@@ -422,8 +420,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
+    # Sensor on the spring that is used for pull out test X100. Not sure what coordinates should be
 
-# Sensor på fjæren som brukes i pull out test X100. Usikker på hva koordinatene skal være
     client.sensor.create(name='F_pullout Slot 8 AI2 (Single ended)',
                          description='Accelerometer - E',
                          unit='m/s^2',
@@ -436,9 +434,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
 
 
 
-    #M207 sensors
+    # M207 sensors
+    # M207_COG sensors. Not sure if x and y should be zero
 
-# M207_COG sensors. Usikker på om x- og y skal være 0
     client.sensor.create(name="M207_COG X",
                          description="",
                          unit="mm",
@@ -499,7 +497,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-# M207_acc_pos. Mangler koordinater
+    # M207_acc_pos. Need coordinates
     client.sensor.create(name="M207_acc_pos X",
                          description="",
                          unit="mm",
@@ -560,7 +558,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          campaign_id=campaign.id)
 
-# M207_COF. Mangler koordinater
+    # M207_COF. Needs coordinates
+
     client.sensor.create(name="M207_COF X",
                          description="",
                          unit="mm",

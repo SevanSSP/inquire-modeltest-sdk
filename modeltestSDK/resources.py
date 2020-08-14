@@ -8,6 +8,10 @@ from typing import Optional
 import warnings
 
 
+'''
+User-side classes 
+'''
+
 class BaseResource(object):
     def __str__(self):
         return json.dumps(make_serializable(self.dump()), indent=2)
@@ -140,16 +144,6 @@ class Campaign(BaseResource):
                 self.test.append(item)
         else:
             self.test.append(child)
-
-    '''
-    def find_test(self, name):
-        try:
-            for t in self.test:
-                if t.description == name:
-                    return t
-        except:
-            raise Exception(f"Test not found under {self.name} campaign ")
-    '''
 
     def populate_sensor(self, child):
         if isinstance(child, SensorList):
@@ -397,10 +391,11 @@ class Timeseries(BaseResource):
         return self.data_points
 
     def to_arrays(self):
-        data_points = self.get_data_points()
+        if not self.data_points:
+            self.get_data_points()
         times_in_tuples = []
         values = []
-        for data_point in data_points:
+        for data_point in self.data_points:
             times_in_tuples.append(data_point.time)
             values.append(data_point.value)
         times_in_array = numpy.array(times_in_tuples)
@@ -455,6 +450,9 @@ class Timeseries(BaseResource):
 
     def get_min_value(self):
         return self._client.timeseries.get_min_value(id=self.id)
+
+    def get_mean(self):
+        return self._client.timeseries.get_mean(id=self.id)
 
     def get_measured_hs(self):
         return self._client.timeseries.get_measured_hs(id=self.id)

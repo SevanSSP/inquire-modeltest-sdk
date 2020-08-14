@@ -3,6 +3,11 @@ import warnings
 
 
 def plot_timeseries(timeseries_list: list):
+    '''
+    Plot one or more timeseries with matplotlib
+    :param timeseries_list:
+    :return:
+    '''
 
     plt.figure(1, figsize=(20, 6), facecolor='w', edgecolor='k')
     plt.axhline(0, color='slategray')

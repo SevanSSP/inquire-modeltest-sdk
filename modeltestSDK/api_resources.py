@@ -12,7 +12,10 @@ def get_id_from_response(response):
     return response[0]["id"]
 
 
+'''Abstraction layer between client and resources'''
+
 class BaseAPI:
+
     def __init__(self, client):
         self._resource_path = format_class_name(self.__class__.__name__)
         self.client = client
@@ -259,6 +262,10 @@ class TimeseriesAPI(BaseAPI):
 
     def get_min_value(self, id: str):
         data = self.client.get(self._resource_path, f"{id}/datapoints/minvalue")
+        return data
+
+    def get_mean(self, id: str):
+        data = self.client.get(self._resource_path, f"{id}/datapoints/mean")
         return data
 
     def get_measured_hs(self, id: str):
