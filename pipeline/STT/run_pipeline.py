@@ -1,9 +1,8 @@
 from modeltestSDK.client import SDKclient
 from modeltestSDK.utils import get_datetime_date
-
-from .add_sensors import add_sensors, sensorDict
-from .add_wave_calibrations import fill_campaign_with_wave_calibrations
-from .add_floater_tests import fill_campaign_with_floater_tests
+from pipeline.STT.add_sensors import add_sensors, sensorDict
+from pipeline.STT.add_wave_calibrations import fill_campaign_with_wave_calibrations
+from pipeline.STT.add_floater_tests import fill_campaign_with_floater_tests
 
 import time
 
@@ -21,7 +20,7 @@ def main():
     client = SDKclient()
 
     # Specify path to folder where campaign is locally stored
-    campaign_dir = "C:/Users/nbu/Documents/STT"
+    campaign_dir = "T:\STT"
 
     # Create initial campaign in database
     campaign = client.campaign.create(name="STT",
@@ -31,8 +30,8 @@ def main():
                                       waterline_diameter=70,    # Main hull cylinder
                                       scale_factor=75,          # From the report
                                       water_density=1025,       # Not sure if this is correct
-                                      water_depth=4.1 * 75,     # Source for water depth being 4.1m is fisk.no, could not find any other official number
-                                      transient=3 * 60 * 60)    # 3 hours in seconds
+                                      water_depth=4.0 * 75,     # Source for water depth being 4.1m is fisk.no, could not find any other official number
+                                      transient=3 * 60 * 60)    # 3 hours in seconds (LMR: transient shouldn't be equal to test length)
 
     # Add all the sensors that were used in STT campaign
     add_sensors(campaign=campaign, client=client)
