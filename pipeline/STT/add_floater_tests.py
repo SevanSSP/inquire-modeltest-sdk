@@ -8,6 +8,7 @@ from modeltestSDK.utils import TwoWayDict
 
 # It is recommended to open the file system for the STT campaign, to understand how floater tests are added in order
 
+
 def fill_campaign_with_floater_tests(campaign: Campaign, concept_ids, client: SDKclient, campaign_dir: str):
     os.chdir(campaign_dir)
 
@@ -60,6 +61,24 @@ waveCalibDict["waveReg_1105"] = "Reg_Hs7_Tp10"
 waveCalibDict["waveReg_1106"] = "Reg_Hs7_Tp13"
 waveCalibDict["waveReg_1107"] = "Reg_Hs10_Tp13"
 waveCalibDict["waveReg_1108"] = "Reg_Hs10_Tp15"
+waveCalibDict["waveReg_1109"] = "Reg_Hs10_Tp17"
+waveCalibDict["waveReg_1110"] = "Reg_Hs10_Tp25"
+waveCalibDict["waveIrreg_2201"] = "Irreg_Hs7_Tp12"
+waveCalibDict["waveIrreg_2202"] = "Irreg_Hs7_Tp16"
+waveCalibDict["waveIrreg_2203"] = "Irreg_Hs10_Tp13"
+waveCalibDict["waveIrreg_2204"] = "Irreg_Hs10_Tp16"
+waveCalibDict["waveIrreg_2205"] = "Irreg_Hs15_Tp16"
+waveCalibDict["waveReg_1201"] = "Reg_Hs3_Tp6.5"
+waveCalibDict["waveReg_1202"] = "Reg_Hs3_Tp8"
+waveCalibDict["waveReg_1203"] = "Reg_Hs5_Tp8"
+waveCalibDict["waveReg_1204"] = "Reg_Hs5_Tp10"
+waveCalibDict["waveReg_1205"] = "Reg_Hs7_Tp10"
+waveCalibDict["waveReg_1206"] = "Reg_Hs7_Tp13"
+waveCalibDict["waveReg_1207"] = "Reg_Hs10_Tp13"
+waveCalibDict["waveReg_1208"] = "Reg_Hs10_Tp15"
+waveCalibDict["waveReg_1209"] = "Reg_Hs10_Tp17"
+waveCalibDict["waveReg_1210"] = "Reg_Hs10_Tp25"
+
 
 def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, concept_id: str, client: SDKclient):
 

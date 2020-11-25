@@ -7,7 +7,6 @@ sensorDict["Wave 1 Moonpool Slot 7 AI0-AI8"] = "wave2"
 
 # Coordinates for the sensors are give for full scale in meters
 # All coordinates are given with origo for x- and y in the center of the moonpool, and z at Base line (deepest point on platform)
-waterline = 0       # [m]
 draft_M206 = 29.5   # [m]
 draft_M207 = 18     # [m]
 deck_height = 47.5  # [m]
@@ -79,14 +78,13 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
 # M206_acc sensors. Accelerometer is origo for these sensors.
-
     client.sensor.create(name="M206_acc_pos X",
                          description="Surge position of 6DOF",
                          unit="mm",
                          kind="length",
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+deck_height+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -96,7 +94,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="length",
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+deck_height+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -106,7 +104,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="length",
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+deck_height+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -116,7 +114,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+deck_height+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -126,7 +124,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+deck_height+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -136,7 +134,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+deck_height+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -148,7 +146,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="length",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M206,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -158,7 +156,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="length",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M206,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -168,7 +166,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="length",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M206,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -178,7 +176,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M206,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -188,7 +186,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M206,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -198,12 +196,12 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M206,
                          is_local=True,
                          campaign_id=campaign.id)
 
     # Wave sensors
-
+    # TODO: cant find this sensor
     client.sensor.create(name="Wave 1 Center Slot 7 AI0-AI8",
                          description="Relative wave probe for moonpool",
                          unit="mm",
@@ -249,7 +247,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          unit='mm',
                          kind='length',
                          x=(1095/1000)*75,
-                         y=(-2750/1000)*75,
+                         y=-(2750/1000)*75,
                          z=None,
                          is_local=True,
                          campaign_id=campaign.id)
@@ -314,7 +312,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='acceleration',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -324,7 +322,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='acceleration',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -334,7 +332,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='acceleration',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -344,7 +342,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='acceleration',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -354,7 +352,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='acceleration',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -364,7 +362,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='acceleration',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -374,7 +372,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='angular velocity',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -384,7 +382,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='angular velocity',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -394,7 +392,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind='angular velocity',
                          x=0,
                          y=(372.5/1000)*75,
-                         z=draft_M206+(60/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -498,13 +496,14 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          campaign_id=campaign.id)
 
     # M207_acc_pos. Need coordinates
+    # TODO: check whether STT has accounted for deck height of 39.5 or not (49.5) in their output
     client.sensor.create(name="M207_acc_pos X",
                          description="",
                          unit="mm",
                          kind="length",
                          x=0,
-                         y=0,
-                         z=0,
+                         y=(372.5/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -513,8 +512,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          unit="mm",
                          kind="length",
                          x=0,
-                         y=0,
-                         z=0,
+                         y=(372.5/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -523,8 +522,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          unit="mm",
                          kind="length",
                          x=0,
-                         y=0,
-                         z=0,
+                         y=(372.5/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -533,8 +532,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          unit="deg",
                          kind="angle",
                          x=0,
-                         y=0,
-                         z=0,
+                         y=(372.5/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -543,8 +542,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          unit="deg",
                          kind="angle",
                          x=0,
-                         y=0,
-                         z=0,
+                         y=(372.5/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -553,20 +552,19 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          unit="deg",
                          kind="angle",
                          x=0,
-                         y=0,
-                         z=0,
+                         y=(372.5/1000)*75,
+                         z=deck_height+(60/1000)*75,
                          is_local=True,
                          campaign_id=campaign.id)
 
     # M207_COF. Needs coordinates
-
     client.sensor.create(name="M207_COF X",
                          description="",
                          unit="mm",
                          kind="length",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M207,
                          is_local=True,
                          campaign_id=campaign.id)
     client.sensor.create(name="M207_COF Y",
@@ -575,7 +573,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="length",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M207,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -585,7 +583,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="length",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M207,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -595,7 +593,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M207,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -605,7 +603,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M207,
                          is_local=True,
                          campaign_id=campaign.id)
 
@@ -615,6 +613,6 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          kind="angle",
                          x=0,
                          y=0,
-                         z=0,
+                         z=draft_M207,
                          is_local=True,
                          campaign_id=campaign.id)

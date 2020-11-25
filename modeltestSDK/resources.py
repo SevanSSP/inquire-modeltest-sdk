@@ -12,6 +12,7 @@ import warnings
 User-side classes 
 '''
 
+
 class BaseResource(object):
     def __str__(self):
         return json.dumps(make_serializable(self.dump()), indent=2)

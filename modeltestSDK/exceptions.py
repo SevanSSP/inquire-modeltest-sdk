@@ -2,6 +2,7 @@
 Parse errors from the api
 '''
 
+
 class ClientException(Exception):
     def __init__(self, exception, response):
         prefix = "\n____________________________ CUSTOM ERROR ____________________________\n"
