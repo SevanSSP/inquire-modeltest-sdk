@@ -62,7 +62,7 @@ class CampaignAPI(NamedBaseAPI):
             raise Exception(f"Could not find any object with name {name}")
 
     def get_all(self) -> CampaignList:
-        data = self.client.get(self._resource_path, "all")
+        data = self.client.get(self._resource_path, "")
         obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
         return CampaignList(resources=obj_list, client=None)
 

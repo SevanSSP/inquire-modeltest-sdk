@@ -56,7 +56,7 @@ class SDKclient:
         if not isinstance(endpoint, str):
             endpoint = str(endpoint)
 
-        url = self.config.host +"/" + "/".join([p for p in [self.config.base_url, resource, endpoint] if p.strip()])
+        url = self.config.host +"/" + "/".join([p for p in [self.config.base_url, self.config.version, resource, endpoint] if p.strip()])
 
         if parameters is not None and isinstance(parameters, dict):
             parameters = to_camel_case({k: v for k, v in parameters.items() if v is not None})
