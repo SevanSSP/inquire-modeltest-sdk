@@ -39,11 +39,10 @@ class NamedBaseAPI(BaseAPI):
 
 class CampaignAPI(NamedBaseAPI):
 
-    def create(self, name: str, description: str, location: str, date: any, waterline_diameter: float,
-               scale_factor: float, water_density: float, water_depth: float, transient: float) -> Campaign:
-        body = dict(name=name, description=description, location=location, date=date, waterline_diameter=waterline_diameter,
-                    scale_factor=scale_factor, water_density=water_density, water_depth=water_depth,
-                    transient=transient)
+    def create(self, name: str, description: str, location: str, date: any,
+               scale_factor: float, water_depth: float) -> Campaign:
+        body = dict(name=name, description=description, location=location, date=date,
+                    scale_factor=scale_factor, water_depth=water_depth,)
         data = self.client.post(self._resource_path, body=body)
         return Campaign.from_dict(data=data, client=self.client)
 
@@ -52,7 +51,7 @@ class CampaignAPI(NamedBaseAPI):
         return Campaign.from_dict(data=data, client=self.client)
 
     def get_by_name(self, name: str) -> Campaign:
-        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
+        response = self.client.get(format_class_name(self.__class__.__name__), "", parameters={'name': name})
         if response:
             if len(response) != 1:
                 warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
@@ -182,9 +181,9 @@ class WindConditionCalibrationAPI(TestAPI):
 class SensorAPI(NamedBaseAPI):
 
     def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-               is_local: bool, campaign_id: str) -> Sensor:
+               is_local: bool, fs: float, intermittent: bool, campaign_id: str) -> Sensor:
         body = dict(name=name, description=description, unit=unit, kind=kind, x=x,
-                    y=y, z=z, is_local=is_local, campaign_id=campaign_id)
+                    y=y, z=z, is_local=is_local, fs=fs, intermittent=intermittent,campaign_id=campaign_id)
         data = self.client.post(self._resource_path, body=body)
         return Sensor.from_dict(data=data, client=self.client)
 
@@ -196,7 +195,7 @@ class SensorAPI(NamedBaseAPI):
         return self.client.post(self._resource_path, "ids", body=ids)
 
     def get_by_name(self, name: str):
-        response = self.client.get(format_class_name(self.__class__.__name__), "all", parameters={'name': name})
+        response = self.client.get(format_class_name(self.__class__.__name__), "", parameters={'name': name})
         if response:
             if len(response) != 1:
                 warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
@@ -206,7 +205,7 @@ class SensorAPI(NamedBaseAPI):
             raise Exception(f"Could not find any object with name {name}")
 
     def get_all(self) -> SensorList:
-        data = self.client.get(self._resource_path, "all")
+        data = self.client.get(self._resource_path, "")
         obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
         return SensorList(resources=obj_list, client=None)
 

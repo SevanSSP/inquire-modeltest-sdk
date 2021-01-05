@@ -167,7 +167,7 @@ class CampaignList(ResourceList):
 class Sensor(BaseResource):
 
     def __init__(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-                 is_local: bool, campaign_id: str = None, id: str = None, client=None):
+                 is_local: bool, fs: float, intermittent: bool, campaign_id: str = None, id: str = None, client=None):
         self.id = id
         self.name = name
         self.description = description
@@ -177,6 +177,8 @@ class Sensor(BaseResource):
         self.y = y
         self.z = z
         self.is_local = is_local
+        self.fs = fs
+        self.intermittent = intermittent
         self.campaign_id = campaign_id
         self._client = client
 
@@ -189,8 +191,8 @@ class Sensor(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'], unit=data['unit'],
-                   kind=data['kind'], x=data['y'], y=data['y'], z=data['z'], is_local=data['is_local'],
-                   campaign_id=data['campaign_id'], id=data['id'], client=client)
+                   kind=data['kind'], x=data['y'], y=data['y'], z=data['z'], is_local=data['is_local'], fs=data['fs'],
+                   intermittent=data['intermittent'], campaign_id=data['campaign_id'], id=data['id'], client=client)
 
 
 class SensorList(ResourceList):
