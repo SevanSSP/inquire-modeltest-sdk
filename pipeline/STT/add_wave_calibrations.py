@@ -42,7 +42,7 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, 
         date_time = date + timestamp
 
         # Create wave&current calibration test in the database
-        wave_current_calibration = client.wave_current_calibration.create(description=calibration,
+        wave_current_calibration = client.wave_calibration.create(description=calibration,
                                                                           test_date=get_datetime_date(date_time),
                                                                           campaign_id=campaign.id,
                                                                           wave_spectrum=wave_spectrum,

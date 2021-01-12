@@ -7,7 +7,6 @@ import numpy
 from typing import Optional
 import warnings
 
-
 '''
 User-side classes 
 '''
@@ -153,8 +152,8 @@ class Campaign(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'], location=data['location'],
-                   date=data['date'],  scale_factor=data['scale_factor'],
-                    water_depth=data['water_depth'], id=data['id'], client=client)
+                   date=data['date'], scale_factor=data['scale_factor'],
+                   water_depth=data['water_depth'], id=data['id'], client=client)
 
 
 class CampaignList(ResourceList):
@@ -166,13 +165,15 @@ class CampaignList(ResourceList):
 
 class Sensor(BaseResource):
 
-    def __init__(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-                 is_local: bool, fs: float, intermittent: bool, campaign_id: str = None, id: str = None, client=None):
+    def __init__(self, name: str, description: str, unit: str, kind: str,  x: float, y: float, z: float,
+                 is_local: bool, fs: float, intermittent: bool, area: float = None, campaign_id: str = None,
+                 id: str = None, client=None):
         self.id = id
         self.name = name
         self.description = description
         self.unit = unit
         self.kind = kind
+        self.area = area
         self.x = x
         self.y = y
         self.z = z
@@ -191,7 +192,7 @@ class Sensor(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'], unit=data['unit'],
-                   kind=data['kind'], x=data['y'], y=data['y'], z=data['z'], is_local=data['is_local'], fs=data['fs'],
+                   kind=data['kind'], area=data['area'], x=data['y'], y=data['y'], z=data['z'], is_local=data['is_local'], fs=data['fs'],
                    intermittent=data['intermittent'], campaign_id=data['campaign_id'], id=data['id'], client=client)
 
 
@@ -240,7 +241,7 @@ class Test(BaseResource):
             self.timeseries.append(child)
 
     @classmethod
-    def from_dict(cls, data: dict, client=None):
+    def from_dict(cls, data, client: object = None) -> object:
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
                    type=data['type'], id=data['id'],
                    client=client)
@@ -264,8 +265,8 @@ class TestList(ResourceList):
                 raise Exception(f"Test {key} not found under campaign ")
 
 
-class Floater(Test):
-    type = "floater"
+class FloaterTest(Test):
+    type = "floatertest"
 
     def __init__(self, description: str, test_date: str, campaign_id: str,
                  category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None,
@@ -286,15 +287,15 @@ class Floater(Test):
                    wave_id=data['wave_id'], wind_id=data['wind_id'], id=data['id'], client=client)
 
 
-class FloaterList(ResourceList):
+class FloaterTestList(ResourceList):
 
-    def __init__(self, resources: List[Floater], client=None):
+    def __init__(self, resources: List[FloaterTest], client=None):
         self.resources = resources
         self._client = client
 
 
-class WaveCurrentCalibration(Test):
-    type = "waveCurrentCalibration"
+class WaveCalibration(Test):
+    type = "Wave Calibration"
 
     def __init__(self, description: str, test_date: str, campaign_id: str,
                  wave_spectrum: str = None, wave_height: float = None, wave_period: float = None,
@@ -320,9 +321,9 @@ class WaveCurrentCalibration(Test):
                    current_direction=data['current_direction'], id=data['id'], client=client)
 
 
-class WaveCurrentCalibrationList(ResourceList):
+class WaveCalibrationList(ResourceList):
 
-    def __init__(self, resources: List[WaveCurrentCalibration], client=None):
+    def __init__(self, resources: List[WaveCalibration], client=None):
         self.resources = resources
         self._client = client
 
@@ -479,15 +480,18 @@ class TimeseriesList(ResourceList):
 
     def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
         df = pd.DataFrame(self.dump())
-
+        '''
         df.rename(columns={'sensor_id': 'sensor', 'data_points': 'length'}, inplace=True)
         if 'test_id' in df:
             df.drop(columns={'test_id'}, inplace=True)
 
-        names = self._client.sensor.get_multiple_by_name(df['sensor'].tolist())
+        print(df['sensor'].tolist())
+        #names = self._client.sensor.get_multiple_by_name(df['sensor'].tolist())
+        #names = [(self._client.sensor.get(sensor_id)).name for sensor_id in df['sensor'].tolist()]
         for i in df.index:
             df.at[i, 'sensor'] = names[i]
             df.at[i, 'length'] = len(self.resources[i].data_points)
+        '''
         return df
 
     def __getitem__(self, key):
@@ -510,7 +514,7 @@ class DataPoint(BaseResource):
 
     def __init__(self, time: float, value: float, timeseries_id: str = None, client=None):
 
-        self.timeseries_id = timeseries_id
+        #self.timeseries_id = timeseries_id
         self.time = time
         self.value = value
         self._client = client
@@ -535,3 +539,34 @@ class DataPointList(ResourceList):
     def __init__(self, resources: List[DataPoint], client=None):
         self.resources = resources
         self._client = client
+
+
+class Tag(BaseResource):
+
+    def __init__(self, name: str, comment: str, test_id: str, sensor_id: str, timeseries_id: str, id: str = None,
+                 client=None):
+        self.name = name
+        self.comment = comment
+        self.test_id = test_id
+        self.sensor_id = sensor_id
+        self.timeseries_id = timeseries_id
+        self.id = id
+        self._client = client
+
+    def __str__(self):
+        return f"<Tag: \n{self.to_pandas()}>"
+
+    def delete(self):
+        self._client.tag.delete(id=self.id)
+
+    @classmethod
+    def from_dict(cls, data: dict, client=None):
+        return cls(name=data['name'], comment=data['comment'], test_id=data['test_id'], sensor_id=data['sensor_id'],
+                   timeseries_id=data['timeseries_id'], id=data['id'], client=client)
+
+
+class TagList(ResourceList):
+
+    def __init__(self, resources: List[Tag], client=None):
+        self.resources = resources
+        self.client = client

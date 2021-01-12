@@ -1,8 +1,8 @@
 import urllib.parse
 import requests
 from .utils import to_camel_case
-from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterAPI, WindConditionCalibrationAPI,
-                            WaveCurrentCalibrationAPI)
+from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindConditionCalibrationAPI,
+                            WaveCalibrationAPI, TagAPI)
 from .config import Config
 from .exceptions import ClientException
 import time
@@ -23,9 +23,10 @@ class SDKclient:
         self.timeseries = TimeseriesAPI(client=self)
         self.sensor = SensorAPI(client=self)
         self.test = TestAPI(client=self)
-        self.floater = FloaterAPI(client=self)
+        self.floater = FloaterTestAPI(client=self)
         self.wind_condition_calibration = WindConditionCalibrationAPI(client=self)
-        self.wave_current_calibration = WaveCurrentCalibrationAPI(client=self)
+        self.wave_calibration = WaveCalibrationAPI(client=self)
+        self.tag = TagAPI(client=self)
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """
@@ -52,6 +53,7 @@ class SDKclient:
                -----
                The full request url is like
                    'https://{host}/{base_url}/{resource}/{endpoint}?firstparameter=value&anotherparameter=value
+                   :param endpoint:
                """
         if not isinstance(endpoint, str):
             endpoint = str(endpoint)
@@ -59,7 +61,7 @@ class SDKclient:
         url = self.config.host +"/" + "/".join([p for p in [self.config.base_url, self.config.version, resource, endpoint] if p.strip()])
 
         if parameters is not None and isinstance(parameters, dict):
-            parameters = to_camel_case({k: v for k, v in parameters.items() if v is not None})
+            #parameters = to_camel_case({k: v for k, v in parameters.items() if v is not None})
             enc_parameters = urllib.parse.urlencode(parameters, quote_via=urllib.parse.quote)
         else:
             enc_parameters = ""
@@ -105,12 +107,13 @@ class SDKclient:
         '''
         return self.do_request(self.session.patch, resource, endpoint, body=body)
 
-    def delete(self, resource: str, endpoint: str):
+    def delete(self, resource: str, endpoint: str, parameters: str=None):
         '''
         Method for deleting a resource from db
         WARNING: Not working in a intuitive way
+        :param parameters: Query string for admin-delete
         :param resource:
         :param endpoint:
         :return:
         '''
-        return self.do_request(self.session.delete, resource, endpoint)
+        return self.do_request(requests.delete, resource=resource, endpoint=endpoint, parameters=parameters)
