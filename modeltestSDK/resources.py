@@ -1,11 +1,9 @@
 import json
 import pandas as pd
-from typing import List, Union
+from typing import List
 from .utils import make_serializable
 from .client import SDKclient
-import datetime
 import numpy
-from typing import Optional
 import warnings
 
 '''
@@ -270,7 +268,7 @@ class FloaterTest(Test):
     type = "Floater Test"
 
     def __init__(self, description: str, test_date: str, campaign_id: str,
-                 category: str, orientation: float, draft: float, concept_id: str = None, wave_id: str = None,
+                 category: str, orientation: float, draft: float, floaterconfig_id: str = None, wave_id: str = None,
                  wind_id: str = None, id: str = None, client=None):
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
                          type=self.type, id=id, client=client)
@@ -280,7 +278,7 @@ class FloaterTest(Test):
         self.draft = draft
         self.wave_id = wave_id
         self.wind_id = wind_id
-        self.concept_id = concept_id
+        self.floaterconfig_id = floaterconfig_id
         self.id = id
         self._client = client
 
@@ -288,7 +286,7 @@ class FloaterTest(Test):
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
                    category=data['category'], orientation=data['orientation'], draft=data['draft'],
-                   wave_id=data['wave_id'], wind_id=data['wind_id'], concept_id=data['concept_id'], id=data['id'],
+                   wave_id=data['wave_id'], wind_id=data['wind_id'],floaterconfig_id=data['floaterconfig_id'], id=data['id'],
                    client=client)
 
 

@@ -98,10 +98,11 @@ class TestAPI(NamedBaseAPI):
 class FloaterTestAPI(TestAPI):
 
     def create(self, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               draft: float, concept_id: str = None, wave_id: str = None, wind_id: str = None, read_only: bool = False) -> FloaterTest:
+               draft: float, floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
+               read_only: bool = False) -> FloaterTest:
         body = dict(description=description, type="Floater Test", test_date=test_date, campaign_id=campaign_id,
                     category=category, orientation=orientation, draft=draft, wave_id=wave_id,
-                    wind_id=wind_id, concept_id=concept_id, read_only=read_only)
+                    wind_id=wind_id, floaterconfig_id=floaterconfig_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return FloaterTest.from_dict(data=data, client=self.client)
 

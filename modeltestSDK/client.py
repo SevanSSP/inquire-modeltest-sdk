@@ -1,11 +1,9 @@
 import urllib.parse
 import requests
-from .utils import to_camel_case
 from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindConditionCalibrationAPI,
                             WaveCalibrationAPI, TagAPI, FloaterConfigAPI)
 from .config import Config
 from .exceptions import ClientException
-import time
 
 class SDKclient:
     '''
