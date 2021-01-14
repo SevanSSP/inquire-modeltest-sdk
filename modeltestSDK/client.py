@@ -2,7 +2,7 @@ import urllib.parse
 import requests
 from .utils import to_camel_case
 from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindConditionCalibrationAPI,
-                            WaveCalibrationAPI, TagAPI)
+                            WaveCalibrationAPI, TagAPI, FloaterConfigAPI)
 from .config import Config
 from .exceptions import ClientException
 import time
@@ -23,10 +23,11 @@ class SDKclient:
         self.timeseries = TimeseriesAPI(client=self)
         self.sensor = SensorAPI(client=self)
         self.test = TestAPI(client=self)
-        self.floater = FloaterTestAPI(client=self)
+        self.floater_test = FloaterTestAPI(client=self)
         self.wind_condition_calibration = WindConditionCalibrationAPI(client=self)
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagAPI(client=self)
+        self.floater_config = FloaterConfigAPI
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """

@@ -1,15 +1,16 @@
 from modeltestSDK.client import SDKclient
 from modeltestSDK.utils import get_datetime_date
-from pipeline.STT.add_sensors import add_sensors, sensorDict
-from pipeline.STT.add_wave_calibrations import fill_campaign_with_wave_calibrations
-from pipeline.STT.add_floater_tests import fill_campaign_with_floater_tests
+from pipeline.WhitePearl.add_sensors import add_sensors, sensorDict
+from pipeline.WhitePearl.add_wave_calibrations import fill_campaign_with_wave_calibrations
+from pipeline.WhitePearl.add_floater_tests import fill_campaign_with_floater_tests
+from pipeline.WhitePearl.add_floater_config import add_floater_configs
+import datetime
 
 import time
 
-
 def main():
 
-    ans = input("You are about to run the pipeline for the STT SWACH model test.\nIf this is already imported you "
+    ans = input("You are about to run the pipeline for the White pearl model test.\nIf this is already imported you "
           "will experience issues with data duplicates.\nAre you sure you want to import? [y/N] ")
 
     if ans != "y":
@@ -20,26 +21,28 @@ def main():
     client = SDKclient()
 
     # Specify path to folder where campaign is locally stored
-    campaign_dir = "C:/Users/jen/Documents/STT"
+    campaign_dir = "C:/Users/jen.SEVAN/Documents/505 Stockman FPU_2008"
 
     # Create initial campaign in database
-    campaign = client.campaign.create(name="STT",
+    campaign = client.campaign.create(name="White Pearl",
                                       description="Modeltest for SWACH and HE Modu",
-                                      date=get_datetime_date("180120120000"),
-                                      location="STADT TOWING TANK",
-                                      scale_factor=75,          # From the report
-                                      water_depth=4.0 * 75,
+                                      date=datetime.datetime(year=2008,month=1,day=1),
+                                      location="MARINTEK",
+                                      scale_factor=62.14,          # From the report
+                                      water_depth=290,
                                       read_only=True)     # Source for water depth being 4.1m is fisk.no, could not find any other official number
 
     # Add all the sensors that were used in STT campaign
     add_sensors(campaign=campaign, client=client)
+    add_floater_configs(campaign=campaign,client=client)
+
+    add_decay_tests(campaign=campaign,client=client)
+
 
     # Add all the wave&current calibration tests from STT campaign
     fill_campaign_with_wave_calibrations(campaign, client, campaign_dir)
 
-    # Add all the floater tests for both concepts used in STT campaign
-    concept_ids = ["M206", "M207"]
-    fill_campaign_with_floater_tests(campaign, concept_ids, client, campaign_dir)
+    fill_campaign_with_floater_tests(campaign, client, campaign_dir)
 
     toc = time.perf_counter()
     print(f"Importing campaign took {toc - tic:0.4f} seconds")

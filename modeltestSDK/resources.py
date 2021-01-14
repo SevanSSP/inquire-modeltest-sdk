@@ -2,6 +2,7 @@ import json
 import pandas as pd
 from typing import List, Union
 from .utils import make_serializable
+from .client import SDKclient
 import datetime
 import numpy
 from typing import Optional
@@ -266,11 +267,11 @@ class TestList(ResourceList):
 
 
 class FloaterTest(Test):
-    type = "floatertest"
+    type = "Floater Test"
 
     def __init__(self, description: str, test_date: str, campaign_id: str,
-                 category: str, orientation: float, draft: float, wave_id: str = None, wind_id: str = None,
-                 id: str = None, client=None):
+                 category: str, orientation: float, draft: float, concept_id: str = None, wave_id: str = None,
+                 wind_id: str = None, id: str = None, client=None):
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
                          type=self.type, id=id, client=client)
 
@@ -279,12 +280,16 @@ class FloaterTest(Test):
         self.draft = draft
         self.wave_id = wave_id
         self.wind_id = wind_id
+        self.concept_id = concept_id
+        self.id = id
+        self._client = client
 
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
                    category=data['category'], orientation=data['orientation'], draft=data['draft'],
-                   wave_id=data['wave_id'], wind_id=data['wind_id'], id=data['id'], client=client)
+                   wave_id=data['wave_id'], wind_id=data['wind_id'], concept_id=data['concept_id'], id=data['id'],
+                   client=client)
 
 
 class FloaterTestList(ResourceList):
@@ -387,7 +392,7 @@ class Timeseries(BaseResource):
         self._client.timeseries.patch(body=self.dump(), id=self.id)
 
     def get_data_points(self):
-        self.data_points = self._client.timeseries.get_data_points(id=self.id)
+        self.data_points = self._client.timeseries.get_data_points(id=self.id)['data']
         return self.data_points
 
     def to_arrays(self):
@@ -539,7 +544,12 @@ class DataPointList(ResourceList):
     def __init__(self, resources: List[DataPoint], client=None):
         self.resources = resources
         self._client = client
-
+'''
+    def from_dict(cls, data: dict, client=None):
+        dp_list = []
+        for dp in data['data']:
+            dp_list.append(DataPoint(time))
+'''
 
 class Tag(BaseResource):
 
@@ -569,4 +579,33 @@ class TagList(ResourceList):
 
     def __init__(self, resources: List[Tag], client=None):
         self.resources = resources
-        self.client = client
+        self._client = client
+
+
+class FloaterConfig(BaseResource):
+
+    def __init__(self, name: str, description: str, characteristic_length: float, draft: float, campaign_id: str, id: str = None,
+                 client: SDKclient = None):
+        self.name = name
+        self.description = description
+        self.characteristic_length = characteristic_length
+        self.draft = draft
+        self.campaign_id = campaign_id
+        self.id = id
+        self._client = client
+
+    def __str__(self):
+        return f"<Concept: \n{self.to_pandas()}>"
+
+    @classmethod
+    def from_dict(cls, data: dict, client=None):
+        return cls(name=data['name'], description=data['description'],
+                   characteristic_length=data['characteristic_length'], draft=data['draft'],
+                   campaign_id=data['campaign_id'],  id=data['id'], client=client)
+
+
+class FloaterConfigList(ResourceList):
+
+    def __init__(self, resources: List[Tag], client=None):
+        self.resources = resources
+        self._client = client

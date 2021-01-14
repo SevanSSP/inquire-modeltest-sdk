@@ -34,7 +34,7 @@ def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
 
         sensor_id = client.sensor.get_id(sensor_strip)
         timeseries = client.timeseries.create(sensor_id=sensor_id,
-                                              test_id=test_id, default_start_time=0, default_end_time=100)
+                                              test_id=test_id, default_start_time=0, default_end_time=100, read_only=True)
 
         datapoints = df[[col_names[0], sensor]].values.tolist()
 

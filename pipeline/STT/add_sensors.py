@@ -43,7 +43,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
     client.sensor.create(name="M206_COG Z",
                          description="Heave COG",
                          unit="mm",
@@ -54,7 +55,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_COG Yaw",
                          description="COG Yaw",
@@ -66,7 +68,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_COG Pitch",
                          description="COG Pitch",
@@ -78,7 +81,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_COG Roll",
                          description="COG Roll",
@@ -90,7 +94,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
 # M206_acc sensors. Accelerometer is origo for these sensors.
     client.sensor.create(name="M206_acc_pos X",
@@ -103,7 +108,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_acc_pos Y",
                          description="Sway position of 6DOF",
@@ -115,7 +121,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_acc_pos Z",
                          description="heave position of 6DOF",
@@ -127,7 +134,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_acc_pos Yaw",
                          description="Yaw at position of 6DOF",
@@ -139,7 +147,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_acc_pos Pitch",
                          description="Pitch at position of 6DOF",
@@ -151,7 +160,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_acc_pos Roll",
                          description="Roll at position of 6DOF",
@@ -163,7 +173,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
 # M206_cof sensors. Not sure what coordinates are for centre of floatation
 
@@ -177,7 +188,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_COF Y",
                          description="Sway COF",
@@ -189,7 +201,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_COF Z",
                          description="Heave COF ",
@@ -201,7 +214,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_COF Yaw",
                          description="COF Yaw ",
@@ -213,7 +227,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_COF Pitch",
                          description="COF Pitch ",
@@ -225,7 +240,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M206_COF Roll",
                          description="COF Roll",
@@ -237,7 +253,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     # Wave sensors
     # TODO: cant find this sensor
@@ -251,7 +268,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='Wave 1 Moonpool Slot 7 AI0-AI8',
                          description='Wave model moonpool - A',
@@ -263,7 +281,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,     # Not sure if these are local or global
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='Wave 2 Front Model Slot 7 AI1-AI9',
                          description='Wave model front - B',
@@ -275,7 +294,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='Wave 3 Front Slot 7 AI2-AI10',
                          description='Wave front - C',
@@ -287,7 +307,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='Wave 4 Side Slot 7 AI4-AI12',
                          description='Wave side - D',
@@ -299,7 +320,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='Wave US Front Slot 7 AI3-AI11',
                          description='Wave side US - F',
@@ -311,7 +333,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
 # Force sensors (in moorings placed on waterline)
 
@@ -325,7 +348,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='F_SB_Front_Slot 8 AI6',
                          description='Force SB Front',
@@ -337,7 +361,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='F_BB_Aft_ Slot 8 AI4',
                          description='Force BB Aft',
@@ -349,7 +374,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='F_SB_Aft_Slot 8 AI3',
                          description='Force SB Aft',
@@ -361,7 +387,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     #MTI 2 sensors (accelerometer)
 
@@ -375,7 +402,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='MTI 2 Pitch (Y)',
                          description='Accelerometer - E',
@@ -387,7 +415,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='MTI 2 Yaw (Z)',
                          description='Accelerometer - E',
@@ -399,7 +428,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='MTI 2 aks X',
                          description='Accelerometer - E',
@@ -411,7 +441,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='MTI 2 aks Y',
                          description='Accelerometer - E',
@@ -423,7 +454,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='MTI 2 aks Z',
                          description='Accelerometer - E',
@@ -435,7 +467,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='MTI 2 rate X',
                          description='Accelerometer - E',
@@ -447,7 +480,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='MTI 2 rate Y',
                          description='Accelerometer - E',
@@ -459,7 +493,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='MTI 2 rate Z',
                          description='Accelerometer - E',
@@ -471,7 +506,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
 # Wagon sensors. Not sure what the coordinates should be for these
 
@@ -485,7 +521,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name='Wagon Master Speed',
                          description='Accelerometer - E',
@@ -497,7 +534,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     # Sensor on the spring that is used for pull out test X100. Not sure what coordinates should be
 
@@ -511,7 +549,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
 
 
@@ -528,7 +567,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COG Y",
                          description="",
@@ -540,7 +580,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COG Z",
                          description="",
@@ -552,7 +593,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COG Yaw",
                          description="",
@@ -564,7 +606,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COG Pitch",
                          description="",
@@ -576,7 +619,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COG Roll",
                          description="",
@@ -588,7 +632,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     # M207_acc_pos. Need coordinates
     # TODO: check whether STT has accounted for deck height of 39.5 or not (49.5) in their output
@@ -602,7 +647,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_acc_pos Y",
                          description="",
@@ -614,7 +660,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_acc_pos Z",
                          description="",
@@ -626,7 +673,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_acc_pos Yaw",
                          description="",
@@ -638,7 +686,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_acc_pos Pitch",
                          description="",
@@ -650,7 +699,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_acc_pos Roll",
                          description="",
@@ -662,7 +712,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     # M207_COF. Needs coordinates
     client.sensor.create(name="M207_COF X",
@@ -675,7 +726,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
     client.sensor.create(name="M207_COF Y",
                          description="",
                          unit="mm",
@@ -686,7 +738,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COF Z",
                          description="",
@@ -698,7 +751,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COF Yaw",
                          description="",
@@ -710,7 +764,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COF Pitch",
                          description="",
@@ -722,7 +777,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)
 
     client.sensor.create(name="M207_COF Roll",
                          description="",
@@ -734,4 +790,5 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                          is_local=True,
                          fs=0,
                          intermittent=False,
-                         campaign_id=campaign.id)
+                         campaign_id=campaign.id,
+                         read_only=restrict_access)

@@ -51,7 +51,8 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: SDKclient, 
                                                                           gamma=gamma,
                                                                           wave_direction=0,
                                                                           current_velocity=0,
-                                                                          current_direction=0)
+                                                                          current_direction=0,
+                                                                          read_only=True)
 
         # Add all timeseries for every sensor used in the wave&current calibration test that was added
         for time in times:

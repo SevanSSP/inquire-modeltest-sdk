@@ -2,17 +2,16 @@ from .utils import format_class_name
 import warnings
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
                         DataPoint, DataPointList, FloaterTest, FloaterTestList, WaveCalibration,
-                        WaveCalibrationList,
-                        WindConditionCalibration, WindConditionCalibrationList, Tag, TagList)
-import gzip
-import zlib
-import datetime
+                        WaveCalibrationList, WindConditionCalibration, WindConditionCalibrationList,
+                        Tag, TagList, FloaterConfig, FloaterConfigList)
+
 
 def get_id_from_response(response):
     return response[0]["id"]
 
 
 '''Abstraction layer between client and resources'''
+
 
 class BaseAPI:
 
@@ -26,9 +25,9 @@ class BaseAPI:
 
 
 class NamedBaseAPI(BaseAPI):
-    '''
+    """
     Only for database items with names. To retrieve id from name
-    '''
+    """
 
     def get_id(self, name: str) -> str:
         response = self.client.get(format_class_name(self.__class__.__name__), "", parameters={'name': name})
@@ -99,10 +98,10 @@ class TestAPI(NamedBaseAPI):
 class FloaterTestAPI(TestAPI):
 
     def create(self, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               draft: float, wave_id: str = None, wind_id: str = None, read_only: bool = False) -> FloaterTest:
-        body = dict(description=description, type="floatertest", test_date=test_date, campaign_id=campaign_id,
+               draft: float, concept_id: str = None, wave_id: str = None, wind_id: str = None, read_only: bool = False) -> FloaterTest:
+        body = dict(description=description, type="Floater Test", test_date=test_date, campaign_id=campaign_id,
                     category=category, orientation=orientation, draft=draft, wave_id=wave_id,
-                    wind_id=wind_id, read_only=read_only)
+                    wind_id=wind_id, concept_id=concept_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return FloaterTest.from_dict(data=data, client=self.client)
 
@@ -203,8 +202,8 @@ class SensorAPI(NamedBaseAPI):
         else:
             raise Exception(f"Could not find any object with name {name}")
 
-    def get_all(self) -> SensorList:
-        data = self.client.get(self._resource_path, "")
+    def get_all(self, parameters: dict = None) -> SensorList:
+        data = self.client.get(self._resource_path, "", parameters=parameters)
         obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
         return SensorList(resources=obj_list, client=None)
 
@@ -234,14 +233,16 @@ class TimeseriesAPI(BaseAPI):
     def patch(self, body: dict, id: str):
         return self.client.patch(resource=self._resource_path, endpoint=f"{id}", body=body)
 
-    def get_data_points(self, id: str) -> DataPointList:
-        data = self.client.get(resource=self._resource_path, endpoint=f"{id}/data")
-        if not data:
-            return DataPointList(resources=[], client=self.client)
+    def get_data_points(self, id: str) -> dict:
+        data = self.client.get(resource=self._resource_path, endpoint=f"{id}/data", parameters={'all_data':'true'})
+        #if not data:
+        #    return DataPointList(resources=[], client=self.client)
+        #print(data["timeseries_id"])
 
-        resources = [DataPoint(time=float(time), value=float(value)) for time, value in [row.replace("\n", "").split("\t") for row in data]]
-        resources = sorted(resources, key=lambda x: x.time)
-        return DataPointList(resources=resources, client=self.client)
+        #resources = [DataPoint(time=float(time), value=float(value)) for time, value in [row.replace("\n", "").split("\t") for row in data]]
+        #resources = sorted(resources, key=lambda x: x.time)
+        #return DataPointList(resources=data, client=self.client)
+        return data
 
     def post_data_points(self, id, body):
         form_body = {'timeseries_id': id, 'data': {'time': [], 'value': []}}
@@ -291,8 +292,9 @@ class TimeseriesAPI(BaseAPI):
 class TagAPI(NamedBaseAPI):
     def create(self, name: str, comment: str, test_id: str, sensor_id: str, timeseries_id: str,
                read_only: bool = False) -> Tag:
-        body = dict(name=name, comment=comment, test_id=test_id, sensor_id=sensor_id,timeseries_id=timeseries_id)
-        data = self.client.post(self._resource_path, body=body, read_only=read_only)
+        body = dict(name=name, comment=comment, test_id=test_id, sensor_id=sensor_id,timeseries_id=timeseries_id,
+                    read_only=read_only)
+        data = self.client.post(self._resource_path, body=body)
         return Tag.from_dict(data=data, client=self.client)
 
     def get(self, id: str) -> Tag:
@@ -311,5 +313,33 @@ class TagAPI(NamedBaseAPI):
                 warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
                               f" first was returned")
             return Tag.from_dict(data=response[0], client=self.client)
+        else:
+            raise Exception(f"Could not find any object with name {name}")
+
+
+class FloaterConfigAPI(NamedBaseAPI):
+    def create(self, name: str, description: str,  campaign_id: str, draft: float, characteristic_length: float = 0,
+               read_only: bool = False) -> FloaterConfig:
+        body = dict(name=name, description=description, campaign_id=campaign_id, characteristic_length=characteristic_length,
+                    draft=draft, read_only=read_only)
+        data = self.client.post(self._resource_path, body=body)
+        return FloaterConfig.from_dict(data=data, client=self.client)
+
+    def get(self, id: str) -> FloaterConfig:
+        data = self.client.get(self._resource_path, id)
+        return FloaterConfig.from_dict(data=data,client=self.client)
+
+    def get_all(self) -> FloaterConfigList:
+        data = self.client.get(self._resource_path, "")
+        obj_list = [FloaterConfig.from_dict(data=obj, client=self.client) for obj in data]
+        return FloaterConfigList(resources=obj_list, client=None)
+
+    def get_by_name(self, name: str) -> FloaterConfig:
+        response = self.client.get(format_class_name(self.__class__.__name__), "", parameters={'name': name})
+        if response:
+            if len(response) != 1:
+                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
+                              f" first was returned")
+            return FloaterConfig.from_dict(data=response[0], client=self.client)
         else:
             raise Exception(f"Could not find any object with name {name}")
