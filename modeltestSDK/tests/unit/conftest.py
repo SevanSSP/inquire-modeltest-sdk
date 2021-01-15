@@ -9,11 +9,8 @@ def new_campaign():
         description = "sdh dfgh rghh",
         date = datetime.utcnow(),
         location= "Ålesund",
-        waterline_diameter= 2.2,
         scale_factor= 1,
-        water_density= 1024,
         water_depth= 1200,
-        transient= 1.0
         )
     return camp
 
@@ -40,7 +37,8 @@ def new_sensor():
 def new_timeseries():
     ts = Timeseries(
         sensor_id="12345678123456781234567812345678",
-        test_id="12345678123456781234567812345678"
+        test_id="12345678123456781234567812345678",
+        fs = 2.5
     )
     return ts
 
