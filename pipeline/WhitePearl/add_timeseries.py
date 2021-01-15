@@ -19,8 +19,8 @@ def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient, sk
 
             ts = client.timeseries.create(sensor_id=sensor_id,
                                           test_id=test.id,
-                                          default_start_time=1419,
-                                          default_end_time=3*60*60,
+                                          default_start_time=1419, #Todo: default_start_time=0 for decay tests
+                                          default_end_time= 1419+3*60*60,
                                           fs=data['fs'][0][0],
                                           read_only=True)
 

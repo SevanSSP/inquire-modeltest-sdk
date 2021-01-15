@@ -1,7 +1,7 @@
 import urllib.parse
 import requests
 from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindConditionCalibrationAPI,
-                            WaveCalibrationAPI, TagAPI, FloaterConfigAPI)
+                            WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .config import Config
 from .exceptions import ClientException
 
@@ -24,7 +24,7 @@ class SDKclient:
         self.floater_test = FloaterTestAPI(client=self)
         self.wind_condition_calibration = WindConditionCalibrationAPI(client=self)
         self.wave_calibration = WaveCalibrationAPI(client=self)
-        self.tag = TagAPI(client=self)
+        self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):

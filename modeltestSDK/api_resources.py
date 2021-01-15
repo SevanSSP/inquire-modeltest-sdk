@@ -202,7 +202,13 @@ class SensorAPI(NamedBaseAPI):
         else:
             raise Exception(f"Could not find any object with name {name}")
 
-    def get_all(self, parameters: dict = None) -> SensorList:
+    def get_all(self, name: str = None, campaign_id: str = None, parameters: dict = None) -> SensorList:
+        if parameters is None and (name is not None or campaign_id is not None):
+            parameters={}
+            if name is not None:
+                parameters['name'] = name
+            if campaign_id is not None:
+                parameters['campaign_id'] = campaign_id
         data = self.client.get(self._resource_path, "", parameters=parameters)
         obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
         return SensorList(resources=obj_list, client=None)
@@ -290,10 +296,10 @@ class TimeseriesAPI(BaseAPI):
         return Test.from_dict(data=data, client=self.client)
 
 
-class TagAPI(NamedBaseAPI):
+class TagsAPI(NamedBaseAPI):
     def create(self, name: str, comment: str, test_id: str = None, sensor_id: str = None, timeseries_id: str = None,
                read_only: bool = False) -> Tag:
-        body = dict(name=name, comment=comment, test_id=test_id, sensor_id=sensor_id,timeseries_id=timeseries_id,
+        body = dict(name=name, comment=comment, test_id=test_id, sensor_id=sensor_id, timeseries_id=timeseries_id,
                     read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return Tag.from_dict(data=data, client=self.client)

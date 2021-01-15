@@ -24,7 +24,7 @@ def main():
     client = SDKclient()
     # Create initial campaign in database
     campaign = client.campaign.create(name="White Pearl",
-                                      description="Modeltest for SWACH and HE Modu",
+                                      description="Modeltest for SWACH and HE Modu", #Todo: update
                                       date=datetime.datetime(year=2008, month=1, day=1).isoformat(),
                                       location="MARINTEK",
                                       scale_factor=62.14,          # From the report

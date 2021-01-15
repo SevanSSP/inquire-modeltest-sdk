@@ -49,11 +49,12 @@ def add_tests(campaign_dir, campaign: Campaign, client: SDKclient):
                                                                   current_velocity=0,
                                                                   current_direction=0,
                                                                   read_only=True,)
-                wave_calibration_id=wave_calibration.id
+                wave_calibration_id = wave_calibration.id
 
                 client.tag.create(name='comment', comment='Gamma unknown, 3.3 assumed', test_id=wave_calibration_id)
 
-                read_wave_calibration_from_mat_with_pandas(data=data, test=wave_calibration, client=client)
+                read_wave_calibration_from_mat_with_pandas(data=data, test=wave_calibration,
+                                                           calibration_sensors=wave_cal, client=client)
 
 
             floater_configs = client.floater_config.get_all().to_pandas() #Todo: filter by campaign
