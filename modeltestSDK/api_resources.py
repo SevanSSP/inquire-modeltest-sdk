@@ -98,10 +98,10 @@ class TestAPI(NamedBaseAPI):
 class FloaterTestAPI(TestAPI):
 
     def create(self, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               draft: float, floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
+               floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
         body = dict(description=description, type="Floater Test", test_date=test_date, campaign_id=campaign_id,
-                    category=category, orientation=orientation, draft=draft, wave_id=wave_id,
+                    category=category, orientation=orientation, wave_id=wave_id,
                     wind_id=wind_id, floaterconfig_id=floaterconfig_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return FloaterTest.from_dict(data=data, client=self.client)
@@ -178,11 +178,10 @@ class WindConditionCalibrationAPI(TestAPI):
 class SensorAPI(NamedBaseAPI):
 
     def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-               is_local: bool, fs: float, intermittent: bool, campaign_id: str,  area: float = None,
+               is_local: bool, campaign_id: str,  area: float = None,
                read_only: bool = False) -> Sensor:
         body = dict(name=name, description=description, unit=unit, kind=kind, area=area, x=x,
-                    y=y, z=z, is_local=is_local, fs=fs, intermittent=intermittent,
-                    campaign_id=campaign_id, read_only=read_only)
+                    y=y, z=z, is_local=is_local, campaign_id=campaign_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return Sensor.from_dict(data=data, client=self.client)
 
@@ -215,10 +214,10 @@ class SensorAPI(NamedBaseAPI):
 
 class TimeseriesAPI(BaseAPI):
 
-    def create(self, sensor_id: str, test_id: str, default_start_time: float, default_end_time: float,
-               read_only: bool = False) -> Timeseries:
+    def create(self, sensor_id: str, test_id: str, default_start_time: float, default_end_time: float, fs: float,
+               intermittent: bool=False, read_only: bool = False) -> Timeseries:
         body = dict(sensor_id=sensor_id, test_id=test_id, default_start_time=default_start_time,
-                    default_end_time=default_end_time, read_only=read_only)
+                    default_end_time=default_end_time, fs=fs, intermittent=intermittent, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return Timeseries.from_dict(data=data, client=self.client)
 
@@ -245,11 +244,12 @@ class TimeseriesAPI(BaseAPI):
         #return DataPointList(resources=data, client=self.client)
         return data
 
-    def post_data_points(self, id, body):
-        form_body = {'timeseries_id': id, 'data': {'time': [], 'value': []}}
-        for p in body:
-            form_body['data']['time'].append(p['time'])
-            form_body['data']['value'].append(p['value'])
+    def post_data_points(self, id, body=None, form_body=None):
+        if form_body is None:
+            form_body = {'timeseries_id': id, 'data': {'time': [], 'value': []}}
+            for p in body:
+                form_body['data']['time'].append(p['time'])
+                form_body['data']['value'].append(p['value'])
         self.client.post(resource=self._resource_path, endpoint=f"{id}/data", body=form_body)
 
     def get_standard_deviation(self, id: str):

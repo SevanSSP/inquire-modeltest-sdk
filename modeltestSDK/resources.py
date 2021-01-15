@@ -2,7 +2,7 @@ import json
 import pandas as pd
 from typing import List
 from .utils import make_serializable
-from .client import SDKclient
+#from .client import SDKclient
 import numpy
 import warnings
 
@@ -165,7 +165,7 @@ class CampaignList(ResourceList):
 class Sensor(BaseResource):
 
     def __init__(self, name: str, description: str, unit: str, kind: str,  x: float, y: float, z: float,
-                 is_local: bool, fs: float, intermittent: bool, area: float = None, campaign_id: str = None,
+                 is_local: bool, area: float = None, campaign_id: str = None,
                  id: str = None, client=None):
         self.id = id
         self.name = name
@@ -177,8 +177,6 @@ class Sensor(BaseResource):
         self.y = y
         self.z = z
         self.is_local = is_local
-        self.fs = fs
-        self.intermittent = intermittent
         self.campaign_id = campaign_id
         self._client = client
 
@@ -191,8 +189,8 @@ class Sensor(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'], unit=data['unit'],
-                   kind=data['kind'], area=data['area'], x=data['y'], y=data['y'], z=data['z'], is_local=data['is_local'], fs=data['fs'],
-                   intermittent=data['intermittent'], campaign_id=data['campaign_id'], id=data['id'], client=client)
+                   kind=data['kind'], area=data['area'], x=data['y'], y=data['y'], z=data['z'], is_local=data['is_local'],
+                   campaign_id=data['campaign_id'], id=data['id'], client=client)
 
 
 class SensorList(ResourceList):
@@ -268,14 +266,13 @@ class FloaterTest(Test):
     type = "Floater Test"
 
     def __init__(self, description: str, test_date: str, campaign_id: str,
-                 category: str, orientation: float, draft: float, floaterconfig_id: str = None, wave_id: str = None,
+                 category: str, orientation: float, floaterconfig_id: str = None, wave_id: str = None,
                  wind_id: str = None, id: str = None, client=None):
         super().__init__(description=description, test_date=test_date, campaign_id=campaign_id,
                          type=self.type, id=id, client=client)
 
         self.category = category
         self.orientation = orientation
-        self.draft = draft
         self.wave_id = wave_id
         self.wind_id = wind_id
         self.floaterconfig_id = floaterconfig_id
@@ -285,7 +282,7 @@ class FloaterTest(Test):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(description=data["description"], test_date=data['test_date'], campaign_id=data['campaign_id'],
-                   category=data['category'], orientation=data['orientation'], draft=data['draft'],
+                   category=data['category'], orientation=data['orientation'],
                    wave_id=data['wave_id'], wind_id=data['wind_id'],floaterconfig_id=data['floaterconfig_id'], id=data['id'],
                    client=client)
 
@@ -361,10 +358,12 @@ class WindConditionCalibrationList(ResourceList):
 
 class Timeseries(BaseResource):
 
-    def __init__(self, sensor_id: str, test_id: str, id: str = None, client=None):
+    def __init__(self, sensor_id: str, test_id: str, fs: float, intermittent: bool=False, id: str = None, client=None):
 
         self.sensor_id = sensor_id
         self.test_id = test_id
+        self.fs = fs
+        self.intermittent=intermittent
         self.id = id
         self.data_points = DataPointList(resources=[], client=client)
         self._client = client
@@ -471,7 +470,7 @@ class Timeseries(BaseResource):
 
     @classmethod
     def from_dict(cls, data: dict, client=None):
-        return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], id=data['id'], client=client)
+        return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], fs=data['fs'], intermittent=data['intermittent'], id=data['id'], client=client)
 
 
 class TimeseriesList(ResourceList):
@@ -583,7 +582,7 @@ class TagList(ResourceList):
 class FloaterConfig(BaseResource):
 
     def __init__(self, name: str, description: str, characteristic_length: float, draft: float, campaign_id: str, id: str = None,
-                 client: SDKclient = None):
+                 client=None):
         self.name = name
         self.description = description
         self.characteristic_length = characteristic_length

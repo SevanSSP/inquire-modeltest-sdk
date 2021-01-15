@@ -1,5 +1,4 @@
-from modeltestSDK.resources import Campaign, Sensor
-from modeltestSDK.client import SDKclient
+from modeltestSDK import SDKclient, Campaign, Sensor
 
 restrict_access = True
 
@@ -17,12 +16,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Wave elevation at position 1, measured during test",
                      unit="m",
                      kind="length",
-                     x=position1.x,
-                     y=position1.y,
-                     z=position1.z,
+                     x=position1['x'],
+                     y=position1['y'],
+                     z=position1['z'],
                      is_local=False,
-                     fs=1/200,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -30,12 +27,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Wave elevation at position 3, measured during test",
                      unit="m",
                      kind="length",
-                     x=position3.x,
-                     y=position3.y,
-                     z=position3.z,
+                     x=position3['x'],
+                     y=position3['y'],
+                     z=position3['z'],
                      is_local=False,
-                     fs=1/200,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -43,12 +38,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Wave elevation at bow of FPSO",
                      unit="m",
                      kind="length",
-                     x=positionBOW.x,
-                     y=positionBOW.y,
-                     z=positionBOW.z,
+                     x=positionBOW['x'],
+                     y=positionBOW['y'],
+                     z=positionBOW['z'],
                      is_local=True,
-                     fs=1/200,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -56,12 +49,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Calibrated wave at position 2",
                      unit="m",
                      kind="length",
-                     x=position1.x,
-                     y=position1.y,
-                     z=position1.z,
+                     x=position1['x'],
+                     y=position1['y'],
+                     z=position1['z'],
                      is_local=False,
-                     fs=1/200,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -69,12 +60,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Calibrated wave at position 2",
                      unit="m",
                      kind="length",
-                     x=position2.x,
-                     y=position2.y,
-                     z=position2.z,
+                     x=position2['x'],
+                     y=position2['y'],
+                     z=position2['z'],
                      is_local=False,
-                     fs=1/200,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -83,12 +72,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Calibrated wave at position 3",
                      unit="m",
                      kind="length",
-                     x=position3.x,
-                     y=position3.y,
-                     z=position3.z,
+                     x=position3['x'],
+                     y=position3['y'],
+                     z=position3['z'],
                      is_local=False,
-                     fs=1/200,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -96,12 +83,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Displacement of TOP DECK in x-direction",
                      unit="m",
                      kind="length",
-                     x=positionTOPDKC.x,
-                     y=positionTOPDKC.y,
-                     z=positionTOPDKC.z,
+                     x=positionTOPDKC['x'],
+                     y=positionTOPDKC['y'],
+                     z=positionTOPDKC['z'],
                      is_local=False,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -109,12 +94,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Displacement of TOP DECK in y-direction",
                      unit="m",
                      kind="length",
-                     x=positionTOPDKC.x,
-                     y=positionTOPDKC.y,
-                     z=positionTOPDKC.z,
+                     x=positionTOPDKC['x'],
+                     y=positionTOPDKC['y'],
+                     z=positionTOPDKC['z'],
                      is_local=False,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -122,12 +105,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      description="Displacement of TOP DECK in z-direction",
                      unit="m",
                      kind="length",
-                     x=positionTOPDKC.x,
-                     y=positionTOPDKC.y,
-                     z=positionTOPDKC.z,
+                     x=positionTOPDKC['x'],
+                     y=positionTOPDKC['y'],
+                     z=positionTOPDKC['z'],
                      is_local=False,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -139,8 +120,6 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      y=0,
                      z=0,
                      is_local=True,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -152,12 +131,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      y=0,
                      z=0,
                      is_local=True,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
-     client.sensor.create(name="YAW",
+    client.sensor.create(name="YAW",
                      description="Rotation of FPSO about z-axis",
                      unit="deg",
                      kind="angle",
@@ -165,8 +142,6 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      y=0,
                      z=0,
                      is_local=True,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -178,8 +153,6 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      y=0,
                      z=0,
                      is_local=False,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -191,8 +164,6 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      y=0,
                      z=0,
                      is_local=False,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)
 
@@ -204,7 +175,5 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      y=0,
                      z=0,
                      is_local=False,
-                     fs=1/20,
-                     intermittent=False,
                      campaign_id=campaign.id,
                      read_only=restrict_access)

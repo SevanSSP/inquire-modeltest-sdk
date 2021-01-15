@@ -25,7 +25,7 @@ class SDKclient:
         self.wind_condition_calibration = WindConditionCalibrationAPI(client=self)
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagAPI(client=self)
-        self.floater_config = FloaterConfigAPI
+        self.floater_config = FloaterConfigAPI(client=self)
 
     def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
         """

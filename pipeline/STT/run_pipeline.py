@@ -29,7 +29,7 @@ def main():
                                       location="STADT TOWING TANK",
                                       scale_factor=75,          # From the report
                                       water_depth=4.0 * 75,
-                                      read_only=True)     # Source for water depth being 4.1m is fisk.no, could not find any other official number
+                                      read_only=True)
 
     # Add all the sensors that were used in STT campaign
     add_sensors(campaign=campaign, client=client)
