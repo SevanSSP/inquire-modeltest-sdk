@@ -65,7 +65,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                      z=position2['z'],
                      is_local=False,
                      campaign_id=campaign.id,
-                     read_only=restrict_access)
+                     read_only=restrict_access) #Todo: Add sensor tag
 
 
     client.sensor.create(name="WAVE_3_CAL",

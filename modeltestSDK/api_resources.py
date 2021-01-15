@@ -291,7 +291,7 @@ class TimeseriesAPI(BaseAPI):
 
 
 class TagAPI(NamedBaseAPI):
-    def create(self, name: str, comment: str, test_id: str, sensor_id: str, timeseries_id: str,
+    def create(self, name: str, comment: str, test_id: str = None, sensor_id: str = None, timeseries_id: str = None,
                read_only: bool = False) -> Tag:
         body = dict(name=name, comment=comment, test_id=test_id, sensor_id=sensor_id,timeseries_id=timeseries_id,
                     read_only=read_only)

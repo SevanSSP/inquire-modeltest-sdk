@@ -550,7 +550,7 @@ class DataPointList(ResourceList):
 
 class Tag(BaseResource):
 
-    def __init__(self, name: str, comment: str, test_id: str, sensor_id: str, timeseries_id: str, id: str = None,
+    def __init__(self, name: str, comment: str, test_id: str = None, sensor_id: str = None, timeseries_id: str = None, id: str = None,
                  client=None):
         self.name = name
         self.comment = comment

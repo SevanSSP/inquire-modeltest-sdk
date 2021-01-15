@@ -4,7 +4,7 @@ from modeltestSDK import Test, SDKclient
 import time as timer
 
 
-def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient):
+def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient, skip_channels: list=None):
     time = data['Time'][0].tolist()
 
     sensor_list = client.sensor.get_all(parameters={'campaign_id': test.campaign_id})
@@ -12,15 +12,15 @@ def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient):
     sensor_names = sensor_pd['name'].tolist()
 
     for name in sensor_names:
-        if name in data:
+        if name in data and name not in skip_channels:
             channel_values = data[name][0].tolist()
             sensor_index = sensor_pd[sensor_pd['name'] == name].index.values
             sensor_id = sensor_pd.loc[sensor_index, 'id'].tolist()[0]
 
             ts = client.timeseries.create(sensor_id=sensor_id,
                                           test_id=test.id,
-                                          default_start_time=180,
-                                          default_end_time=100,
+                                          default_start_time=1419,
+                                          default_end_time=3*60*60,
                                           fs=data['fs'][0][0],
                                           read_only=True)
 
@@ -30,9 +30,34 @@ def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient):
             toc = timer.perf_counter()
             print(f"Posting timeseries for sensor {name} in test {str(data['comment'])[2:-2]} took  {toc - tic:0.4f} seconds")
 
+            #Todo: timeseries tags?
+
+
+
+def read_wave_calibration_from_mat_with_pandas(data, test: Test, calibration_sensors: list, client: SDKclient):
+    time = data['Time'][0].tolist()
+
+    for sensor_name in calibration_sensors:
+        channel_values = data[sensor_name][0].tolist()
+
+        sensor = client.sensor.get_by_name(sensor_name)
+
+        ts = client.timeseries.create(sensor_id=sensor.id,
+                                      test_id=test.id,
+                                      default_start_time=0,
+                                      default_end_time=3 * 60 * 60,
+                                      fs=data['fs'][0][0],
+                                      read_only=True)
+
+        body = {'timeseries_id': ts.id, 'data': {'time': time, 'value': channel_values}}
+        client.timeseries.post_data_points(ts.id, form_body=body)
+
 '''
 
 client = SDKclient()
+
+floater_config_names = client.floater_config.get_all().to_pandas()['name'].tolist()
+print(floater_config_names)
 
 test = client.test.get("66c7dd9d-cfd1-4eb6-9575-c6f0974b0321")
 
