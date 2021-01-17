@@ -97,10 +97,10 @@ class TestAPI(NamedBaseAPI):
 
 class FloaterTestAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
+    def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
                floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
-        body = dict(description=description, type="Floater Test", test_date=test_date, campaign_id=campaign_id,
+        body = dict(number=number, description=description, type="Floater Test", test_date=test_date, campaign_id=campaign_id,
                     category=category, orientation=orientation, wave_id=wave_id,
                     wind_id=wind_id, floaterconfig_id=floaterconfig_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
@@ -129,11 +129,11 @@ class FloaterTestAPI(TestAPI):
 
 class WaveCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str,
+    def create(self, number:str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
                id: str = None, read_only: bool = False) -> WaveCalibration:
-        body = dict(description=description, type="Wave Calibration", test_date=test_date,
+        body = dict(number=number, description=description, type="Wave Calibration", test_date=test_date,
                     campaign_id=campaign_id,
                     wave_spectrum=wave_spectrum, wave_period=wave_period, wave_height=wave_height,
                     gamma=gamma, wave_direction=wave_direction, current_velocity=current_velocity,
@@ -154,10 +154,10 @@ class WaveCalibrationAPI(TestAPI):
 
 class WindConditionCalibrationAPI(TestAPI):
 
-    def create(self, description: str, test_date: str, campaign_id: str,
+    def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
                id: str = None, read_only: bool = False) -> WindConditionCalibration:
-        body = dict(description=description, test_date=test_date, type="windConditionCalibration",
+        body = dict(number = number, description=description, test_date=test_date, type="windConditionCalibration",
                     campaign_id=campaign_id,
                     wind_spectrum=wind_spectrum,
                     wind_velocity=wind_velocity, zref=zref, wind_direction=wind_direction, id=id, read_only=read_only)
@@ -297,7 +297,7 @@ class TimeseriesAPI(BaseAPI):
 
 
 class TagsAPI(NamedBaseAPI):
-    def create(self, name: str, comment: str, test_id: str = None, sensor_id: str = None, timeseries_id: str = None,
+    def create(self, name: str, comment: str = None, test_id: str = None, sensor_id: str = None, timeseries_id: str = None,
                read_only: bool = False) -> Tag:
         body = dict(name=name, comment=comment, test_id=test_id, sensor_id=sensor_id, timeseries_id=timeseries_id,
                     read_only=read_only)
