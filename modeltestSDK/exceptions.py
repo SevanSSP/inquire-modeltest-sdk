@@ -9,7 +9,7 @@ class ClientException(Exception):
 
         if exception.response is not None and exception.response.status_code == 403:
             raise ConnectionRefusedError(
-                f"{prefix}You're ip has not been validated by Azure. Contact admin to get access")
+                f"{prefix}Access denied. You're ip has not been validated by Azure. Contact admin to get access")
 
         if response is not None:
             prefix = f"{prefix}Server returned error {response.status_code} for {response.url}:\n"

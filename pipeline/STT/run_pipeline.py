@@ -20,18 +20,16 @@ def main():
     client = SDKclient()
 
     # Specify path to folder where campaign is locally stored
-    campaign_dir = "T:\STT"
+    campaign_dir = "C:/Users/jen/Documents/STT"
 
     # Create initial campaign in database
     campaign = client.campaign.create(name="STT",
                                       description="Modeltest for SWACH and HE Modu",
                                       date=get_datetime_date("180120120000"),
                                       location="STADT TOWING TANK",
-                                      waterline_diameter=70,    # Main hull cylinder
                                       scale_factor=75,          # From the report
-                                      water_density=1025,       # Not sure if this is correct
-                                      water_depth=4.0 * 75,     # Source for water depth being 4.1m is fisk.no, could not find any other official number
-                                      transient=3 * 60 * 60)    # 3 hours in seconds (LMR: transient shouldn't be equal to test length)
+                                      water_depth=4.0 * 75,
+                                      read_only=True)
 
     # Add all the sensors that were used in STT campaign
     add_sensors(campaign=campaign, client=client)

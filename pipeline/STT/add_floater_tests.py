@@ -113,7 +113,8 @@ def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, c
                                          orientation=orientation,
                                          draft=draft,
                                          wave_id=wave_id,
-                                         wind_id=None)  # No wind in STT campaign
+                                         wind_id=None,
+                                         read_only=True)  # No wind in STT campaign
 
     # Add every timeseries from the floater test
     for file in files:

@@ -12,7 +12,6 @@ def test_types(new_campaign):
     assert isinstance(new_campaign.description, str)
     #assert isinstance(new_campaign.date, datetime.datetime)
     assert isinstance(new_campaign.location, str)
-    assert isinstance(new_campaign.waterline_diameter, float)
 '''
 def test_dump(new_campaign):
     d = new_campaign.dump
