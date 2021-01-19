@@ -31,7 +31,7 @@ def lint(session):
 def tests(session):
     """Run test suite."""
     # install dependencies
-    # session.run("poetry", "install", external=True)
+    session.run("poetry", "install", external=True)
     session.install("pytest")
     session.install("coverage")
     session.install("-r", "requirements.txt")
