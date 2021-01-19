@@ -1,6 +1,6 @@
-'''
+"""
 Parse errors from the api
-'''
+"""
 
 
 class ClientException(Exception):
@@ -18,9 +18,9 @@ class ClientException(Exception):
                 items = list(response.json().values())
                 for item in items:
                     for it in item:
-                        message = message + "Location: " + it["loc"][0] + ", " + it["loc"][1] + " | Message: " +\
+                        message = message + "Location: " + it["loc"][0] + ", " + it["loc"][1] + " | Message: " + \
                                   it["msg"] + "\n"
-                raise ConnectionRefusedError( f"{prefix}{message}")
+                raise ConnectionRefusedError(f"{prefix}{message}")
 
             elif response.status_code == 500:
                 raise ConnectionAbortedError(
@@ -34,7 +34,7 @@ class ClientException(Exception):
 
         if (response is None) and (exception.response is None):
             raise ConnectionError(
-                    f"{prefix}Connection failed when retrieving data. Make sure server is running and url is correct")
+                f"{prefix}Connection failed when retrieving data. Make sure server is running and url is correct")
 
         raise Exception
 
@@ -42,5 +42,7 @@ class ClientException(Exception):
         print(self.message)
 
 
+"""
 def parse_response(response):
     pass
+"""
