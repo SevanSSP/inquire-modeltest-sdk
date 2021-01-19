@@ -5,6 +5,9 @@ from scipy.io import loadmat
 from modeltestSDK import SDKclient, Campaign
 from .add_timeseries import read_datapoints_from_mat_with_pandas, read_wave_calibration_from_mat_with_pandas
 
+category_dict = {'Current': 'current force', 'Wind': 'wind force', 'Decay': 'decay', 'IrrWave': 'irregular wave',
+                 'RegWave': 'regular wave', }
+
 
 def add_tests(campaign_dir, campaign: Campaign, client: SDKclient):
     existing_wave_calibrations = {}
@@ -16,12 +19,11 @@ def add_tests(campaign_dir, campaign: Campaign, client: SDKclient):
 
         os.chdir(os.getcwd() + "\\" + category)
         tests = os.listdir(path='.')
-        if category == "Decay":
-            category = category.lower()
-        elif category == "IrrWave":
-            category = "irregular wave"
+        if category not in category_dict:
+            raise KeyError('Unknown test category')
         else:
-            raise Exception
+            category = category_dict[category]
+
         for test in tests:
             if os.path.isdir(test):
                 continue
@@ -33,7 +35,7 @@ def add_tests(campaign_dir, campaign: Campaign, client: SDKclient):
             test_description = str(data['comment'])[2:-2]
             print(test_description)
 
-            number = data['test_num'][0]
+            number = data['test_num']
 
             wave_calibration_id = None
             wave_cal = ["WAVE_1_CAL", "WAVE_2_CAL", "WAVE_3_CAL"]
