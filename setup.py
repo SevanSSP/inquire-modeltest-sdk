@@ -11,7 +11,7 @@ setuptools.setup(
     use_scm_version=True,
     setup_requires=['setuptools_scm'] + requirements,
     install_requires= requirements,
-    author="Jørgen",
+    author="Jørgen Engelsen",
     author_email="jen@sevanssp.com",
     description="Python SDK for inquire-modeltest",
     long_description=long_description,
