@@ -1,0 +1,26 @@
+name: Build and test package
+
+on: [push]
+
+jobs:
+  build:
+
+    name: Test with ${{matrix.python}} on Ubuntu
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.7, 3.8]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Dependencies
+        run: pip install nox poetry
+
+      - name: Run tests with Nox
+        run: nox -s lint tests
