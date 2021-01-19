@@ -34,7 +34,7 @@ def tests(session):
     session.run("poetry", "install", external=True)
     session.install("pytest")
     session.install("coverage")
-    session.install("-r", "requirements.txt")
+    # session.install("-r", "requirements.txt")
 
     # unit tests
     testfiles = ["modeltestSDK/tests/"]

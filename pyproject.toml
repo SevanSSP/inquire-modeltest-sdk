@@ -20,7 +20,7 @@ python = "^3.6"
 
 
 [tool.poetry.dev-dependencies]
-nox = "^2020.12.13"
+nox = "^2020.8.22"
 
 [[tool.poetry.source]]
 name = "private_pypi"
