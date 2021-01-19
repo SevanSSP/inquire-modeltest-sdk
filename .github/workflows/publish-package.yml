@@ -5,7 +5,7 @@ name: Upload Python Package
 
 on:
   release:
-    types: [published]
+    types: [created]
 
 jobs:
   deploy:
@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.x'
+        python-version: '3.7'
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
@@ -25,4 +25,5 @@ jobs:
     - name: Build and publish
       run: |
         python setup.py sdist bdist_wheel
-        twine upload --repository-url https://api.packagr.app/EYvhW6SyL/ dist/* -u "" --password ${{secrets.PACKAGR_KEY}}
+        #twine upload --repository-url https://api.packagr.app/EYvhW6SyL/ dist/* -u "" --password ${{secrets.PACKAGR_KEY}}
+        twine upload --repository-url ${{ secrets.PACKAGR_REPOSITORY_URL }} dist/* --u ${{ secrets.PACKAGR_USERNAME }} --password ${{ secrets.PACKAGR_PASSWORD }} 
