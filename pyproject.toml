@@ -6,6 +6,7 @@ authors = ["Jørgen Engelsen <jen@sevanssp.com>","Per Voie <pev@sevanssp.com>", 
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/SevanSSP/inquire-modeltest-sdk"
+packages = [{ include = "modeltestSDK" },]
 include = [
     "LICENSE"
 ]
