@@ -5,15 +5,16 @@ from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, Floa
 from .config import Config
 from .exceptions import ClientException
 
+
 class SDKclient:
-    '''
+    """
     Main entrypoint into modeltest-db SDK.
 
     Parameters
     ----------
     config : object, optional
         Client configuration (host, base URL)
-    '''
+    """
     def __init__(self, config=Config):
         self.config = config
         '''Initilize objects for interacting with the API'''
@@ -52,15 +53,19 @@ class SDKclient:
                -----
                The full request url is like
                    'https://{host}/{base_url}/{resource}/{endpoint}?firstparameter=value&anotherparameter=value
+                   :param body:
+                   :param parameters:
+                   :param resource:
+                   :param method:
                    :param endpoint:
                """
         if not isinstance(endpoint, str):
             endpoint = str(endpoint)
 
-        url = self.config.host +"/" + "/".join([p for p in [self.config.base_url, self.config.version, resource, endpoint] if p.strip()])
-
+        url = self.config.host + "/"
+        url = url + "/".join([p for p in [self.config.base_url, self.config.version, resource, endpoint] if p.strip()])
         if parameters is not None and isinstance(parameters, dict):
-            #parameters = to_camel_case({k: v for k, v in parameters.items() if v is not None})
+            # parameters = to_camel_case({k: v for k, v in parameters.items() if v is not None})
             enc_parameters = urllib.parse.urlencode(parameters, quote_via=urllib.parse.quote)
         else:
             enc_parameters = ""
@@ -77,42 +82,42 @@ class SDKclient:
             return response.json()
 
     def get(self, resource: str, endpoint: str = "", parameters: dict = None):
-        '''
+        """
         Method to retrieve resource from db
         :param resource:
         :param endpoint:
         :param parameters:
         :return:
-        '''
+        """
         return self.do_request(requests.get, resource, endpoint, parameters=parameters)
 
     def post(self, resource: str, endpoint: str = "", body: dict = None):
-        '''
+        """
         Method to create resource in db
         :param resource:
         :param endpoint:
         :param body:
         :return:
-        '''
+        """
         return self.do_request(requests.post, resource, endpoint, body=body)
 
     def patch(self, resource: str, endpoint: str = "", body: dict = None):
-        '''
+        """
         Method to update resource in db
         :param resource:
         :param endpoint:
         :param body:
         :return:
-        '''
-        return self.do_request(self.session.patch, resource, endpoint, body=body)
+        """
+        return self.do_request(requests.patch, resource, endpoint, body=body)
 
-    def delete(self, resource: str, endpoint: str, parameters: str=None):
-        '''
+    def delete(self, resource: str, endpoint: str, parameters: str = None):
+        """
         Method for deleting a resource from db
         WARNING: Not working in a intuitive way
         :param parameters: Query string for admin-delete
         :param resource:
         :param endpoint:
         :return:
-        '''
+        """
         return self.do_request(requests.delete, resource=resource, endpoint=endpoint, parameters=parameters)

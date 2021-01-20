@@ -7,7 +7,6 @@ from collections import OrderedDict, defaultdict
 from datetime import datetime, timedelta
 import uuid
 import re
-from .config import Config
 
 # compile regex for camel case to snake case
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
@@ -133,6 +132,7 @@ def to_camel_case(d):
             dd[k] = v
         return dd
 
+
 def from_datetime_string(s):
     """
     Convert formatted date time string to date time object.
@@ -185,9 +185,9 @@ def get_datetime_date(date):
 
 
 class TwoWayDict(dict):
-    '''
+    """
     Special dict where index and value is searchable
-    '''
+    """
     def __setitem__(self, key, value):
         # Remove any previous connections with these values
         if key in self:

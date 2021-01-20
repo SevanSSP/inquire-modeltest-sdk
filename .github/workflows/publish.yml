@@ -1,0 +1,26 @@
+name: Publish Python package to Packagr
+
+on:
+  release:
+    types: [created, edited]
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install dependencies
+      run: pip install nox poetry
+    - name: Run tests
+      run: nox -s tests
+    - name: Publish package
+      run: |
+        poetry config repositories.packagr ${{ secrets.PACKAGR_REPOSITORY_URL }}
+        poetry config http-basic.packagr ${{ secrets.PACKAGR_USERNAME }} ${{ secrets.PACKAGR_PASSWORD }}
+        poetry publish --build --repository packagr
