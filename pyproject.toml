@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "modeltestSDK"
-version = "1.3.12"
+version = "1.3.13"
 description = "SDK for use with modeltest API"
 authors = ["Jørgen Engelsen <jen@sevanssp.com>","Per Voie <pev@sevanssp.com>", "Einar Glomnes <ebg@sevanssp.com>"]
 license = "MIT"
