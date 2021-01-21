@@ -24,8 +24,16 @@ class CompAttribute:
         return dict(name=self.name, op='asc')
 
     @property
+    def asc(self):
+        return self.ascending
+
+    @property
     def descending(self):
         return dict(name=self.name, op='desc')
+
+    @property
+    def desc(self):
+        return self.descending
 
 
 def class_factory(name: str, attribute_list: list):
@@ -51,6 +59,7 @@ class Query:
                                                                        'water_depth',
                                                                        'read_only',
                                                                        'id'])
+        # TODO: add the others
         self.sensor = class_factory(name="Sensor", attribute_list=['name',
                                                                    'description',
                                                                    'unit',
