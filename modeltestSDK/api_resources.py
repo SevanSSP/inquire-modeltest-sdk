@@ -3,7 +3,7 @@ import warnings
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
                         FloaterTest, FloaterTestList, WaveCalibration, WaveCalibrationList, WindConditionCalibration,
                         WindConditionCalibrationList, Tag, TagList, FloaterConfig, FloaterConfigList)
-from .utils import query_dict_to_url
+from .query import query_dict_to_url
 
 
 def get_id_from_response(response):
@@ -63,7 +63,11 @@ class CampaignAPI(NamedBaseAPI):
         else:
             raise Exception(f"Could not find any object with name {name}")
 
-    def get_all(self, filter_by: list, sort_by: list) -> CampaignList:
+    def get_all(self, filter_by=None, sort_by=None) -> CampaignList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:
@@ -96,7 +100,11 @@ class TestAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, test_id)
         return Test.from_dict(data=data, client=self.client)
 
-    def get_all(self, filter_by: list, sort_by: list) -> TestList:
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> TestList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:
@@ -132,7 +140,11 @@ class FloaterTestAPI(TestAPI):
         else:
             raise Exception(f"Could not find any object with name {description}")
 
-    def get_all(self, filter_by: list, sort_by: list) -> FloaterTestList:
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> FloaterTestList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:
@@ -161,7 +173,11 @@ class WaveCalibrationAPI(TestAPI):
         data = self.client.get(self._resource_path, wave_calibration_id)
         return WaveCalibration.from_dict(data=data, client=self.client)
 
-    def get_all(self, filter_by: list, sort_by: list) -> WaveCalibrationList:
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> WaveCalibrationList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:
@@ -187,7 +203,11 @@ class WindConditionCalibrationAPI(TestAPI):
         data = self.client.get(self._resource_path, wind_condition_id)
         return WindConditionCalibration.from_dict(data=data, client=self.client)
 
-    def get_all(self, filter_by: list, sort_by: list) -> WindConditionCalibrationList:
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> WindConditionCalibrationList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:
@@ -224,7 +244,11 @@ class SensorAPI(NamedBaseAPI):
         else:
             raise Exception(f"Could not find any object with name {name}")
 
-    def get_all(self, filter_by: list, sort_by: list) -> SensorList:
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> SensorList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:
@@ -251,7 +275,11 @@ class TimeseriesAPI(BaseAPI):
         data = self.client.get(self._resource_path, ts_id)
         return Timeseries.from_dict(data=data, client=self.client)
 
-    def get_all(self, filter_by: list, sort_by: list) -> TimeseriesList:
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> TimeseriesList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:
@@ -314,7 +342,11 @@ class TagsAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, tag_id)
         return Tag.from_dict(data=data, client=self.client)
 
-    def get_all(self, filter_by: list, sort_by: list) -> TagList:
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> TagList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:
@@ -346,7 +378,11 @@ class FloaterConfigAPI(NamedBaseAPI):
         data = self.client.get(self._resource_path, floater_id)
         return FloaterConfig.from_dict(data=data, client=self.client)
 
-    def get_all(self, filter_by: list, sort_by: list) -> FloaterConfigList:
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> FloaterConfigList:
+        if sort_by is None:
+            sort_by = []
+        if filter_by is None:
+            filter_by = []
         if not filter_by == [] or not sort_by == []:
             enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
         else:

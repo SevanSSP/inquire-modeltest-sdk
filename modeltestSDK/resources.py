@@ -190,7 +190,7 @@ class Sensor(BaseResource):
         return cls(name=data['name'], description=data['description'], unit=data['unit'],
                    kind=data['kind'], area=data['area'], x=data['y'], y=data['y'], z=data['z'],
                    is_local=data['is_local'],
-                   campaign_id=data['campaign_id'], id=data['id'], client=client)
+                   campaign_id=data['campaign_id'], sensor_id=data['id'], client=client)
 
 
 class SensorList(ResourceList):
@@ -242,7 +242,7 @@ class Test(BaseResource):
     @classmethod
     def from_dict(cls, data, client: object = None) -> object:
         return cls(number=data['number'], description=data["description"], test_date=data['test_date'],
-                   campaign_id=data['campaign_id'], type=data['type'], id=data['id'], client=client)
+                   campaign_id=data['campaign_id'], test_type=data['type'], test_id=data['id'], client=client)
 
 
 class TestList(ResourceList):
@@ -270,7 +270,7 @@ class FloaterTest(Test):
                  category: str, orientation: float, floaterconfig_id: str = None, wave_id: str = None,
                  wind_id: str = None, floater_id: str = None, client=None):
         super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=self.type, id=id, client=client)
+                         test_type=self.type, test_id=floater_id, client=client)
 
         self.category = category
         self.orientation = orientation
@@ -285,7 +285,7 @@ class FloaterTest(Test):
         return cls(number=data['number'], description=data["description"], test_date=data['test_date'],
                    campaign_id=data['campaign_id'], category=data['category'], orientation=data['orientation'],
                    wave_id=data['wave_id'], wind_id=data['wind_id'], floaterconfig_id=data['floaterconfig_id'],
-                   id=data['id'], client=client)
+                   floater_id=data['id'], client=client)
 
 
 class FloaterTestList(ResourceList):
@@ -303,7 +303,7 @@ class WaveCalibration(Test):
                  gamma: float = None, wave_direction: float = None, current_velocity: float = None,
                  current_direction: float = None, wave_calibration_id: str = None, client=None):
         super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=self.type, id=wave_calibration_id, client=client)
+                         test_type=self.type, test_id=wave_calibration_id, client=client)
 
         self.wave_spectrum = wave_spectrum
         self.wave_height = wave_height
@@ -320,7 +320,7 @@ class WaveCalibration(Test):
                    wave_height=data['wave_height'],
                    wave_period=data['wave_period'], gamma=data['gamma'], wave_direction=data['wave_direction'],
                    current_velocity=data['current_velocity'], current_direction=data['current_direction'],
-                   id=data['id'], client=client)
+                   wave_calibration_id=data['id'], client=client)
 
 
 class WaveCalibrationList(ResourceList):
@@ -337,7 +337,7 @@ class WindConditionCalibration(Test):
                  wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
                  wind_direction: float = None, wind_condition_id: str = None, client=None):
         super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         type=self.type, id=wind_condition_id, client=client)
+                         test_type=self.type, test_id=wind_condition_id, client=client)
 
         self.wind_spectrum = wind_spectrum
         self.wind_velocity = wind_velocity
@@ -349,7 +349,7 @@ class WindConditionCalibration(Test):
         return cls(number=data['number'], description=data["description"], test_date=data['test_date'],
                    campaign_id=data['campaign_id'], wind_spectrum=data['wind_spectrum'],
                    wind_velocity=data['wind_velocity'], zref=data['zref'], wind_direction=data['wind_direction'],
-                   id=data['id'], client=client)
+                   wind_condition_id=data['id'], client=client)
 
 
 class WindConditionCalibrationList(ResourceList):
@@ -475,7 +475,7 @@ class Timeseries(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], fs=data['fs'],
-                   intermittent=data['intermittent'], id=data['id'], client=client)
+                   intermittent=data['intermittent'], ts_id=data['id'], client=client)
 
 
 class TimeseriesList(ResourceList):
@@ -576,7 +576,7 @@ class Tag(BaseResource):
     @classmethod
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], comment=data['comment'], test_id=data['test_id'], sensor_id=data['sensor_id'],
-                   timeseries_id=data['timeseries_id'], id=data['id'], client=client)
+                   timeseries_id=data['timeseries_id'], tag_id=data['id'], client=client)
 
 
 class TagList(ResourceList):
@@ -605,7 +605,7 @@ class FloaterConfig(BaseResource):
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'],
                    characteristic_length=data['characteristic_length'], draft=data['draft'],
-                   campaign_id=data['campaign_id'], id=data['id'], client=client)
+                   campaign_id=data['campaign_id'], floater_id=data['id'], client=client)
 
 
 class FloaterConfigList(ResourceList):
