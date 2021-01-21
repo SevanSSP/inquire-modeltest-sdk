@@ -214,7 +214,7 @@ class WindCalibrationAPI(TestAPI):
         data = self.client.post(self._resource_path, body=body)
         return WindCalibration.from_dict(data=data, client=self.client)
 
-    def get(self, wind_condition_id: str) -> WindConditionCalibration:
+    def get(self, wind_condition_id: str) -> WindCalibration:
         data = self.client.get(self._resource_path, wind_condition_id)
         return WindCalibration.from_dict(data=data, client=self.client)
 
