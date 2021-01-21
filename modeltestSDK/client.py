@@ -19,8 +19,8 @@ class SDKclient:
     def __init__(self, config=Config):
         """Initilize objects for interacting with the API"""
         self.config = config
-        self.filter = Query()
-        self.sort = Query()
+        self.filter = Query(method_spec='filter')
+        self.sort = Query(method_spec='sort')
         self.campaign = CampaignAPI(client=self)
         self.timeseries = TimeseriesAPI(client=self)
         self.sensor = SensorAPI(client=self)
