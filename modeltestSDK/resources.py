@@ -151,7 +151,7 @@ class Campaign(BaseResource):
     def from_dict(cls, data: dict, client=None):
         return cls(name=data['name'], description=data['description'], location=data['location'],
                    date=data['date'], scale_factor=data['scale_factor'],
-                   water_depth=data['water_depth'], id=data['id'], client=client)
+                   water_depth=data['water_depth'], campaign_id=data['id'], client=client)
 
 
 class CampaignList(ResourceList):

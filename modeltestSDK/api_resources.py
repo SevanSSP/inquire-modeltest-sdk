@@ -3,6 +3,7 @@ import warnings
 from .resources import (Campaign, CampaignList, Test, Sensor, SensorList, Timeseries, TimeseriesList,
                         FloaterTest, FloaterTestList, WaveCalibration, WaveCalibrationList, WindConditionCalibration,
                         WindConditionCalibrationList, Tag, TagList, FloaterConfig, FloaterConfigList)
+from .utils import query_dict_to_url
 
 
 def get_id_from_response(response):
@@ -62,8 +63,12 @@ class CampaignAPI(NamedBaseAPI):
         else:
             raise Exception(f"Could not find any object with name {name}")
 
-    def get_all(self) -> CampaignList:
-        data = self.client.get(self._resource_path, "")
+    def get_all(self, filter_by: list = [], sort_by: list = []) -> CampaignList:
+        if not filter_by == [] or not sort_by == []:
+            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
+        else:
+            enc_parameters = None
+        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
         obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
         return CampaignList(resources=obj_list, client=None)
 

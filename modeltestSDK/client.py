@@ -2,6 +2,7 @@ import urllib.parse
 import requests
 from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindConditionCalibrationAPI,
                             WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
+from .query import Query
 from .config import Config
 from .exceptions import ClientException
 
@@ -16,8 +17,9 @@ class SDKclient:
         Client configuration (host, base URL)
     """
     def __init__(self, config=Config):
+        """Initilize objects for interacting with the API"""
         self.config = config
-        '''Initilize objects for interacting with the API'''
+        self.query = Query()
         self.campaign = CampaignAPI(client=self)
         self.timeseries = TimeseriesAPI(client=self)
         self.sensor = SensorAPI(client=self)
@@ -28,7 +30,8 @@ class SDKclient:
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
 
-    def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, body: dict = None):
+    def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, enc_parameters: str = None,
+                   body: dict = None):
         """
         Carry out request.
         Parameters
@@ -53,6 +56,7 @@ class SDKclient:
                -----
                The full request url is like
                    'https://{host}/{base_url}/{resource}/{endpoint}?firstparameter=value&anotherparameter=value
+                   :param enc_parameters:
                    :param body:
                    :param parameters:
                    :param resource:
@@ -64,11 +68,12 @@ class SDKclient:
 
         url = self.config.host + "/"
         url = url + "/".join([p for p in [self.config.base_url, self.config.version, resource, endpoint] if p.strip()])
-        if parameters is not None and isinstance(parameters, dict):
-            # parameters = to_camel_case({k: v for k, v in parameters.items() if v is not None})
-            enc_parameters = urllib.parse.urlencode(parameters, quote_via=urllib.parse.quote)
-        else:
-            enc_parameters = ""
+        if enc_parameters is None:
+            if parameters is not None and isinstance(parameters, dict):
+                # parameters = to_camel_case({k: v for k, v in parameters.items() if v is not None})
+                enc_parameters = urllib.parse.urlencode(parameters, quote_via=urllib.parse.quote)
+            else:
+                enc_parameters = ""
 
         query_url = f"{url}/?{enc_parameters}"
 
@@ -81,15 +86,16 @@ class SDKclient:
         else:
             return response.json()
 
-    def get(self, resource: str, endpoint: str = "", parameters: dict = None):
+    def get(self, resource: str, endpoint: str = "", parameters: dict = None, enc_parameters: str = None):
         """
         Method to retrieve resource from db
+        :param enc_parameters:
         :param resource:
         :param endpoint:
         :param parameters:
         :return:
         """
-        return self.do_request(requests.get, resource, endpoint, parameters=parameters)
+        return self.do_request(requests.get, resource, endpoint, parameters=parameters, enc_parameters=enc_parameters)
 
     def post(self, resource: str, endpoint: str = "", body: dict = None):
         """
