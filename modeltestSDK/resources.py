@@ -330,8 +330,8 @@ class WaveCalibrationList(ResourceList):
         self._client = client
 
 
-class WindConditionCalibration(Test):
-    type = "windConditionCalibration"
+class WindCalibration(Test):
+    type = "Wind Calibration"
 
     def __init__(self, number: str, description: str, test_date: str, campaign_id: str,
                  wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
@@ -352,9 +352,9 @@ class WindConditionCalibration(Test):
                    wind_condition_id=data['id'], client=client)
 
 
-class WindConditionCalibrationList(ResourceList):
+class WindCalibrationList(ResourceList):
 
-    def __init__(self, resources: List[WindConditionCalibration], client=None):
+    def __init__(self, resources: List[WindCalibration], client=None):
         self.resources = resources
         self._client = client
 

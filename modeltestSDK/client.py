@@ -1,6 +1,6 @@
 import urllib.parse
 import requests
-from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindConditionCalibrationAPI,
+from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
                             WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
 from .config import Config
@@ -26,7 +26,7 @@ class SDKclient:
         self.sensor = SensorAPI(client=self)
         self.test = TestAPI(client=self)
         self.floater_test = FloaterTestAPI(client=self)
-        self.wind_condition_calibration = WindConditionCalibrationAPI(client=self)
+        self.wind_calibration = WindCalibrationAPI(client=self)
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)

@@ -18,7 +18,7 @@ def plot_timeseries(timeseries_list: list):
     datas = []
     sensor_list = []
     for timeseries in timeseries_list:
-        if not timeseries.data_points:
+        if timeseries.data_points is None:
             warnings.warn("No datapoints in timeseries, fetching datapoints...")
             timeseries.get_data_points()
         datas.append(timeseries.data_points.to_pandas())
