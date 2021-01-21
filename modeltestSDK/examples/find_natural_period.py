@@ -1,4 +1,4 @@
-from modeltestSDK import SDKclient
+from .. import SDKclient
 import numpy
 from qats.signal import find_maxima
 from modeltestSDK.plot_timeseries import plot_timeseries
