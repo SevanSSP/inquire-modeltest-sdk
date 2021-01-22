@@ -7,6 +7,7 @@ from collections import OrderedDict, defaultdict
 from datetime import datetime, timedelta
 import uuid
 import re
+import urllib.parse
 
 # compile regex for camel case to snake case
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')

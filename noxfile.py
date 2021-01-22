@@ -37,7 +37,7 @@ def tests(session):
     # session.install("-r", "requirements.txt")
 
     # unit tests
-    testfiles = ["modeltestSDK/tests/"]
+    testfiles = ["tests/"]
     session.run("coverage", "run", "-m", "pytest", *testfiles)
     session.notify("cover")
 
