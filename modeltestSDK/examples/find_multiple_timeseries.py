@@ -1,5 +1,5 @@
-from .. import SDKclient
-from ..plot_timeseries import plot_timeseries
+from modeltestSDK import SDKclient
+from modeltestSDK.plot_timeseries import plot_timeseries
 import random
 import json
 

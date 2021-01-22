@@ -1,6 +1,5 @@
-
-from .. import SDKclient
-from modeltestSDK.resources import WaveCurrentCalibration, Timeseries, Sensor
+from modeltestSDK import SDKclient
+from modeltestSDK.resources import WaveCalibration, Timeseries, Sensor
 import datetime
 import random
 from modeltestSDK.utils import from_datetime_string

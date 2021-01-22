@@ -1,4 +1,4 @@
-from .. import SDKclient
+from modeltestSDK import SDKclient
 
 client = SDKclient()
 

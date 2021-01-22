@@ -1,4 +1,4 @@
-from .. import SDKclient
+from modeltestSDK import SDKclient
 import time
 import matplotlib.pyplot as plt
 from modeltestSDK.utils import get_datetime_date
