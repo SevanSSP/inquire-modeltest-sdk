@@ -16,7 +16,7 @@ pos_BL = {'x': 0, 'y': 0, 'z': 0}
 
 def add_sensors(campaign: Campaign, client: SDKclient):
     sensor = client.sensor.create(name="WAVE_1",
-                                  description="Wave elevation at position 1, zero at SWL - positive upwards",
+                                  description="Wave elevation 350 m ahead of midship",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -27,7 +27,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="WAVE_3",
-                                  description="Wave elevation at position 3, zero at SWL - positive upwards",
+                                  description="Wave elevation 350 m port of midship",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -37,8 +37,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="CURRENT_2",
-                                  description="Current speed at position 2, zero at SWL - positive upwards",
+    '''sensor = client.sensor.create(name="CURRENT_2",
+                                  description="Current velocity 360m ahead of FPU",
                                   unit="m/s",
                                   kind="velocity",
                                   x=position1['x'],
@@ -46,21 +46,43 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   z=None,
                                   is_local=False,
                                   campaign_id=campaign.id,
-                                  read_only=restrict_access)
+                                  read_only=restrict_access)'''  # Potential duplicate
 
-    sensor = client.sensor.create(name="WIND",
-                                  description="Wind speed. Derived quasi speed",
-                                  unit="m/s",
-                                  kind="velocity",
+    sensor = client.sensor.create(name="WIND_Ui",
+                                  description="Wind velocity, power on fans in Volt",
+                                  unit="V",
+                                  kind="control signal",
                                   x=position1['x'],
                                   y=position1['y'],
                                   z=None,
                                   is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="PRESS_TOP_6639",
+                                  description="Water pressure on top damping plate",
+                                  unit="bar",
+                                  kind="pressure",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="PRESS_TOP_6635",
+                                  description="Water pressure on bottom damping plate",
+                                  unit="bar",
+                                  kind="pressure",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="REL_WAVE_0",
-                                  description="Wave elevation at position 1, zero at SWL - positive upwards",
+                                  description="Relative waveheight at LQ – 0 deg",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -71,7 +93,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="REL_WAVE_120",
-                                  description="Wave elevation at position 1, zero at SWL - positive upwards",
+                                  description="Relative waveheight at 120 deg",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -82,7 +104,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="REL_WAVE_270",
-                                  description="Wave elevation at position 1, zero at SWL - positive upwards",
+                                  description="Relative waveheight transverse LQ – 270deg",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -93,7 +115,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="REL_WAVE_300",
-                                  description="Wave elevation at position 1, zero at SWL - positive upwards",
+                                  description="Relative waveheight at 300 deg",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -104,7 +126,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="REL_WAVE_MOONP_CENTRE",
-                                  description="Relative wave elevation at center of moonpool",
+                                  description="Relative waveheight at centre moonpool",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -115,7 +137,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="REL_WAVE_MOONP_120",
-                                  description="Relative wave elevation at center of moonpool",
+                                  description="Relative waveheight in moonpool at 120deg",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -126,7 +148,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="REL_WAVE_MOONP_300",
-                                  description="Relative wave elevation at center of moonpool",
+                                  description="Relative waveheight in moonpool at 300deg",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -137,7 +159,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="GREEN_WATER_300_1",
-                                  description="Green water on process deck. Dir 300 deg",
+                                  description="Green water on P-deck at 300 deg, pos 1",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -148,7 +170,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="GREEN_WATER_300_2",
-                                  description="Green water on process deck. Dir 300 deg",
+                                  description="Green water on P-deck at 300 deg, pos 2",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -159,7 +181,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="GREEN_WATER_300_3",
-                                  description="Green water on process deck. Dir 300 deg",
+                                  description="Green water on P-deck at 300 deg, pos 3",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -170,7 +192,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="X_ACC_MOONP_C",
-                                  description="Near centre, EL 65m",
+                                  description="X-acceleration at MOONPOOL_CENTRE",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -181,7 +203,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="Y_ACC_MOONP_C",
-                                  description="Near centre, EL 65m",
+                                  description="Y-acceleration at MOONPOOL_CENTRE",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -192,7 +214,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="Z_ACC_MOONP_C",
-                                  description="Near centre, EL 65m",
+                                  description="Z-acceleration at MOONPOOL_CENTRE",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -203,7 +225,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="X_ACC_PDK_120",
-                                  description="Near centre, EL 48m",
+                                  description="X-acceleration at P-deck at 120 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -214,7 +236,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="Y_ACC_PDK_120",
-                                  description="Near centre, EL 48m",
+                                  description="Y-acceleration at P-deck at 120 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -225,7 +247,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="Z_ACC_PDK_120",
-                                  description="Near centre, EL 48m",
+                                  description="Z-acceleration at P-deck at 120 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -236,7 +258,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="FZ_PONTOON",
-                                  description="External force downwards, Section of pontoon, b=4.6m",
+                                  description="Vertical force on pontoon element at 300deg",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -247,9 +269,9 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="M_300_PONTOON",
-                                  description="External force downwards, Section of pontoon, b=4.6m",
+                                  description="Moment on pontoon element at 300 deg",
                                   unit="kNm",
-                                  kind="force", #TODO: Sensor type
+                                  kind="moment",
                                   x=position1['x'],
                                   y=position1['y'],
                                   z=None,
@@ -257,30 +279,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="PRESSURE_TOP",
-                                  description="",
-                                  unit="Pa",
-                                  kind="pressure",
-                                  x=position1['x'],
-                                  y=position1['y'],
-                                  z=None,
-                                  is_local=True,
-                                  campaign_id=campaign.id,
-                                  read_only=restrict_access)
-
-    sensor = client.sensor.create(name="PRESSURE_BOTTOM",
-                                  description="",
-                                  unit="Pa",
-                                  kind="pressure",
-                                  x=position1['x'],
-                                  y=position1['y'],
-                                  z=None,
-                                  is_local=True,
-                                  campaign_id=campaign.id,
-                                  read_only=restrict_access)
-
-    sensor = client.sensor.create(name="TENSION_L01",
-                                  description="Mooring line tensions at fairlead",
+    sensor = client.sensor.create(name="TENSION_01",
+                                  description="Tension in line 1 of FPU",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -290,8 +290,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="TENSION_L02",
-                                  description="Mooring line tensions at fairlead",
+    sensor = client.sensor.create(name="TENSION_02",
+                                  description="Tension in line 2 of FPU",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -301,8 +301,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="TENSION_L05",
-                                  description="Mooring line tensions at fairlead",
+    sensor = client.sensor.create(name="TENSION_05",
+                                  description="Tension in line 5 of FPU",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -312,8 +312,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="TENSION_L06",
-                                  description="Mooring line tensions at fairlead",
+    sensor = client.sensor.create(name="TENSION_06",
+                                  description="Tension in line 6 of FPU",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -323,8 +323,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="TENSION_L09",
-                                  description="Mooring line tensions at fairlead",
+    sensor = client.sensor.create(name="TENSION_09",
+                                  description="Tension in line 9 of FPU",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -334,8 +334,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="TENSION_L10",
-                                  description="Mooring line tensions at fairlead",
+    sensor = client.sensor.create(name="TENSION_10",
+                                  description="Tension in line 10 of FPU",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -346,7 +346,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="TENSION_R01",
-                                  description="Mooring line tensions at fairlead",
+                                  description="Tension in riser 01 of FPU",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -357,7 +357,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="X_POS_BL",
-                                  description="",
+                                  description="X-position at BL line and centre",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -368,7 +368,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="Y_POS_BL",
-                                  description="",
+                                  description="Y-position at BL line and centre",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -379,7 +379,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="Z_POS_BL",
-                                  description="",
+                                  description="Z-position at BL line and centre",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -390,7 +390,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="X_POS_WL",
-                                  description="",
+                                  description="X-position at WL line and centre",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -401,7 +401,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="Y_POS_WL",
-                                  description="",
+                                  description="Y-position at WL line and centre",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -412,7 +412,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="Z_POS_WL",
-                                  description="",
+                                  description="Z-position at WL line and centre",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -423,7 +423,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="ROLL",
-                                  description="",
+                                  description="Roll motion of FPU",
                                   unit="deg",
                                   kind="angle",
                                   x=position1['x'],
@@ -434,7 +434,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="PITCH",
-                                  description="",
+                                  description="Pitch motion of FPU",
                                   unit="deg",
                                   kind="angle",
                                   x=position1['x'],
@@ -445,7 +445,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="YAW",
-                                  description="",
+                                  description="Yaw motion of FPU",
                                   unit="deg",
                                   kind="angle",
                                   x=position1['x'],
@@ -455,8 +455,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="XY_POS",
-                                  description="",
+    sensor = client.sensor.create(name="XY_POS_WL",
+                                  description="XY-position at WL line and centre",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -467,7 +467,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="XPOS_MOONP_C",
-                                  description="",
+                                  description="X-position at MOONPOOL_CENTRE",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -478,7 +478,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="YPOS_MOONP_C",
-                                  description="",
+                                  description="Y-position at MOONPOOL_CENTRE",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -489,7 +489,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="ZPOS_MOONP_C",
-                                  description="",
+                                  description="Z-position at MOONPOOL_CENTRE",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -500,7 +500,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="XPOS_PDCK_BOW",
-                                  description="",
+                                  description="X-position at PROCESS_DECK_BOW",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -511,7 +511,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="YPOS_PDCK_BOW",
-                                  description="",
+                                  description="Y-position at PROCESS_DECK_BOW",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -522,7 +522,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="ZPOS_PDCK_BOW",
-                                  description="",
+                                  description="Z-position at PROCESS_DECK_BOW",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -533,7 +533,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="XPOS_PDCK_STERN",
-                                  description="",
+                                  description="X-position at PROCESS_DECK_STERN",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -541,10 +541,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   z=None,
                                   is_local=False,
                                   campaign_id=campaign.id,
-                                  read_only=restrict_access) #TODO: Check name
+                                  read_only=restrict_access)
 
     sensor = client.sensor.create(name="YPOS_PDCK_STERN",
-                                  description="",
+                                  description="Y-position at PROCESS_DECK_STERN",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -555,7 +555,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="ZPOS_PDCK_STERN",
-                                  description="",
+                                  description="Z-position at PROCESS_DECK_STERN",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -565,8 +565,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="XPOS_HELIDECK",
-                                  description="",
+    sensor = client.sensor.create(name="XPOS_HELID",
+                                  description="X-position at HELIDECK",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -576,8 +576,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="YPOS_HELIDECK",
-                                  description="",
+    sensor = client.sensor.create(name="YPOS_HELID",
+                                  description="Y-position at HELIDECK",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -587,8 +587,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="ZPOS_HELIDECK",
-                                  description="",
+    sensor = client.sensor.create(name="ZPOS_HELID",
+                                  description="Z-position at HELIDECK",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -599,7 +599,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="XACC_MOONP_C_CALC",
-                                  description="Derived acceleration from motion measurements",
+                                  description="X-acceleration at MOONPOOL_CENTRE. Derived from motion measurements",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -610,7 +610,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="YACC_MOONP_C_CALC",
-                                  description="Derived acceleration from motion measurements",
+                                  description="Y-acceleration at MOONPOOL_CENTRE. Derived from motion measurements",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -621,7 +621,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="ZACC_MOONP_C_CALC",
-                                  description="Derived acceleration from motion measurements",
+                                  description="Z-acceleration at MOONPOOL_CENTRE. Derived from motion measurements",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -630,8 +630,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   is_local=True,
                                   campaign_id=campaign.id,)
 
-    sensor = client.sensor.create(name="XACC_PDCK_BOW",
-                                  description="",
+    sensor = client.sensor.create(name="XACC_PDCK_BOW_CALC",
+                                  description="X-acceleration at P-deck at 300 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -641,8 +641,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="YACC_PDCK_BOW",
-                                  description="",
+    sensor = client.sensor.create(name="YACC_PDCK_BOW_CALC",
+                                  description="Y-acceleration at P-deck at 300 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -652,8 +652,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="ZACC_PDCK_BOW",
-                                  description="",
+    sensor = client.sensor.create(name="ZACC_PDCK_BOW_CALC",
+                                  description="Z-acceleration at P-deck at 300 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -662,8 +662,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   is_local=True,
                                   campaign_id=campaign.id,)
 
-    sensor = client.sensor.create(name="XACC_PDCK_STERN",
-                                  description="",
+    sensor = client.sensor.create(name="XACC_PDCK_STERN_CALC",
+                                  description="X-acceleration at P-deck at 120 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -673,8 +673,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="YACC_PDCK_STERN",
-                                  description="",
+    sensor = client.sensor.create(name="YACC_PDCK_STERN_CALC",
+                                  description="Y-acceleration at P-deck at 120 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -684,8 +684,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="ZACC_PDCK_STERN",
-                                  description="",
+    sensor = client.sensor.create(name="ZACC_PDCK_STERN_CALC",
+                                  description="Z-acceleration at P-deck at 120 deg",
                                   unit="m/s^2",
                                   kind="acceleration",
                                   x=position1['x'],
@@ -694,7 +694,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   is_local=True,
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
-
+    '''
     sensor = client.sensor.create(name="XACC_HELIDECK",
                                   description="",
                                   unit="m/s^2",
@@ -726,10 +726,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   z=None,
                                   is_local=True,
                                   campaign_id=campaign.id,
-                                  read_only=restrict_access)
+                                  read_only=restrict_access) ''' # Not found in final report
 
     sensor = client.sensor.create(name="WAVE_1_CAL",
-                                  description="Wave elevation at position 1, zero at SWL - positive upwards",
+                                  description="Calib. wave elev. 350 m ahead of model",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -740,7 +740,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="WAVE_2_CAL",
-                                  description="Wave elevation at position 1, zero at SWL - positive upwards",
+                                  description="Calib. wave elevation at midship",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -751,7 +751,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="WAVE_3_CAL",
-                                  description="Wave elevation at position 3, zero at SWL - positive upwards",
+                                  description="Calib. wave elev. 350 m port side of model",
                                   unit="m",
                                   kind="length",
                                   x=position1['x'],
@@ -762,7 +762,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="XVEL_MOONPOOL",
-                                  description="",
+                                  description="Water velocity at centre of moonpool at BL",
                                   unit="m/s",
                                   kind="velocity",
                                   x=position1['x'],
@@ -773,7 +773,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="ZVEL_MOONPOOL",
-                                  description="",
+                                  description="Water velocity at centre of moonpool at BL",
                                   unit="m/s",
                                   kind="velocity",
                                   x=position1['x'],
@@ -784,7 +784,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="CURRENT_1",
-                                  description="At centre model",
+                                  description="Current velocity at 14m depth at FPU",
                                   unit="m/s",
                                   kind="velocity",
                                   x=position1['x'],
@@ -795,7 +795,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   read_only=restrict_access)
 
     sensor = client.sensor.create(name="CURRENT_2",
-                                  description="At centre model",
+                                  description="Current at 24 m depth 420 m ahead of FPU",
                                   unit="m/s",
                                   kind="velocity",
                                   x=position1['x'],
@@ -805,8 +805,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="WIND_10",
-                                  description="",
+    sensor = client.sensor.create(name="WIND_SPEED",
+                                  description="Wind velocity at FPU model",
                                   unit="m/s",
                                   kind="velocity",
                                   x=position1['x'],
@@ -816,7 +816,7 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="SLAM_39.5_300",
+    '''sensor = client.sensor.create(name="SLAM_39.5_300",
                                   description="Square slamming panel (2.8*2.8)",
                                   unit="kN",
                                   kind="slamming force",
@@ -862,10 +862,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   z=None,
                                   is_local=True,
                                   campaign_id=campaign.id,
-                                  read_only=restrict_access)
+                                  read_only=restrict_access)'''
 
-    sensor = client.sensor.create(name="FX_WIND/CURR",
-                                  description="Wind force tests",
+    sensor = client.sensor.create(name="FX_WIND_CURR",
+                                  description="Current/ wind force in X-direction",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -875,8 +875,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="FY_WIND/CURR",
-                                  description="Wind force tests",
+    sensor = client.sensor.create(name="FY_WIND_CURR", # TODO Rapport named FX
+                                  description="Current/ wind force in Y-direction",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -886,10 +886,10 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="MZ_WIND/CURR",
-                                  description="Wind force tests",
+    sensor = client.sensor.create(name="MZ_WIND_CURR",
+                                  description="Current/ wind turning moment about centre",
                                   unit="kNm",
-                                  kind="force", #TODO: Add moment kind
+                                  kind="moment",
                                   x=position1['x'],
                                   y=position1['y'],
                                   z=None,
@@ -897,8 +897,8 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
-    sensor = client.sensor.create(name="PULLFORCE",
-                                  description="Static tests",
+    sensor = client.sensor.create(name="PULLOUT_FORCE",
+                                  description="Tension in pull line",
                                   unit="kN",
                                   kind="force",
                                   x=position1['x'],
@@ -908,6 +908,346 @@ def add_sensors(campaign: Campaign, client: SDKclient):
                                   campaign_id=campaign.id,
                                   read_only=restrict_access)
 
+    sensor = client.sensor.create(name="XPOS_BL_WAVEDIR",
+                                  description="X-position at BL line and centre",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="YPOS_BL_WAVEDIR",
+                                  description="Y-position at BL line and centre",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="ZPOS_BL_WAVEDIR",
+                                  description="Z-position at BL line and centre",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="XPOS_WL_WAVEDIR",
+                                  description="X-position at WL line and centre",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="YPOS_WL_WAVEDIR",
+                                  description="Y-position at WL line and centre",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="ZPOS_WL_WAVEDIR",
+                                  description="Z-position at WL line and centre",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="XPOS_HELID_WAVEDIR",
+                                  description="X-position at HELID",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="YPOS_HELID_WAVEDIR",
+                                  description="Y-position at HELID",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="ZPOS_HELID_WAVEDIR",
+                                  description="Z-position at HELID",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="XPOS_MOONP_C_WAVEDIR",
+                                  description="X-position at MOONPOOL_CENTRE",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="YPOS_MOONP_C_WAVEDIR",
+                                  description="Y-position at MOONPOOL_CENTRE",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="ZPOS_MOONP_C_WAVEDIR",
+                                  description="Z-position at MOONPOOL_CENTRE",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="XPOS_PDCK_STERN_WAVEDIR",
+                                  description="X-position at PDCK_STERN",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="YPOS_PDCK_STERN_WAVEDIR",
+                                  description="Y-position at PDCK_STERN",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="ZPOS_PDCK_STERN_WAVEDIR",
+                                  description="Z-position at PDCK_STERN",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="XPOS_PDCK_BOW_WAVEDIR",
+                                  description="X-position at PDCK_BOW",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="YPOS_PDCK_BOW_WAVEDIR",
+                                  description="Y-position at PDCK_BOW",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="ZPOS_PDCK_BOW_WAVEDIR",
+                                  description="Z-position at PDCK_BOW",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="XY_POS_WL_WAVEDIR",
+                                  description="XY-position at WL line and centre",
+                                  unit="m",
+                                  kind="length",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=False,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="ROLL_WAVEDIR",
+                                  description="Roll motion of FPU",
+                                  unit="deg",
+                                  kind="angle",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="PITCH_WAVEDIR",
+                                  description="Pitch motion of FPU",
+                                  unit="deg",
+                                  kind="angle",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="YAW_WAVEDIR",
+                                  description="Yaw motion of FPU",
+                                  unit="deg",
+                                  kind="angle",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="X_ACC_MOONP_C_WAVEDIR",
+                                  description="X-acceleration at MOONPOOL_CENTRE",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="Y_ACC_MOONP_C_WAVEDIR",
+                                  description="Y-acceleration at MOONPOOL_CENTRE",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="Z_ACC_MOONP_C_WAVEDIR",
+                                  description="Z-acceleration at MOONPOOL_CENTRE",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="X_ACC_PDCK_STERN_WAVEDIR",
+                                  description="X-acceleration at P-deck at 120 deg",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="Y_ACC_PDCK_STERN_WAVEDIR",
+                                  description="Y-acceleration at P-deck at 120 deg",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="Z_ACC_PDCK_STERN_WAVEDIR",
+                                  description="Z-acceleration at P-deck at 120 deg",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="X_ACC_PDCK_BOW_WAVEDIR",
+                                  description="X-acceleration at P-deck at 300 deg",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="Y_ACC_PDCK_BOW_WAVEDIR",
+                                  description="Y-acceleration at P-deck at 300 deg",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
+
+    sensor = client.sensor.create(name="Z_ACC_PDCK_BOW_WAVEDIR",
+                                  description="Z-acceleration at P-deck at 300 deg",
+                                  unit="m/s^2",
+                                  kind="acceleration",
+                                  x=position1['x'],
+                                  y=position1['y'],
+                                  z=None,
+                                  is_local=True,
+                                  campaign_id=campaign.id,
+                                  read_only=restrict_access)
 
 
 

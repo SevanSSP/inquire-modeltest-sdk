@@ -107,6 +107,37 @@ def add_tests(campaign_dir, campaign: Campaign, client: SDKclient):
                 else:
                     wave_calibration_id = existing_wave_calibrations[cal_test_num]
 
+                if category == 'RegWave':
+                    continue
+                if category == "Wind":
+                    os.chdir(os.getcwd() + "\\Calib")
+                    calibrations = os.listdir(path='.')
+                    for calibration in calibrations:
+                        calibration_data = loadmat(os.getcwd() + "\\" + calibration)
+                        calibration_description = str(calibration_data['comment'])[2:-2]
+                        calibration_number = str(calibration_data['test_num'][0])[1:-1]
+                        calibration_date = str(calibration_data['test_date'])[2:-2]
+                        current_vel_str = re.findall("\d+,\d+", calibration_description)[0]
+                        current_vel = float(current_vel_str.replace(',', '.'))
+
+                        current_calibration = client.wave_calibration.create(number=calibration_number,
+                                                                             description=calibration_description,
+                                                                             test_date=calibration_date,
+                                                                             campaign_id=campaign.id,
+                                                                             wave_spectrum="jonswap",
+                                                                             wave_height=0,
+                                                                             wave_period=0,
+                                                                             gamma=0,
+                                                                             wave_direction=0,
+                                                                             current_velocity=current_vel,
+                                                                             current_direction=0,  # TODO: Direction?
+                                                                             read_only=True, )
+                        read_datapoints(data=calibration_data, test=current_calibration, client=client)
+
+                    wave_calibration_id = current_calibration.id
+
+                    os.chdir('..')
+
             floater_configs = client.floater_config.get_all().to_pandas()  # Todo: filter by campaign
             floater_config_names = floater_configs['name'].tolist()
 
