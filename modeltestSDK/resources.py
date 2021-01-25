@@ -240,7 +240,7 @@ class Test(BaseResource):
             self.timeseries.append(child)
 
     @classmethod
-    def from_dict(cls, data, client: object = None) -> object:
+    def from_dict(cls, data, client: object = None):
         return cls(number=data['number'], description=data["description"], test_date=data['test_date'],
                    campaign_id=data['campaign_id'], test_type=data['type'], test_id=data['id'], client=client)
 

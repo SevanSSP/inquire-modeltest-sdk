@@ -1,3 +1,8 @@
+"""
+APIs
+
+Abstraction layer between client and resources.
+"""
 from .utils import format_class_name
 import warnings
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
@@ -8,9 +13,6 @@ from .query import query_dict_to_url
 
 def get_id_from_response(response):
     return response[0]["id"]
-
-
-'''Abstraction layer between client and resources'''
 
 
 class BaseAPI:
