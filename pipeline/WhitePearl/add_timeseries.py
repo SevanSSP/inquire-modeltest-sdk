@@ -1,10 +1,9 @@
-import pandas as pd
-from scipy.io import loadmat
-from modeltestSDK import Test, SDKclient
+from modeltestSDK import Client
+from modeltestSDK.resources import Test
 import time as timer
 
 
-def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient, skip_channels: list=None,
+def read_datapoints_from_mat_with_pandas(data, test: Test, client: Client, skip_channels: list=None,
                                          derive_channels: dict = None):
     time = data['Time'][0].tolist()
 
@@ -66,7 +65,7 @@ def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient, sk
 
 
 
-def read_wave_calibration_from_mat_with_pandas(data, test: Test, calibration_sensors: list, client: SDKclient):
+def read_wave_calibration_from_mat_with_pandas(data, test: Test, calibration_sensors: list, client: Client):
     time = data['Time'][0].tolist()
 
     for sensor_name in calibration_sensors:

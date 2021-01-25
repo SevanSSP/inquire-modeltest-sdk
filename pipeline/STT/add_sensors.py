@@ -1,5 +1,5 @@
-from modeltestSDK.resources import Campaign, Sensor
-from modeltestSDK.client import SDKclient
+from modeltestSDK.resources import Campaign
+from modeltestSDK.client import Client
 from modeltestSDK.utils import TwoWayDict
 
 sensorDict = TwoWayDict()
@@ -16,7 +16,7 @@ VCG_M207 = 18.2     # [m]   # This is 18.4 meters in HE MODU specification repor
 restrict_access = True
 
 # TODO: Verify all coordinates
-def add_sensors(campaign: Campaign, client: SDKclient):
+def add_sensors(campaign: Campaign, client: Client):
 
     # M206 sensors
     # M_206_COG sensors

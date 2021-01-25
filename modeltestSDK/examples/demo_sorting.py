@@ -1,6 +1,6 @@
-from modeltestSDK import SDKclient
+from modeltestSDK import Client
 
-client = SDKclient()
+client = Client()
 
 print(client.campaign.get_all(filter_by=[client.filter.campaign.scale_factor >= 100]))
 

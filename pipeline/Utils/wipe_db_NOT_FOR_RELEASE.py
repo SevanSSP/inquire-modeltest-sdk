@@ -1,6 +1,6 @@
-from modeltestSDK import SDKclient
+from modeltestSDK import Client
 
-client = SDKclient()
+client = Client()
 
 ans = input("You are about to delete all campaigns in DB. \nAre you sure you want to wipe db? [Y/N] ")
 

@@ -1,13 +1,28 @@
 import urllib.parse
 import requests
-from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
-                            WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
+import logging
+from datetime import datetime
+from requests.auth import AuthBase
+from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
+                  WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
 from .config import Config
 from .exceptions import ClientException
 
 
-class SDKclient:
+class TokenAuth(AuthBase):
+    """Implements a custom authentication scheme."""
+
+    def __init__(self, token):
+        self.token = token
+
+    def __call__(self, r):
+        """Attach an API token to a custom auth header."""
+        r.headers["Authorization"] = f"Bearer {self.token}"
+        return r
+
+
+class Client:
     """
     Main entrypoint into modeltest-db SDK.
 

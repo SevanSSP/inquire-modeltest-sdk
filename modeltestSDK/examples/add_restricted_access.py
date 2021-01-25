@@ -1,10 +1,10 @@
-from modeltestSDK import SDKclient
+from modeltestSDK import Client
 import time
 import matplotlib.pyplot as plt
 from modeltestSDK.utils import get_datetime_date
 
 
-client = SDKclient()
+client = Client()
 
 '''
 campaign = client.campaign.create(name="TestCamp2",

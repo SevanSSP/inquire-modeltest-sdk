@@ -2,11 +2,12 @@ import os
 import re
 import datetime
 from scipy.io import loadmat
-from modeltestSDK import SDKclient, Campaign
+from modeltestSDK import Client
+from modeltestSDK.resources import Campaign
 from .add_timeseries import read_datapoints_from_mat_with_pandas, read_wave_calibration_from_mat_with_pandas
 
 
-def add_tests(campaign_dir, campaign: Campaign, client: SDKclient):
+def add_tests(campaign_dir, campaign: Campaign, client: Client):
     existing_wave_calibrations = {}
 
     os.chdir(campaign_dir)

@@ -1,4 +1,4 @@
-from modeltestSDK.client import SDKclient
+from modeltestSDK.client import Client
 from modeltestSDK.utils import get_datetime_date
 from pipeline.STT.add_sensors import add_sensors, sensorDict
 from pipeline.STT.add_wave_calibrations import fill_campaign_with_wave_calibrations
@@ -17,7 +17,7 @@ def main():
 
     tic = time.perf_counter()
 
-    client = SDKclient()
+    client = Client()
 
     # Specify path to folder where campaign is locally stored
     campaign_dir = "C:/Users/jen/Documents/STT"

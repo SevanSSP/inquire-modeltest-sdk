@@ -1,4 +1,5 @@
-from modeltestSDK import SDKclient, Campaign
+from modeltestSDK import Client
+from modeltestSDK.resources import Campaign
 
 restrict_access = True
 
@@ -11,7 +12,7 @@ positionWL = {'x': 0, 'y': 0, 'z': 0}
 positionTOPDKC = {'x': 0, 'y': 0, 'z': -39.10}
 
 
-def add_sensors(campaign: Campaign, client: SDKclient):
+def add_sensors(campaign: Campaign, client: Client):
     sensor = client.sensor.create(name="WAVE_1",
                                   description="Wave elevation at position 1, zero at SWL - positive upwards",
                                   unit="m",

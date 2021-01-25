@@ -1,7 +1,7 @@
-from modeltestSDK import SDKclient
+from modeltestSDK import Client
 from modeltestSDK.plot_timeseries import plot_timeseries
 
-client = SDKclient()
+client = Client()
 
 
 campaign_name = "STT"
