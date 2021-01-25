@@ -88,11 +88,6 @@ class Campaign(BaseResource):
     def __init__(self, name: str, description: str, location: str, date: any,
                  scale_factor: float, water_depth: float, campaign_id: str = None,
                  client=None):
-        # if not isinstance(date, datetime.datetime):
-        #    try:
-        #        date = from_datetime_string(date)
-        #    except ValueError:
-        #        raise ValueError("Could not convert datetime string to datetime object")
 
         self.id = campaign_id
         self.name = name
