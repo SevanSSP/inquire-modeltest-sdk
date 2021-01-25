@@ -11,10 +11,6 @@ from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorLi
 from .query import query_dict_to_url
 
 
-def get_id_from_response(response):
-    return response[0]["id"]
-
-
 class BaseAPI:
 
     def __init__(self, client):
@@ -30,7 +26,6 @@ class NamedBaseAPI(BaseAPI):
     """
     Only for database items with names. To retrieve id from name
     """
-
     def get_id(self, name: str) -> str:
         response = self.client.get(format_class_name(self.__class__.__name__), "", parameters={'name': name})
         if response:
@@ -83,19 +78,6 @@ class CampaignAPI(NamedBaseAPI):
     def patch(self, body: dict, campaign_id: str) -> Campaign:
         data = self.client.patch(self._resource_path, endpoint=f"{campaign_id}", body=body)
         return Campaign.from_dict(data=data, client=self.client)
-
-
-'''
-    def get_sensors(self, id: str) -> SensorList:
-        data = self.client.get(self._resource_path, f"{id}/sensors")
-        obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
-        return SensorList(resources=obj_list, client=None)
-
-    def get_tests(self, id: str, type: str = None) -> TestList:
-        data = self.client.get(self._resource_path, f"{id}/tests", parameters={"type": type})
-        resources = [Test.from_dict(data=obj, client=self.client) for obj in data]
-        return TestList(resources=resources, client=self.client)
-'''
 
 
 class TestAPI(NamedBaseAPI):
@@ -349,16 +331,6 @@ class TimeseriesAPI(BaseAPI):
     def get_mean(self, ts_id: str):
         data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats")
         return data['mean']
-
-    """
-    def get_measured_hs(self, id: str):
-        data = self.client.get(self._resource_path, f"{id}/datapoints/measured_hs")
-        return data
-
-    def get_measured_tp(self, id: str):
-        data = self.client.get(self._resource_path, f"{id}/datapoints/measured_tp")
-        return data
-    """
 
 
 class TagsAPI(NamedBaseAPI):

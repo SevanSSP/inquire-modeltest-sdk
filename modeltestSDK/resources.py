@@ -21,11 +21,6 @@ class BaseResource(object):
         """
         Dump the instance into a json serializable Python data type.
 
-        Parameters
-        ----------
-        camel_case : bool, optional
-            Use camelCase for attribute names. Defaults to False.
-
         Returns
         -------
         Dict[str, Any]
