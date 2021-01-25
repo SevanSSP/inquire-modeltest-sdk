@@ -159,7 +159,7 @@ class Query:
                                                             'id'])
 
 
-def query_dict_to_url(filter_expressions: list, sorting_expressions: list) -> dict:
+def create_query_parameters(filter_expressions: list, sorting_expressions: list) -> dict:
     """
     Create query parameters
 
