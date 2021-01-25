@@ -1,4 +1,6 @@
-import urllib.parse
+"""
+Classes and functions enabling advanced API queries
+"""
 
 
 class FilterAttribute:
@@ -157,40 +159,46 @@ class Query:
                                                             'id'])
 
 
-def query_dict_to_url(query_filters: list, query_sort_parameters: list) -> str:
+def query_dict_to_url(filter_expressions: list, sorting_expressions: list) -> dict:
     """
-    :param query_filters: List of dicts with filtering parameters [{'name': draft, 'op': gt, 'val':30}]
-    :param query_sort_parameters: list of dicts with sorting parameters [{'name': height, 'op': asc}]
-    :return: query string for url-request
-    """
+    Create query parameters
 
+    Parameters
+    ----------
+    filter_expressions: List[dict]
+        Filtering parameters [{'name': draft, 'op': gt, 'val':30}]
+    sorting_expressions: List[dict]
+        Sorting parameters [{'name': height, 'op': asc}]
+
+    Returns
+    -------
+    dict
+        Query parameters for URL
+    """
     filter_s = ''
-    for query_filter in query_filters:
+    for query_filter in filter_expressions:
         if not filter_s == '':
             filter_s = filter_s + ','
         if not type(query_filter['val']) == str:
             query_filter['val'] = str(query_filter['val'])
         filter_s = filter_s + query_filter['name'] + '[' + query_filter['op'] + ']' + '=' + query_filter['val']
 
-    if query_sort_parameters == [] or query_filters == []:
+    if sorting_expressions == [] or filter_expressions == []:
         sort_filter = ''
     else:
         sort_filter = '&'
 
     sort_str = ''
-    for sort_parameter in query_sort_parameters:
+    for sort_parameter in sorting_expressions:
         if not sort_str == '':
             sort_str = sort_str + ','
         sort_str = sort_str + sort_parameter['op'] + '(' + sort_parameter['name'] + ')'
 
-    if not filter_s == '':
-        filter_by = 'filter_by='
-    else:
-        filter_by = ''
+    parameters = dict()
+    if filter_s != "":
+        parameters["filter_by"] = filter_s + sort_filter
 
-    if not sort_str == '':
-        sort_by = 'sort_by='
-    else:
-        sort_by = ''
+    if sort_str != "":
+        parameters["sort_by"] = sort_str
 
-    return filter_by + urllib.parse.quote(filter_s) + sort_filter + sort_by + urllib.parse.quote(sort_str)
+    return parameters

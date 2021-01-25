@@ -62,16 +62,13 @@ class CampaignAPI(NamedBaseAPI):
         else:
             raise Exception(f"Could not find any object with name {name}")
 
-    def get_all(self, filter_by=None, sort_by=None) -> CampaignList:
-        if sort_by is None:
-            sort_by = []
+    def get_all(self, filter_by: list = None, sort_by: list = None) -> CampaignList:
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
         return CampaignList(resources=obj_list, client=None)
 
@@ -87,15 +84,12 @@ class TestAPI(NamedBaseAPI):
         return Test.from_dict(data=data, client=self.client)
 
     def get_all(self, filter_by: list = None, sort_by: list = None) -> TestList:
-        if sort_by is None:
-            sort_by = []
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [Test.from_dict(data=obj, client=self.client) for obj in data]
         return TestList(resources=obj_list, client=None)
 
@@ -128,15 +122,12 @@ class FloaterTestAPI(TestAPI):
             raise Exception(f"Could not find any object with name {test_number}")
 
     def get_all(self, filter_by: list = None, sort_by: list = None) -> FloaterTestList:
-        if sort_by is None:
-            sort_by = []
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [FloaterTest.from_dict(data=obj, client=self.client) for obj in data]
         return FloaterTestList(resources=obj_list, client=None)
 
@@ -161,15 +152,12 @@ class WaveCalibrationAPI(TestAPI):
         return WaveCalibration.from_dict(data=data, client=self.client)
 
     def get_all(self, filter_by: list = None, sort_by: list = None) -> WaveCalibrationList:
-        if sort_by is None:
-            sort_by = []
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [WaveCalibration.from_dict(data=obj, client=self.client) for obj in data]
         return WaveCalibrationList(resources=obj_list, client=None)
 
@@ -203,15 +191,12 @@ class WindCalibrationAPI(TestAPI):
         return WindCalibration.from_dict(data=data, client=self.client)
 
     def get_all(self, filter_by: list = None, sort_by: list = None) -> WindCalibrationList:
-        if sort_by is None:
-            sort_by = []
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [WindCalibration.from_dict(data=obj, client=self.client) for obj in data]
         return WindCalibrationList(resources=obj_list, client=None)
 
@@ -258,15 +243,12 @@ class SensorAPI(NamedBaseAPI):
             raise Exception(f"Could not find any object with name {name}")
 
     def get_all(self, filter_by: list = None, sort_by: list = None) -> SensorList:
-        if sort_by is None:
-            sort_by = []
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
         return SensorList(resources=obj_list, client=None)
 
@@ -289,15 +271,12 @@ class TimeseriesAPI(BaseAPI):
         return Timeseries.from_dict(data=data, client=self.client)
 
     def get_all(self, filter_by: list = None, sort_by: list = None) -> TimeseriesList:
-        if sort_by is None:
-            sort_by = []
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
         return TimeseriesList(resources=obj_list, client=None)
 
@@ -346,15 +325,12 @@ class TagsAPI(NamedBaseAPI):
         return Tag.from_dict(data=data, client=self.client)
 
     def get_all(self, filter_by: list = None, sort_by: list = None) -> TagList:
-        if sort_by is None:
-            sort_by = []
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [Tag.from_dict(data=obj, client=self.client) for obj in data]
         return TagList(resources=obj_list, client=None)
 
@@ -384,15 +360,12 @@ class FloaterConfigAPI(NamedBaseAPI):
         return FloaterConfig.from_dict(data=data, client=self.client)
 
     def get_all(self, filter_by: list = None, sort_by: list = None) -> FloaterConfigList:
-        if sort_by is None:
-            sort_by = []
         if filter_by is None:
-            filter_by = []
-        if not filter_by == [] or not sort_by == []:
-            enc_parameters = query_dict_to_url(query_filters=filter_by, query_sort_parameters=sort_by)
-        else:
-            enc_parameters = None
-        data = self.client.get(self._resource_path, "", enc_parameters=enc_parameters)
+            filter_by = list()
+        if sort_by is None:
+            sort_by = list()
+        params = query_dict_to_url(filter_expressions=filter_by, sorting_expressions=sort_by)
+        data = self.client.get(self._resource_path, "", parameters=params)
         obj_list = [FloaterConfig.from_dict(data=obj, client=self.client) for obj in data]
         return FloaterConfigList(resources=obj_list, client=None)
 
