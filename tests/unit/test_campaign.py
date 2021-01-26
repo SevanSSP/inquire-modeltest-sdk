@@ -1,4 +1,3 @@
-
 from modeltestSDK.resources import Campaign
 from pandas import DataFrame
 
@@ -10,14 +9,6 @@ def test_types(new_campaign):
     assert isinstance(new_campaign.description, str)
     # assert isinstance(new_campaign.date, datetime.datetime)
     assert isinstance(new_campaign.location, str)
-
-
-'''
-def test_dump(new_campaign):
-    d = new_campaign.dump
-    assert isinstance(d, dict)
-    assert "id" in d
-'''
 
 
 def test_topandas(new_campaign):
