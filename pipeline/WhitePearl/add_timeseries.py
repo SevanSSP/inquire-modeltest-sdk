@@ -4,11 +4,11 @@ from modeltestSDK import Test, SDKclient
 import time as timer
 
 
-def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient, skip_channels: list=None,
+def read_datapoints_from_mat_with_pandas(data, test: Test, client: SDKclient, skip_channels: list = None,
                                          derive_channels: dict = None):
     time = data['Time'][0].tolist()
 
-    sensor_list = client.sensor.get_all()
+    sensor_list = client.sensor.get_all(filter_by=[client.filter.sensor.campaign_id == test.campaign_id])
     sensor_pd = sensor_list.to_pandas()
     sensor_names = sensor_pd['name'].tolist()
 

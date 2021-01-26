@@ -6,7 +6,7 @@ def read_datapoints(data, test: Test, client: SDKclient, skip_channels: list = [
                     derive_channels: dict = {}):
     time = data['Time'][0].tolist()
 
-    sensor_list = client.sensor.get_all(parameters={'campaign_id': test.campaign_id})
+    sensor_list = client.sensor.get_all(filter_by=[client.filter.sensor.campaign_id == test.campaign_id])
     sensor_pd = sensor_list.to_pandas()
     sensor_names = sensor_pd['name'].tolist()
 
