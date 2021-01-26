@@ -109,7 +109,7 @@ class Client:
            'https://{host}/{base_url}/{version}/{resource}/{endpoint}'
 
         """
-        url = f"http://{self.config.host}/{self.config.base_url}/{self.config.version}/"
+        url = f"https://{self.config.host}/{self.config.base_url}/{self.config.version}/"
         url += "/".join([p for p in [resource, endpoint] if p is not None])
         return url
 
