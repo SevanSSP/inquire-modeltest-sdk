@@ -54,7 +54,7 @@ pip install -r requirements.txt
 The application is published as a package to Sevans packagr site. To use this library in other projects use:
 
 ```
-pip install modeltestSDK --extra-index-url https://api.packagr.app/EYvhW6Syl/ -U
+pip install modeltestSDK --extra-index-url https://api.packagr.app/EYvhW6SyL/ -U
 ```
 
 Continue by logging in to the packagr server with your credentials.
