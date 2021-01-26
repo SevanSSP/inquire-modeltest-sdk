@@ -53,11 +53,18 @@ class Client:
         # authenticate and get access token
         try:
             logging.info("Authenticating by user impersonation without any shared secret.")
+            user = os.getenv("INQUIRE_MODELTEST_API_USER")
+            passwd = os.getenv("INQUIRE_MODELTEST_API_PASSWORD")
+            assert user is not None and passwd is not None, "You have to set the following two environment variables " \
+                                                            "to login and acquire an access token\n" \
+                                                            "\n\t'INQUIRE_MODELTEST_API_USER'" \
+                                                            "\n\t'INQUIRE_MODELTEST_API_PASSWORD'."
+
             r = requests.post(
                 self._create_url(resource="auth", endpoint="token"),
                 data=dict(
-                    username=os.getenv("INQUIRE_MODELTEST_API_USER"),
-                    password=os.getenv("INQUIRE_MODELTEST_API_PASSWORD")
+                    username=user,
+                    password=passwd
                 )
             )
             r.raise_for_status()
