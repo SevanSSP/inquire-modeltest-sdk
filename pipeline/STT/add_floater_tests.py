@@ -2,14 +2,14 @@ import os
 import datetime
 from modeltestSDK.utils import get_datetime_date, get_parent_dir
 from modeltestSDK.resources import Campaign
-from modeltestSDK.client import SDKclient
+from modeltestSDK.client import Client
 from pipeline.STT.add_timeseries import read_datapoints_from_csv_with_pandas
 from modeltestSDK.utils import TwoWayDict
 
 # It is recommended to open the file system for the STT campaign, to understand how floater tests are added in order
 
 
-def fill_campaign_with_floater_tests(campaign: Campaign, concept_ids, client: SDKclient, campaign_dir: str):
+def fill_campaign_with_floater_tests(campaign: Campaign, concept_ids, client: Client, campaign_dir: str):
     os.chdir(campaign_dir)
 
     # Go through system of files to add every floater test
@@ -80,7 +80,7 @@ waveCalibDict["waveReg_1209"] = "Reg_Hs10_Tp17"
 waveCalibDict["waveReg_1210"] = "Reg_Hs10_Tp25"
 
 
-def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, concept_id: str, client: SDKclient):
+def add_floater_test(files, campaign: Campaign, testname: str, date: datetime, concept_id: str, client: Client):
 
     orientation = 0  # Standard for all floaters in SWACH modeltest
     if concept_id == "M206":

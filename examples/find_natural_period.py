@@ -1,9 +1,9 @@
-from modeltestSDK import SDKclient
+from modeltestSDK import Client
 import numpy
 from qats.signal import find_maxima
 from modeltestSDK.plot_timeseries import plot_timeseries
 
-client = SDKclient()
+client = Client()
 
 campaign = client.campaign.get_by_name("STT")
 test_name = "X300"

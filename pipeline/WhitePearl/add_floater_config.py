@@ -1,8 +1,8 @@
 from modeltestSDK.resources import FloaterConfig, Campaign
-from modeltestSDK.client import SDKclient
+from modeltestSDK.client import Client
 
 
-def add_floater_configs(campaign: Campaign, client: SDKclient):
+def add_floater_configs(campaign: Campaign, client: Client):
 
     client.floater_config.create(name="SEVAN BASE IN-LINE MOOR T15",
                                  description="Base model S-1079D. Draft 15m. Mooring setup 1. GM=7[m]",

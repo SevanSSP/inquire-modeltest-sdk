@@ -1,5 +1,5 @@
-from modeltestSDK.resources import Campaign, Sensor, DataPoint, Timeseries
-from modeltestSDK.client import SDKclient
+from modeltestSDK.resources import DataPoint
+from modeltestSDK.client import Client
 import datetime
 import pandas as pd
 import time as timer
@@ -21,7 +21,7 @@ def str_to_datetime(s):
 
 
 # Create timeseries for every sensor that was used for a test, by reading the .csv file
-def read_datapoints_from_csv_with_pandas(file, test_id, client: SDKclient):
+def read_datapoints_from_csv_with_pandas(file, test_id, client: Client):
     df = pd.read_csv(file, sep=';')
 
     col_names = list(df.columns)

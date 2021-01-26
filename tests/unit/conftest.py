@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from modeltestSDK import Campaign, Sensor, Timeseries
+from modeltestSDK.resources import Campaign, Sensor, Timeseries
 
 
 @pytest.fixture(scope="module")

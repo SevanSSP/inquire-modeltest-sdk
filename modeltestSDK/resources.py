@@ -21,11 +21,6 @@ class BaseResource(object):
         """
         Dump the instance into a json serializable Python data type.
 
-        Parameters
-        ----------
-        camel_case : bool, optional
-            Use camelCase for attribute names. Defaults to False.
-
         Returns
         -------
         Dict[str, Any]
@@ -93,11 +88,6 @@ class Campaign(BaseResource):
     def __init__(self, name: str, description: str, location: str, date: any,
                  scale_factor: float, water_depth: float, campaign_id: str = None,
                  client=None):
-        # if not isinstance(date, datetime.datetime):
-        #    try:
-        #        date = from_datetime_string(date)
-        #    except ValueError:
-        #        raise ValueError("Could not convert datetime string to datetime object")
 
         self.id = campaign_id
         self.name = name
@@ -240,7 +230,7 @@ class Test(BaseResource):
             self.timeseries.append(child)
 
     @classmethod
-    def from_dict(cls, data, client: object = None) -> object:
+    def from_dict(cls, data, client: object = None):
         return cls(number=data['number'], description=data["description"], test_date=data['test_date'],
                    campaign_id=data['campaign_id'], test_type=data['type'], test_id=data['id'], client=client)
 

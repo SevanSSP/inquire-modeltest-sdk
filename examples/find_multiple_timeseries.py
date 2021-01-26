@@ -1,9 +1,8 @@
-from modeltestSDK import SDKclient
+from modeltestSDK import Client
 from modeltestSDK.plot_timeseries import plot_timeseries
-import random
-import json
 
-client = SDKclient()
+
+client = Client()
 
 campaign_name = "STT"
 test_names = ["waveReg_1102"]
