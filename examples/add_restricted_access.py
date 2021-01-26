@@ -1,7 +1,6 @@
 from modeltestSDK import Client
 import time
 import matplotlib.pyplot as plt
-from modeltestSDK.utils import get_datetime_date
 
 
 client = Client()
