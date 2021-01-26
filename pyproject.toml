@@ -19,6 +19,7 @@ python = "^3.6.1"
 
 
 [tool.poetry.dev-dependencies]
+pytest = "^6.2.2"
 nox = "^2020.8.22"
 scipy="^1.5.0"
 
