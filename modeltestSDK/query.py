@@ -186,7 +186,7 @@ def create_query_parameters(filter_expressions: list, sorting_expressions: list)
     if sorting_expressions == [] or filter_expressions == []:
         sort_filter = ''
     else:
-        sort_filter = '&'
+        sort_filter = ''
 
     sort_str = ''
     for sort_parameter in sorting_expressions:

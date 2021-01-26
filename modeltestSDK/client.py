@@ -45,10 +45,10 @@ class Client:
         # check if current access token is still valid
         current_token = os.getenv("INQUIRE_MODELTEST_API_TOKEN")
         token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
-        if current_token is not None and token_expires_on is not None and \
-                datetime.utcnow().timestamp() < float(token_expires_on):
-            logging.debug("Your current access token has not yet expired.")
-            return current_token
+        if current_token is not None and not token_expires_on == "None" :
+            if datetime.utcnow().timestamp() < float(token_expires_on):
+                logging.debug("Your current access token has not yet expired.")
+                return current_token
 
         # authenticate and get access token
         try:
