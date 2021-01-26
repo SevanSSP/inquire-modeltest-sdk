@@ -1,3 +1,6 @@
+"""
+Test the TimeSeries models
+"""
 
 
 def test_types(new_timeseries):

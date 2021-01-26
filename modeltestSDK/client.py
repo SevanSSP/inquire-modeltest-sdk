@@ -1,13 +1,14 @@
-import urllib.parse
+import os
 import requests
-from .api_resources import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
-                            WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
+import logging
+from datetime import datetime
+from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
+                  WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
 from .config import Config
-from .exceptions import ClientException
 
 
-class SDKclient:
+class Client:
     """
     Main entrypoint into modeltest-db SDK.
 
@@ -15,6 +16,14 @@ class SDKclient:
     ----------
     config : object, optional
         Client configuration (host, base URL)
+
+    Notes
+    -----
+    Using the SDK requires setting the following environmental variables
+
+        INQUIRE_MODELTEST_API_USER - Your username
+        INQUIRE_MODELTEST_API_PASSWORD - Your password
+
     """
     def __init__(self, config=Config):
         """Initilize objects for interacting with the API"""
@@ -31,100 +40,213 @@ class SDKclient:
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
 
-    def do_request(self, method, resource: str, endpoint: str = "", parameters: dict = None, enc_parameters: str = None,
-                   body: dict = None):
+    def _request_token(self) -> str:
+        """str: Authenticate and return access token."""
+        # check if current access token is still valid
+        current_token = os.getenv("INQUIRE_MODELTEST_API_TOKEN")
+        token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
+        if current_token is not None and not token_expires_on == "None" :
+            if datetime.utcnow().timestamp() < float(token_expires_on):
+                logging.debug("Your current access token has not yet expired.")
+                return current_token
+
+        # authenticate and get access token
+        try:
+            logging.info("Authenticating by user impersonation without any shared secret.")
+            user = os.getenv("INQUIRE_MODELTEST_API_USER")
+            passwd = os.getenv("INQUIRE_MODELTEST_API_PASSWORD")
+            assert user is not None and passwd is not None, "You have to set the following two environment variables " \
+                                                            "to login and acquire an access token\n" \
+                                                            "\n\t'INQUIRE_MODELTEST_API_USER'" \
+                                                            "\n\t'INQUIRE_MODELTEST_API_PASSWORD'."
+
+            r = requests.post(
+                self._create_url(resource="auth", endpoint="token"),
+                data=dict(
+                    username=user,
+                    password=passwd
+                )
+            )
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            raise e
+        except requests.exceptions.ConnectionError as e:
+            raise e
+        except requests.exceptions.Timeout as e:
+            raise e
+        except requests.exceptions.RequestException as e:
+            raise e
+        else:
+            logging.debug("Acquired valid access token.")
+
+            # update env vars
+            data = r.json()
+            token = data.get("access_token")
+            expires = data.get("expires")
+            os.environ["INQUIRE_MODELTEST_API_TOKEN"] = token
+            os.environ["INQUIRE_MODELTEST_API_TOKEN_EXPIRES"] = str(expires)
+            return token
+
+    def _create_url(self, resource: str = None, endpoint: str = None) -> str:
+        """
+        Create URL for endpoint
+
+        Parameters
+        ----------
+        resource : str, optiona
+            API resource e.g. 'plant/timeseries'
+        endpoint : str, optional
+           API resource endpoint e.g. 'list' or 'search'
+
+        Returns
+        -------
+        str
+           Request response
+
+        Notes
+        -----
+        The full request url is like
+           'https://{host}/{base_url}/{version}/{resource}/{endpoint}'
+
+        """
+        url = f"https://{self.config.host}/{self.config.base_url}/{self.config.version}/"
+        url += "/".join([p for p in [resource, endpoint] if p is not None])
+        return url
+
+    def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
         """
         Carry out request.
+
         Parameters
         ----------
         method : {'GET', 'POST', 'PUT', 'PATCH', 'DELETE'}
             Request method.
-        resource : str
+        resource : str, optional
             API resource e.g. 'plant/timeseries'
-            version : str
-                 API version e.g. 'v1.3'
-               endpoint : str
-                   API resource endpoint e.g.
-               parameters : dict, optional
-                   Request parameters.
-               body : dict, optional
-                   Request body.
-               Returns
-               -------
-               dict
-                   Request response
-               Notes
-               -----
-               The full request url is like
-                   'https://{host}/{base_url}/{resource}/{endpoint}?firstparameter=value&anotherparameter=value
-                   :param enc_parameters:
-                   :param body:
-                   :param parameters:
-                   :param resource:
-                   :param method:
-                   :param endpoint:
-               """
-        if not isinstance(endpoint, str):
-            endpoint = str(endpoint)
+        endpoint : str, optional
+            API resource endpoint e.g.
+        parameters : dict, optional
+            Request parameters.
+        body : dict, optional
+            Request body.
 
-        url = self.config.host + "/"
-        url = url + "/".join([p for p in [self.config.base_url, self.config.version, resource, endpoint] if p.strip()])
-        if enc_parameters is None:
-            if parameters is not None and isinstance(parameters, dict):
-                # parameters = to_camel_case({k: v for k, v in parameters.items() if v is not None})
-                enc_parameters = urllib.parse.urlencode(parameters, quote_via=urllib.parse.quote)
-            else:
-                enc_parameters = ""
+        Returns
+        -------
+        dict
+            Request response
 
-        query_url = f"{url}/?{enc_parameters}"
+        """
+        # create base url
+        url = self._create_url(resource=resource, endpoint=endpoint)
 
-        response = None
+        # authenticate and get access token
+        token = self._request_token()
+
+        # create request headers
+        headers = {
+            "Authorization": f"bearer {token}",
+            "Connection": "keep-alive",
+            "Host": self.config.host,
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        }
+
+        # do request (also encodes parameters)
         try:
-            response = method(query_url, json=body)
-            response.raise_for_status()
-        except Exception as inst:
-            ClientException(exception=inst, response=response)
+            r = requests.request(method, url, params=parameters, data=body, headers=headers)
+            r.raise_for_status()
+        except requests.exceptions.HTTPError as e:
+            raise e
+        except requests.exceptions.ConnectionError as e:
+            raise e
+        except requests.exceptions.Timeout as e:
+            raise e
+        except requests.exceptions.RequestException as e:
+            raise e
         else:
-            return response.json()
+            return r.json()
 
-    def get(self, resource: str, endpoint: str = "", parameters: dict = None, enc_parameters: str = None):
+    def get(self, resource: str = None, endpoint: str = None, parameters: dict = None):
         """
-        Method to retrieve resource from db
-        :param enc_parameters:
-        :param resource:
-        :param endpoint:
-        :param parameters:
-        :return:
-        """
-        return self.do_request(requests.get, resource, endpoint, parameters=parameters, enc_parameters=enc_parameters)
+        Perform GET request
 
-    def post(self, resource: str, endpoint: str = "", body: dict = None):
-        """
-        Method to create resource in db
-        :param resource:
-        :param endpoint:
-        :param body:
-        :return:
-        """
-        return self.do_request(requests.post, resource, endpoint, body=body)
+        Parameters
+        ----------
+        resource : str, optional
+            API resource e.g. 'plant/timeseries'
+        endpoint : str, optional
+           API resource endpoint e.g. 'list' or 'search'
+        parameters : dict, optional
+            URL parameters
 
-    def patch(self, resource: str, endpoint: str = "", body: dict = None):
-        """
-        Method to update resource in db
-        :param resource:
-        :param endpoint:
-        :param body:
-        :return:
-        """
-        return self.do_request(requests.patch, resource, endpoint, body=body)
+        Returns
+        -------
+        dict
+            Request response
 
-    def delete(self, resource: str, endpoint: str, parameters: str = None):
         """
-        Method for deleting a resource from db
-        WARNING: Not working in a intuitive way
-        :param parameters: Query string for admin-delete
-        :param resource:
-        :param endpoint:
-        :return:
+        return self._do_request("GET", resource=resource, endpoint=endpoint, parameters=parameters)
+
+    def post(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
         """
-        return self.do_request(requests.delete, resource=resource, endpoint=endpoint, parameters=parameters)
+        Perform POST request
+
+        Parameters
+        ----------
+        resource : str, optional
+            API resource e.g. 'plant/timeseries'
+        endpoint : str, optional
+            API resource endpoint e.g.
+        parameters : dict, optional
+            Request parameters.
+        body : dict, optional
+            Request body.
+
+        Returns
+        -------
+        dict
+            Request response
+        """
+        return self._do_request("POST", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
+
+    def patch(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
+        """
+        Perform PATCH request
+
+        Parameters
+        ----------
+        resource : str, optional
+            API resource e.g. 'plant/timeseries'
+        endpoint : str, optional
+            API resource endpoint e.g.
+        parameters : dict, optional
+            Request parameters.
+        body : dict, optional
+            Request body.
+
+        Returns
+        -------
+        dict
+            Request response
+        """
+        return self._do_request("PATCH", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
+
+    def delete(self, resource: str = None, endpoint: str = None, parameters: str = None):
+        """
+        Perform DELETE request
+
+        Parameters
+        ----------
+        resource : str, optional
+            API resource e.g. 'plant/timeseries'
+        endpoint : str, optional
+            API resource endpoint e.g.
+        parameters : dict, optional
+            Request parameters.
+
+        Returns
+        -------
+        dict
+            Request response
+        """
+        return self._do_request("DELETE", resource=resource, endpoint=endpoint, parameters=parameters)

@@ -1,5 +1,4 @@
-from modeltestSDK.client import SDKclient
-from modeltestSDK.utils import get_datetime_date
+from modeltestSDK.client import Client
 from pipeline.WhitePearl.add_sensor import add_sensors
 from pipeline.WhitePearl.add_floater_config import add_floater_configs
 from pipeline.WhitePearl.add_tests import add_tests
@@ -22,7 +21,7 @@ def main():
     campaign_dir = "C:/Users/jen.SEVAN/Documents/505 Stockman FPU_2008"
     #campaign_dir = r"C:/Users/ebg/Documents/White_Pearl_MT/505 Stockman FPU_2008"
 
-    client = SDKclient()
+    client = Client()
     # Create initial campaign in database
     campaign = client.campaign.create(name="White Pearl",
                                       description="Sevan ICE-FPU. Ice breaking hull", #Todo: update

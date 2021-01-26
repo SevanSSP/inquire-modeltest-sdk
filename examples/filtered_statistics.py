@@ -1,25 +1,12 @@
-from modeltestSDK import SDKclient
-from modeltestSDK.resources import WaveCalibration, Timeseries, Sensor
-import datetime
-import random
-from modeltestSDK.utils import from_datetime_string
-from typing import List
-import time
-import asyncio
+from modeltestSDK import Client
 import numpy
-from qats.signal import find_maxima, smooth, tfe, psd
-from qats import TsDB
 from qats.ts import TimeSeries
 import os
-from modeltestSDK.plot_timeseries import plot_timeseries
-
-import time
-import matplotlib.pyplot as plt
 import matplotlib.style as mplstyle
 mplstyle.use('fast')
 
 
-client = SDKclient()
+client = Client()
 
 campaign = client.campaign.get_by_name("STT")
 tests = ["waveIrreg_2101", "waveIrreg_2102", "waveIrreg_2103", "waveIrreg_2104", "waveIrreg_2105"]
