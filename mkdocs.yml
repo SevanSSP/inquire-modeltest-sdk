@@ -1,0 +1,7 @@
+site_name: Sevan Model Test SDK Docs
+theme:
+  name: material
+  palette:
+    scheme: default
+    primary: blue
+    accent: blue
