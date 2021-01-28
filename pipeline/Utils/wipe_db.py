@@ -2,7 +2,8 @@ from modeltestSDK import Client
 
 client = Client()
 
-ans = input("You are about to delete all campaigns in DB. \nAre you sure you want to wipe db? [Y/N] ")
+ans = input(f"You are about to delete all campaigns in DB. URL: {client.config.host}."
+            "\nAre you sure you want to wipe db? [Y/N] ")
 
 if ans == "Y":
     key = input("Secret key: ")
