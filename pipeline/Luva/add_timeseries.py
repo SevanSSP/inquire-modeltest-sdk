@@ -1,8 +1,9 @@
-from modeltestSDK import Test, SDKclient
+from modeltestSDK import Client
+from modeltestSDK.resources import Test
 import time as timer
 
 
-def read_datapoints(data, test: Test, client: SDKclient, skip_channels: list = [],
+def read_datapoints(data, test: Test, client: Client, skip_channels: list = [],
                     derive_channels: dict = {}):
     time = data['Time'][0].tolist()
 

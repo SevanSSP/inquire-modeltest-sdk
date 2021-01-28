@@ -4,8 +4,8 @@ import re
 from scipy.io import loadmat
 from modeltestSDK import Client
 from modeltestSDK.resources import Campaign
-from .add_timeseries import read_datapoints
-from .add_calibrations import add_wind_calibrations, add_current_calibrations, add_wave_calibrations
+from pipeline.Luva.add_timeseries import read_datapoints
+
 
 category_dict = {'Current': 'current force', 'Wind': 'wind force', 'Decay': 'decay', 'IrrWave': 'irregular wave',
                  'RegWave': 'regular wave', }
@@ -36,7 +36,7 @@ def add_tests(campaign_dir, campaign: Campaign, client: Client):
 
             test_description = str(data['comment'])[2:-2]
 
-            test_number = str(data['test_num'][0])[1:-1]
+            test_number = str(data['test_num'][0])[2:-2]
 
             wave_calibration_id = None
             wind_calibration_id = None
@@ -100,9 +100,6 @@ def add_tests(campaign_dir, campaign: Campaign, client: Client):
             for config_name in floater_config_names:
                 if config_name in test_description:
                     config_index = floater_configs[floater_configs['name'] == config_name].index.values
-                    floater_config_id = floater_configs.loc[config_index, 'id'].tolist()[0]
-                elif "NEW DESIGN" not in test_description:
-                    config_index = floater_configs[floater_configs['name'] == "GM1"].index.values
                     floater_config_id = floater_configs.loc[config_index, 'id'].tolist()[0]
 
             if "HD60" in test_description:

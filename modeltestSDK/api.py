@@ -43,7 +43,7 @@ class CampaignAPI(NamedBaseAPI):
                scale_factor: float, water_depth: float, read_only: bool = False) -> Campaign:
         body = dict(name=name, description=description, location=location, date=date,
                     scale_factor=scale_factor, water_depth=water_depth, read_only=read_only)
-        data = self.client.post(self._resource_path, body=body)
+        data = self.client.post(resource=self._resource_path, body=body)
         return Campaign.from_dict(data=data, client=self.client)
 
     def get(self, campaign_id: str) -> Campaign:

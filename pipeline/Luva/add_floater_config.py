@@ -1,26 +1,26 @@
 from modeltestSDK.resources import Campaign
-from modeltestSDK.client import SDKclient
+from modeltestSDK.client import Client
 
 
-def add_floater_configs(campaign: Campaign, client: SDKclient):
+def add_floater_configs(campaign: Campaign, client: Client):
 
-    client.floater_config.create(name="Base case",
+    client.floater_config.create(name="GM2",
                                  description="Base Case - Loaded condition GM2 (GM=6[m])",
                                  campaign_id=campaign.id,
                                  characteristic_length=70.0,
                                  draft=30.0,
                                  read_only=True)
 
-    client.floater_config.create(name="Design A",
-                                 description="Design A - Loaded condition GM3 (GM=7[m])",
+    client.floater_config.create(name="GM1",
+                                 description="Base Case - Loaded condition GM1 (GM=3[m])",
                                  campaign_id=campaign.id,
-                                 characteristic_length=76.0,
+                                 characteristic_length=70.0,
                                  draft=30.0,
                                  read_only=True)
 
-    client.floater_config.create(name="Design B",
-                                 description="Design B - Loaded condition GM3 (GM=7[m])",
+    client.floater_config.create(name="D2",
+                                 description="Base Case - Loaded condition GM2 - New draft(GM=6[m])",
                                  campaign_id=campaign.id,
-                                 characteristic_length=76.0,
-                                 draft=30.0,
+                                 characteristic_length=70.0,
+                                 draft=33.0,
                                  read_only=True)

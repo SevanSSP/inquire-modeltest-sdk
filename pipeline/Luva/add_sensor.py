@@ -1,4 +1,5 @@
-from modeltestSDK import SDKclient, Campaign
+from modeltestSDK import Client
+from modeltestSDK.resources import Campaign
 
 restrict_access = True
 
@@ -14,7 +15,8 @@ pos_BL = {'x': 0, 'y': 0, 'z': 0}
 
  #TODO: Add tags, update desc, update coords
 
-def add_sensors(campaign: Campaign, client: SDKclient):
+
+def add_sensors(campaign: Campaign, client: Client):
     sensor = client.sensor.create(name="WAVE_1",
                                   description="Wave elevation 350 m ahead of midship",
                                   unit="m",

@@ -1,18 +1,22 @@
 import os
 from scipy.io import loadmat
-from modeltestSDK import SDKclient, Campaign
+from modeltestSDK import Client
+from modeltestSDK.resources import Campaign
 from .add_timeseries import read_datapoints
 import re
 
-def add_calibrations(campaign: Campaign, client: SDKclient = None):
+
+def add_calibrations(campaign: Campaign, client: Client = None):
+    os.chdir("C://Users/jen.SEVAN/Documents/529 Luva_2009/Analysis/Timeseries (To be modified)/Current/Calib")
     add_current_calibrations(campaign=campaign,client=client)
+    os.chdir("C://Users/jen.SEVAN/Documents/529 Luva_2009/Analysis/Timeseries (To be modified)/Wind/Calib")
     add_wind_calibrations(campaign=campaign,client=client)
+    os.chdir("C://Users/jen.SEVAN/Documents/529 Luva_2009/Analysis/Timeseries (To be modified)/IrrWave/WaveCalib")
     add_wave_calibrations(campaign=campaign,client=client)
 
-def add_wind_calibrations(campaign: Campaign, client: SDKclient = None):
-    wind_calibrations = dict()
 
-    os.chdir(os.getcwd() + "\\Calib")
+def add_wind_calibrations(campaign: Campaign, client: Client = None):
+    wind_calibrations = dict()
     calibrations = os.listdir(path='.')
     for calibration in calibrations:
         calibration_data = loadmat(os.getcwd() + "\\" + calibration)
@@ -38,8 +42,7 @@ def add_wind_calibrations(campaign: Campaign, client: SDKclient = None):
     return wind_calibrations
 
 
-def add_current_calibrations(campaign: Campaign, client: SDKclient = None):
-    os.chdir(os.getcwd() + "\\Calib")
+def add_current_calibrations(campaign: Campaign, client: Client = None):
     calibration = os.listdir(path='.')[0]
     calibration_data = loadmat(os.getcwd() + "\\" + calibration)
     calibration_description = str(calibration_data['comment'])[2:-2]
@@ -65,9 +68,8 @@ def add_current_calibrations(campaign: Campaign, client: SDKclient = None):
     return current_calibration.id
 
 
-def add_wave_calibrations(campaign: Campaign, client: SDKclient = None):
+def add_wave_calibrations(campaign: Campaign, client: Client = None):
 
-    os.chdir(os.getcwd() + "\\WaveCalib")
     calibrations = os.listdir(path='.')
     for calibration in calibrations:
         calibration_data = loadmat(os.getcwd() + "\\" + calibration)

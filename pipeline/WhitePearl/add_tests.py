@@ -32,7 +32,6 @@ def add_tests(campaign_dir, campaign: Campaign, client: Client):
             test_date = datetime.datetime.strptime(test_date_str, '%H:%M %d/%m/%y').isoformat()
 
             test_description = str(data['comment'])[2:-2]
-            print(test_description)
 
             number = data['test_num'][0]
 
@@ -92,7 +91,7 @@ def add_tests(campaign_dir, campaign: Campaign, client: Client):
                                               campaign_id=campaign.id,
                                               category=category,
                                               orientation=0,
-                                              floaterconfig_id=floaterconfig_id,
+                                              floater_config_id=floaterconfig_id,
                                               wave_id=wave_calibration_id,
                                               read_only=True, )
 

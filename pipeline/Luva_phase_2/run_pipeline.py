@@ -1,7 +1,7 @@
 from modeltestSDK.client import Client
-from pipeline.Luva.add_floater_config import add_floater_configs
+from pipeline.Luva_phase_2.add_floater_config import add_floater_configs
 from pipeline.Luva.add_sensor import add_sensors
-from pipeline.Luva.add_test import add_tests
+from pipeline.Luva_phase_2.add_test import add_tests
 from pipeline.Luva.add_calibrations import add_calibrations
 import datetime
 
@@ -10,7 +10,7 @@ import time
 
 def main():
 
-    ans = input("You are about to run the pipeline for the Luva model test.\nIf this is already imported you "
+    ans = input("You are about to run the pipeline for the Luva phase 2.\nIf this is already imported you "
           "will experience issues with data duplicates.\nAre you sure you want to import? [y/N] ")
 
     if ans != "y":
@@ -24,7 +24,7 @@ def main():
 
     client = Client()
     # Create initial campaign in database
-    campaign = client.campaign.create(name="Luva",
+    campaign = client.campaign.create(name="Luva - phase 2",
                                       description="SEVAN LUVA FSU, a mono-column structure to be permanently moored "
                                                   "at the Luva Field",
                                       date=datetime.datetime(year=2010, month=7, day=20).isoformat(),
@@ -37,7 +37,7 @@ def main():
 
     add_floater_configs(campaign=campaign, client=client)
 
-    add_calibrations(campaign=campaign,client=client)
+    add_calibrations(campaign=campaign, client=client)
 
     add_tests(campaign_dir=campaign_dir, campaign=campaign, client=client)
 

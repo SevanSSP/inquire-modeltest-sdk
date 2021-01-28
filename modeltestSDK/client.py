@@ -45,7 +45,8 @@ class Client:
         # check if current access token is still valid
         current_token = os.getenv("INQUIRE_MODELTEST_API_TOKEN")
         token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
-        if current_token is not None and not token_expires_on == "None" :
+
+        if current_token is not None and token_expires_on is not None:
             if datetime.utcnow().timestamp() < float(token_expires_on):
                 logging.debug("Your current access token has not yet expired.")
                 return current_token
@@ -113,7 +114,8 @@ class Client:
         url += "/".join([p for p in [resource, endpoint] if p is not None])
         return url
 
-    def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
+    def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None,
+                    body: dict = None):
         """
         Carry out request.
 
@@ -153,7 +155,7 @@ class Client:
 
         # do request (also encodes parameters)
         try:
-            r = requests.request(method, url, params=parameters, data=body, headers=headers)
+            r = requests.request(method, url, params=parameters, json=body, headers=headers)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise e
