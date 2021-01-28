@@ -26,7 +26,7 @@ def main():
     # Create initial campaign in database
     campaign = client.campaign.create(name="Luva",
                                       description="SEVAN LUVA FSU, a mono-column structure to be permanently moored "
-                                                  "at the Luva Field",
+                                                  "at the Luva Field. Truncated mooring - full scale water depth 1280m",
                                       date=datetime.datetime(year=2009, month=12).isoformat(),
                                       location="MARINTEK",
                                       scale_factor=70,          # From the report
