@@ -9,9 +9,11 @@ import time
 
 
 def main():
+    client = Client()
 
-    ans = input("You are about to run the pipeline for the Luva phase 2.\nIf this is already imported you "
-          "will experience issues with data duplicates.\nAre you sure you want to import? [y/N] ")
+    ans = input(f"You are about to run the pipeline for the Luva phase 2 to db at ({client.config.host}.\nIf this is "
+                f"already imported you "
+                "will experience issues with data duplicates.\nAre you sure you want to import? [y/N] ")
 
     if ans != "y":
         return
@@ -22,7 +24,6 @@ def main():
     campaign_dir = "C:/Users/jen.SEVAN/Documents/529 Luva_2009"
     #campaign_dir = r"C:/Users/ebg/Documents/White_Pearl_MT/505 Stockman FPU_2008"
 
-    client = Client()
     # Create initial campaign in database
     campaign = client.campaign.create(name="Luva - phase 2",
                                       description="SEVAN LUVA FSU, a mono-column structure to be permanently moored "
