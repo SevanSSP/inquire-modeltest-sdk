@@ -29,7 +29,7 @@ def main():
     campaign = client.campaign.create(name="Luva",
                                       description="SEVAN LUVA FSU, a mono-column structure to be permanently moored "
                                                   "at the Luva Field",
-                                      date=datetime.datetime(year=2009, month=12).isoformat(),
+                                      date=datetime.datetime(year=2009, month=12, day = 1).isoformat(),
                                       location="MARINTEK",
                                       scale_factor=70,          # From the report
                                       water_depth=350,
