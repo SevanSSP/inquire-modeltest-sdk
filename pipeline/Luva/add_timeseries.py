@@ -11,6 +11,10 @@ def read_datapoints(data, test: Test, client: Client, skip_channels: list = [],
     sensor_pd = sensor_list.to_pandas()
     sensor_names = sensor_pd['name'].tolist()
 
+    remaining_channels = []
+    for p in list(data)[8:]:
+        remaining_channels.append(p)
+
     for name in sensor_names:
         if name in data and name not in skip_channels:
             channel_values = data[name][0].tolist()
@@ -56,4 +60,9 @@ def read_datapoints(data, test: Test, client: Client, skip_channels: list = [],
                     print(
                         f"Posting timeseries for sensor {name} in test {str(data['comment'])[2:-2]} took  {toc - tic:0.4f} seconds")
 
-            # Todo: timeseries tags?
+                    remaining_channels.remove(org_channel)
+    f = open("C://users/jen.SEVAN/Documents/remains.txt", "a")
+    for ch in remaining_channels:
+        f.write(f"{ch}\n")
+    f.close()
+    # Todo: timeseries tags?
