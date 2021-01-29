@@ -20,7 +20,7 @@ purposes. See deployment for notes on how to deploy the project on a live system
 ### Use as Python package
 
 Pip-install package from packagr.
-```pip install modeltestSDK --extra-index-url https://api.packagr.app/EYvhW6Syl/ -U```
+```pip install modeltestSDK --extra-index-url https://api.packagr.app/EYvhW6SyL/ -U```
 
 Then enter packagr credentials to initiate install.
 
