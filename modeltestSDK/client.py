@@ -144,7 +144,7 @@ class Client:
 
         # create request headers
         headers = {
-            "Authorization": f"bearer {token}",
+            "Authorization": f"Bearer {token}",
             "Connection": "keep-alive",
             "Host": self.config.host,
             "Content-Type": "application/json",
