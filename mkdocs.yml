@@ -5,3 +5,9 @@ theme:
     scheme: default
     primary: blue
     accent: blue
+  features:
+    - navigation.instant
+nav:
+  - Home: 'index.md'
+  - Installation: 'installation.md'
+  - Examples: 'examples.md'
