@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 import logging
 from datetime import datetime
@@ -6,6 +7,9 @@ from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
 from .config import Config
+
+
+log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
 
 
 class Client:
@@ -40,20 +44,25 @@ class Client:
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
 
+        logging.basicConfig(
+            stream=sys.stdout,
+            level=log_levels.get(self.config.log_level, logging.INFO),
+            format="%(levelname)s at line %(lineno)d in %(filename)s - %(message)s"
+        )
+
     def _request_token(self) -> str:
         """str: Authenticate and return access token."""
         # check if current access token is still valid
         current_token = os.getenv("INQUIRE_MODELTEST_API_TOKEN")
         token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
-
-        if current_token is not None and token_expires_on is not None:
-            if datetime.utcnow().timestamp() < float(token_expires_on):
-                logging.debug("Your current access token has not yet expired.")
-                return current_token
+        if current_token is not None and token_expires_on is not None and \
+                datetime.utcnow().timestamp() < float(token_expires_on):
+            logging.debug("Your current access token has not yet expired.")
+            return current_token
 
         # authenticate and get access token
         try:
-            logging.info("Authenticating by user impersonation without any shared secret.")
+            logging.info("Authenticating by user impersonation.")
             user = os.getenv("INQUIRE_MODELTEST_API_USER")
             passwd = os.getenv("INQUIRE_MODELTEST_API_PASSWORD")
             assert user is not None and passwd is not None, "You have to set the following two environment variables " \
@@ -78,15 +87,18 @@ class Client:
         except requests.exceptions.RequestException as e:
             raise e
         else:
-            logging.debug("Acquired valid access token.")
-
             # update env vars
             data = r.json()
             token = data.get("access_token")
             expires = data.get("expires")
-            os.environ["INQUIRE_MODELTEST_API_TOKEN"] = token
-            os.environ["INQUIRE_MODELTEST_API_TOKEN_EXPIRES"] = str(expires)
-            return token
+            if token is None and expires is None:
+                raise ValueError(f"Unable to acquire a valid access token 'access_token'= {token} and "
+                                 f"token expiry 'expires' = {expires}")
+            else:
+                logging.info("Authentication successful. Acquired valid access token.")
+                os.environ["INQUIRE_MODELTEST_API_TOKEN"] = token
+                os.environ["INQUIRE_MODELTEST_API_TOKEN_EXPIRES"] = str(expires)
+                return token
 
     def _create_url(self, resource: str = None, endpoint: str = None) -> str:
         """
@@ -146,16 +158,15 @@ class Client:
 
         # create request headers
         headers = {
-            "Authorization": f"bearer {token}",
+            "Authorization": f"Bearer {token}",
             "Connection": "keep-alive",
             "Host": self.config.host,
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
-
         # do request (also encodes parameters)
         try:
-            r = requests.request(method, url, params=parameters, json=body, headers=headers)
+            r = requests.request(method, url, params=parameters, data=body, headers=headers)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise e

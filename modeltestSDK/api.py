@@ -284,8 +284,8 @@ class TimeseriesAPI(BaseAPI):
         return self.client.patch(resource=self._resource_path, endpoint=f"{ts_id}", body=body)
 
     def get_data_points(self, ts_id: str) -> dict:
-        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data")
-        return data
+        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data/?all_data=true")
+        return data['data']
 
     def post_data_points(self, ts_id, body=None, form_body=None):
         if form_body is None:
@@ -293,22 +293,22 @@ class TimeseriesAPI(BaseAPI):
             for p in body:
                 form_body['data']['time'].append(p['time'])
                 form_body['data']['value'].append(p['value'])
-        self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=form_body)
+        self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data/", body=form_body)
 
     def get_standard_deviation(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
         return data['std']
 
     def get_max_value(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
         return data['max']
 
     def get_min_value(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats=min")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
         return data['min']
 
     def get_mean(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
         return data['mean']
 
 

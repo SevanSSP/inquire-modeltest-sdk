@@ -11,3 +11,4 @@ class Config:
     host = os.environ.get("INQUIRE_MODELTEST_API_HOST")
     base_url = "api"
     version = 'v1'
+    log_level = 'info'
