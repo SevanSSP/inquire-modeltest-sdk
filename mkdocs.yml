@@ -11,3 +11,6 @@ nav:
   - Home: 'index.md'
   - Installation: 'installation.md'
   - Examples: 'examples.md'
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
