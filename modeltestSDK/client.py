@@ -119,11 +119,13 @@ class Client:
         Notes
         -----
         The full request url is like
-           'https://{host}/{base_url}/{version}/{resource}/{endpoint}'
+           '{host}/{base_url}/{version}/{resource}/{endpoint}'
 
         """
-        url = f"https://{self.config.host}/{self.config.base_url}/{self.config.version}/"
-        url += "/".join([p for p in [resource, endpoint] if p is not None])
+        if endpoint is None:
+            endpoint = ""
+        url = f"{self.config.host}/{self.config.base_url}/{self.config.version}/"
+        url += "/".join([p for p in [resource, endpoint]])
         return url
 
     def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None,
@@ -166,7 +168,7 @@ class Client:
         }
         # do request (also encodes parameters)
         try:
-            r = requests.request(method, url, params=parameters, data=body, headers=headers)
+            r = requests.request(method, url, params=parameters, json=body, headers=headers)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             raise e
