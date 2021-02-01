@@ -3,14 +3,20 @@ import datetime
 from modeltestSDK.client import Client
 from modeltestSDK.resources import SensorList, FloaterConfigList, WaveCalibrationList
 from scipy.io import loadmat
+import os
+
+os.environ["INQUIRE_MODELTEST_API_USER"] = "ebg"
+os.environ["INQUIRE_MODELTEST_API_PASSWORD"] = "pass"
+os.environ["INQUIRE_MODELTEST_API_HOST"] = "http://127.0.0.1:8000"
+
 
 client = Client()
 
-xls_loc = "C://users/jen.SEVAN/Documents/ImportPipelineInput.xls"
+xls_loc = "Pipeline_Input_Luva_I.xls"
 
 df_campaign = pd.read_excel(xls_loc, sheet_name='Campaign', skiprows=2)
 df_sensor = pd.read_excel(xls_loc, sheet_name='Sensor', skiprows=2, true_values="TRUE",false_values="FALSE")
-df_sensor = df_sensor.fillna(value=0) # TODO: dangerous method use None?
+df_sensor = df_sensor.fillna(value=None) # TODO: dangerous method use None?
 df_floater_config = pd.read_excel(xls_loc, sheet_name='FloaterConfig', skiprows=2)
 df_wave_calibration = pd.read_excel(xls_loc,sheet_name='WaveCal', skiprows=2)
 
