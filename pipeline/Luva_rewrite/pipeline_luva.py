@@ -12,10 +12,10 @@ from scipy.io import loadmat
 client = Client()
 
 xls_loc = "Pipeline_Input_Luva_I.xls"
+data_folder = r"c:\\"
 
 df_campaign = pd.read_excel(xls_loc, sheet_name='Campaign', skiprows=2)
 df_sensor = pd.read_excel(xls_loc, sheet_name='Sensor', skiprows=2, true_values="TRUE", false_values="FALSE")
-# df_sensor = df_sensor.fillna(value=None)
 df_floater_config = pd.read_excel(xls_loc, sheet_name='FloaterConfig', skiprows=2)
 df_wave_calibration = pd.read_excel(xls_loc, sheet_name='WaveCal', skiprows=2)
 
@@ -27,25 +27,26 @@ campaign = client.campaign.create(name=df_campaign['name'][0],
                                   date=datetime.datetime(year=df_campaign['campaign_date'][0].year,
                                                          month=df_campaign['campaign_date'][0].month,
                                                          day=1).isoformat(),
-                                  scale_factor=float(df_campaign['scale_factor'][0]),
-                                  water_depth=float(df_campaign['water_depth'][0]),
+                                  scale_factor=df_campaign['scale_factor'][0],
+                                  water_depth=df_campaign['water_depth'][0],
                                   read_only=restrict_access)
 
-# sensors = SensorList(resources=[])
-#
-# for index, sensor in df_sensor.iterrows():
-#     sensors.resources.append(
-#         client.sensor.create(name=sensor['name'],
-#                              description=sensor['description'],
-#                              unit=sensor['unit'],
-#                              kind=sensor['kind'],
-#                              x=sensor['x'],
-#                              y=sensor['y'],
-#                              z=sensor['z'],
-#                              is_local=sensor['is_local'],
-#                              campaign_id=campaign.id,
-#                              read_only=restrict_access)
-#     )
+sensors = SensorList(resources=[])
+
+for index, sensor in df_sensor.iterrows():
+    sensors.resources.append(
+        client.sensor.create(name=sensor['name'],
+                             description=sensor['description'],
+                             unit=sensor['unit'],
+                             kind=sensor['kind'],
+                             x=sensor['x'],
+                             y=sensor['y'],
+                             z=sensor['z'],
+                             is_local=sensor['is_local'],
+                             area=sensor['area'],
+                             campaign_id=campaign.id,
+                             read_only=restrict_access)
+    )
 #
 # floater_configs = FloaterConfigList(resources=[])
 #
