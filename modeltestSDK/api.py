@@ -216,10 +216,14 @@ class WindCalibrationAPI(TestAPI):
 class SensorAPI(NamedBaseAPI):
 
     def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-               is_local: bool, campaign_id: str, area: float = None,
+               position_reference: str, position_heading_lock: bool, position_draft_lock: bool,
+               positive_direction_definition: str, campaign_id: str, area: float = None,
                read_only: bool = False) -> Sensor:
         body = dict(name=name, description=description, unit=unit, kind=kind, area=area, x=x,
-                    y=y, z=z, is_local=is_local, campaign_id=campaign_id, read_only=read_only)
+                    y=y, z=z, position_reference=position_reference, position_heading_lock=position_heading_lock,
+                    position_draft_lock=position_draft_lock,
+                    positive_direction_definition=positive_direction_definition,
+                    campaign_id=campaign_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return Sensor.from_dict(data=data, client=self.client)
 

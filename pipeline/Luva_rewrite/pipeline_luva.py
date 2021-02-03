@@ -34,16 +34,11 @@ campaign = client.campaign.create(name=df_campaign['name'][0],
 sensors = SensorList(resources=[])
 
 for index, sensor in df_sensor.iterrows():
+    sensor_input = {key:sensor[key] for key in ['name', 'description', 'unit', 'kind', 'x', 'y', 'z',
+                                                'position_reference', 'position_heading_lock', 'position_draft_lock',
+                                                'positive_direction_definition', 'area']}
     sensors.resources.append(
-        client.sensor.create(name=sensor['name'],
-                             description=sensor['description'],
-                             unit=sensor['unit'],
-                             kind=sensor['kind'],
-                             x=sensor['x'],
-                             y=sensor['y'],
-                             z=sensor['z'],
-                             is_local=sensor['is_local'],
-                             area=sensor['area'],
+        client.sensor.create(**sensor_input,
                              campaign_id=campaign.id,
                              read_only=restrict_access)
     )
