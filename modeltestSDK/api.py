@@ -27,7 +27,7 @@ class NamedBaseAPI(BaseAPI):
     Only for database items with names. To retrieve id from name
     """
     def get_id(self, name: str) -> str:
-        response = self.client.get(format_class_name(self.__class__.__name__), "", parameters={'name': name})
+        response = self.client.get(format_class_name(self.__class__.__name__), parameters={'name': name})
         if response:
             if len(response) != 1:
                 warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
@@ -68,7 +68,7 @@ class CampaignAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
         return CampaignList(resources=obj_list, client=None)
 
@@ -89,7 +89,7 @@ class TestAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Test.from_dict(data=obj, client=self.client) for obj in data]
         return TestList(resources=obj_list, client=None)
 
@@ -127,7 +127,7 @@ class FloaterTestAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [FloaterTest.from_dict(data=obj, client=self.client) for obj in data]
         return FloaterTestList(resources=obj_list, client=None)
 
@@ -157,7 +157,7 @@ class WaveCalibrationAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [WaveCalibration.from_dict(data=obj, client=self.client) for obj in data]
         return WaveCalibrationList(resources=obj_list, client=None)
 
@@ -196,7 +196,7 @@ class WindCalibrationAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [WindCalibration.from_dict(data=obj, client=self.client) for obj in data]
         return WindCalibrationList(resources=obj_list, client=None)
 
@@ -252,7 +252,7 @@ class SensorAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
         return SensorList(resources=obj_list, client=None)
 
@@ -280,7 +280,7 @@ class TimeseriesAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
         return TimeseriesList(resources=obj_list, client=None)
 
@@ -334,7 +334,7 @@ class TagsAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Tag.from_dict(data=obj, client=self.client) for obj in data]
         return TagList(resources=obj_list, client=None)
 
@@ -369,7 +369,7 @@ class FloaterConfigAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [FloaterConfig.from_dict(data=obj, client=self.client) for obj in data]
         return FloaterConfigList(resources=obj_list, client=None)
 

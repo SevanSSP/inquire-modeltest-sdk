@@ -124,8 +124,6 @@ class Client:
            '{host}/{base_url}/{version}/{resource}/{endpoint}'
 
         """
-        if endpoint is None:
-            endpoint = ""
         url = f"{self.config.host}/{self.config.base_url}/{self.config.version}/"
         url += "/".join([p for p in [resource, endpoint]])
         return url
