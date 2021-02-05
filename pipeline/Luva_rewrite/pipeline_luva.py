@@ -6,6 +6,7 @@ os.environ["INQUIRE_MODELTEST_API_HOST"] = r"http://127.0.0.1:8000"
 
 import pandas as pd
 import datetime
+import time as timer
 from modeltestSDK import Client
 from modeltestSDK.resources import SensorList, FloaterConfigList, WaveCalibrationList
 from scipy.io import loadmat
@@ -31,33 +32,33 @@ campaign = client.campaign.create(name=df_campaign['name'][0],
                                   scale_factor=df_campaign['scale_factor'][0],
                                   water_depth=df_campaign['water_depth'][0],
                                   read_only=restrict_access)
-#
-# sensors = SensorList(resources=[])
-# sensor_huid_mapper = dict()
-#
-# for index, sensor in df_sensor.iterrows():
-#     sensor_input = {key: sensor[key] for key in ['name', 'description', 'unit', 'kind', 'source', 'x', 'y', 'z',
-#                                                  'position_reference', 'position_heading_lock', 'position_draft_lock',
-#                                                  'positive_direction_definition', 'area']}
-#     sensors.resources.append(
-#         client.sensor.create(**sensor_input,
-#                              campaign_id=campaign.id,
-#                              read_only=restrict_access)
-#     )
-#     sensor_huid_mapper[sensor['HUID']] = sensors.resources[-1].id
-#
-#
-# floater_configs = FloaterConfigList(resources=[])
-# floater_configs_huid_mapper = dict()
-#
-# for index, floater in df_floater_config.iterrows():
-#     floater_input = {key: floater[key] for key in ['name', 'description', 'characteristic_length', 'draft']}
-#     floater_configs.resources.append(
-#         client.floater_config.create(**floater_input,
-#                                      campaign_id=campaign.id,
-#                                      read_only=restrict_access)
-#     )
-#     floater_configs_huid_mapper[floater['HUID']] = floater_configs.resources[-1].id
+
+sensors = SensorList(resources=[])
+sensor_huid_mapper = dict()
+
+for index, sensor in df_sensor.iterrows():
+    sensor_input = {key: sensor[key] for key in ['name', 'description', 'unit', 'kind', 'source', 'x', 'y', 'z',
+                                                 'position_reference', 'position_heading_lock', 'position_draft_lock',
+                                                 'positive_direction_definition', 'area']}
+    sensors.resources.append(
+        client.sensor.create(**sensor_input,
+                             campaign_id=campaign.id,
+                             read_only=restrict_access)
+    )
+    sensor_huid_mapper[sensor['HUID']] = sensors.resources[-1].id
+
+
+floater_configs = FloaterConfigList(resources=[])
+floater_configs_huid_mapper = dict()
+
+for index, floater in df_floater_config.iterrows():
+    floater_input = {key: floater[key] for key in ['name', 'description', 'characteristic_length', 'draft']}
+    floater_configs.resources.append(
+        client.floater_config.create(**floater_input,
+                                     campaign_id=campaign.id,
+                                     read_only=restrict_access)
+    )
+    floater_configs_huid_mapper[floater['HUID']] = floater_configs.resources[-1].id
 
 wave_calibrations = WaveCalibrationList(resources=[])
 wave_calibration_huid_mapper = dict()
@@ -86,4 +87,43 @@ for index, wave_cal in df_wave_calibration.iterrows():
                                        campaign_id=campaign.id,
                                        read_only=restrict_access)
     )
-    wave_calibration_huid_mapper[wave_cal['HUID']] = wave_calibrations.resources[-1].id
+    wave_calibration_huid_mapper[wave_cal['HUID']] = test_id = wave_calibrations.resources[-1].id
+
+
+    time = data['Time'][0].tolist()
+    fs = data['fs'][0][0]
+
+    for key in data.keys():
+        if key in ['Time', 'comment', 'test_date', 'test_num', 'fs', ] or key[0:2] == '__':
+            continue
+        elif key in df_sensor['name'].values:
+            value = data[key][0].tolist()
+            sensor_id = sensor_huid_mapper[df_sensor['HUID'][df_sensor['name'] == 'WAVE_2'].values[0]]
+        else:
+            sensor_found = False
+            for _, sensor in df_sensor.iterrows():
+                if type(sensor['aliases']) == str:
+                    if key in [alias.strip() for alias in sensor['aliases'].split(',')]:
+                        value = data[key][0].tolist()
+                        sensor_id = sensor_huid_mapper[sensor['HUID']]
+                        sensor_found = True
+                        break
+            if not sensor_found:
+                print(f'No sensor found for data labelled {key} skipping this record')
+                continue
+
+        ts = client.timeseries.create(sensor_id=sensor_id,
+                                      test_id=test_id,
+                                      default_start_time=1419,
+                                      default_end_time=1419 + 3 * 60 * 60,
+                                      fs=fs,
+                                      read_only=True)
+
+        body = {'data': {'time': time,
+                         'value': value}}
+        tic = timer.perf_counter()
+        client.timeseries.post_data_points(ts.id, form_body=body)
+        toc = timer.perf_counter()
+        print(
+            f"Posting timeseries for sensor {key} in test {wave_cal_input['number']} took {toc - tic:0.4f}s")
+

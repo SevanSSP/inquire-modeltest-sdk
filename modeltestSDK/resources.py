@@ -58,6 +58,8 @@ class BaseResource:
         data.pop('read_only')
         if cls in [WaveCalibration, WindCalibration, FloaterTest]:
             data.pop('type')
+        elif cls is Timeseries:
+            data.pop('datapoints_created_at')
         return cls(**data, client=client)
 
 
@@ -151,7 +153,7 @@ class CampaignList(ResourceList):
 
 class Sensor(BaseResource):
 
-    def __init__(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
+    def __init__(self, name: str, description: str, unit: str, kind: str, source: str, x: float, y: float, z: float,
                  position_reference: str, position_heading_lock: bool, position_draft_lock: bool,
                  positive_direction_definition: str, area: float = None, campaign_id: str = None,
                  id: str = None, client=None):
@@ -160,6 +162,7 @@ class Sensor(BaseResource):
         self.description = description
         self.unit = unit
         self.kind = kind
+        self.source = source
         self.area = area
         self.x = x
         self.y = y
@@ -318,14 +321,17 @@ class WindCalibrationList(ResourceList):
 
 class Timeseries(BaseResource):
 
-    def __init__(self, sensor_id: str, test_id: str, fs: float, intermittent: bool = False,
-                 ts_id: str = None, client=None):
+    def __init__(self, sensor_id: str, test_id: str, fs: float,
+                 default_start_time: float, default_end_time: float, intermittent: bool = False,
+                 id: str = None, client=None):
 
         self.sensor_id = sensor_id
         self.test_id = test_id
         self.fs = fs
         self.intermittent = intermittent
-        self.id = ts_id
+        self.default_start_time = default_start_time
+        self.default_end_time = default_end_time
+        self.id = id
         self.data_points = DataPointList(resources=[], client=client)
         self._client = client
 
@@ -536,13 +542,13 @@ class TagList(ResourceList):
 class FloaterConfig(BaseResource):
 
     def __init__(self, name: str, description: str, characteristic_length: float, draft: float, campaign_id: str,
-                 floater_id: str = None, client=None):
+                 id: str = None, client=None):
         self.name = name
         self.description = description
         self.characteristic_length = characteristic_length
         self.draft = draft
         self.campaign_id = campaign_id
-        self.id = floater_id
+        self.id = id
         self._client = client
 
     def __str__(self):

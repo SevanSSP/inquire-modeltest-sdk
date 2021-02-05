@@ -215,11 +215,11 @@ class WindCalibrationAPI(TestAPI):
 
 class SensorAPI(NamedBaseAPI):
 
-    def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
+    def create(self, name: str, description: str, unit: str, kind: str, source: str, x: float, y: float, z: float,
                position_reference: str, position_heading_lock: bool, position_draft_lock: bool,
                positive_direction_definition: str, campaign_id: str, area: float = None,
                read_only: bool = False) -> Sensor:
-        body = dict(name=name, description=description, unit=unit, kind=kind, area=area, x=x,
+        body = dict(name=name, description=description, unit=unit, kind=kind, source=source, area=area, x=x,
                     y=y, z=z, position_reference=position_reference, position_heading_lock=position_heading_lock,
                     position_draft_lock=position_draft_lock,
                     positive_direction_definition=positive_direction_definition,
@@ -288,7 +288,7 @@ class TimeseriesAPI(BaseAPI):
         return self.client.patch(resource=self._resource_path, endpoint=f"{ts_id}", body=body)
 
     def get_data_points(self, ts_id: str) -> dict:
-        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data/?all_data=true")
+        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data?all_data=true")
         return data['data']
 
     def post_data_points(self, ts_id, body=None, form_body=None):
@@ -297,22 +297,22 @@ class TimeseriesAPI(BaseAPI):
             for p in body:
                 form_body['data']['time'].append(p['time'])
                 form_body['data']['value'].append(p['value'])
-        self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data/", body=form_body)
+        self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=form_body)
 
     def get_standard_deviation(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics")
         return data['std']
 
     def get_max_value(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics")
         return data['max']
 
     def get_min_value(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics")
         return data['min']
 
     def get_mean(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics")
         return data['mean']
 
 
