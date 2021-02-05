@@ -137,12 +137,12 @@ class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
-               wave_calibration_id: str = None, read_only: bool = False) -> WaveCalibration:
+               id: str = None, read_only: bool = False) -> WaveCalibration:
         body = dict(number=number, description=description, type="Wave Calibration", test_date=test_date,
                     campaign_id=campaign_id,
                     wave_spectrum=wave_spectrum, wave_period=wave_period, wave_height=wave_height,
                     gamma=gamma, wave_direction=wave_direction, current_velocity=current_velocity,
-                    current_direction=current_direction, id=wave_calibration_id, read_only=read_only)
+                    current_direction=current_direction, id=id, read_only=read_only)
 
         data = self.client.post(self._resource_path, body=body)
         return WaveCalibration.from_dict(data=data, client=self.client)

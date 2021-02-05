@@ -125,7 +125,7 @@ class Client:
 
         """
         url = f"{self.config.host}/{self.config.base_url}/{self.config.version}/"
-        url += "/".join([p for p in [resource, endpoint]])
+        url += "/".join([p for p in [resource, endpoint] if p is not None])
         return url
 
     def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None,

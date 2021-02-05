@@ -56,6 +56,8 @@ class BaseResource:
     def from_dict(cls, data: dict, client=None):
         # noinspection PyArgumentList
         data.pop('read_only')
+        if cls in [WaveCalibration, WindCalibration, FloaterTest]:
+            data.pop('type')
         return cls(**data, client=client)
 
 
@@ -196,7 +198,7 @@ class SensorList(ResourceList):
 
 class Test(BaseResource):
     def __init__(self, number: str, description: str, test_date: str, test_type: str, campaign_id: str = None,
-                 test_id: str = None,
+                 id: str = None,
                  client=None):
 
         self.number = number
@@ -204,7 +206,7 @@ class Test(BaseResource):
         self.test_date = test_date
         self.campaign_id = campaign_id
         self.type = test_type
-        self.id = test_id
+        self.id = id
         self._client = client
 
         self.timeseries = TimeseriesList(resources=[], client=client)
@@ -272,9 +274,9 @@ class WaveCalibration(Test):
     def __init__(self, number: str, description: str, test_date: str, campaign_id: str,
                  wave_spectrum: str = None, wave_height: float = None, wave_period: float = None,
                  gamma: float = None, wave_direction: float = None, current_velocity: float = None,
-                 current_direction: float = None, wave_calibration_id: str = None, client=None):
+                 current_direction: float = None, id: str = None, client=None):
         super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         test_type=self.type, test_id=wave_calibration_id, client=client)
+                         test_type=self.type, id=id, client=client)
 
         self.wave_spectrum = wave_spectrum
         self.wave_height = wave_height
