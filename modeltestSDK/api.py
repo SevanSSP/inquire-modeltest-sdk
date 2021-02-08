@@ -97,11 +97,11 @@ class TestAPI(NamedBaseAPI):
 class FloaterTestAPI(TestAPI):
 
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               floater_config_id: str = None, wave_id: str = None, wind_id: str = None,
+               floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
         body = dict(number=number, description=description, type="Floater Test", test_date=test_date,
                     campaign_id=campaign_id, category=category, orientation=orientation, wave_id=wave_id,
-                    wind_id=wind_id, floaterconfig_id=floater_config_id, read_only=read_only)
+                    wind_id=wind_id, floaterconfig_id=floaterconfig_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return FloaterTest.from_dict(data=data, client=self.client)
 
@@ -178,10 +178,10 @@ class WindCalibrationAPI(TestAPI):
 
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
-               wind_condition_id: str = None, read_only: bool = False) -> WindCalibration:
+               id: str = None, read_only: bool = False) -> WindCalibration:
         body = dict(number=number, description=description, test_date=test_date, type="Wind Calibration",
                     campaign_id=campaign_id, wind_spectrum=wind_spectrum, wind_velocity=wind_velocity, zref=zref,
-                    wind_direction=wind_direction, id=wind_condition_id, read_only=read_only)
+                    wind_direction=wind_direction, id=id, read_only=read_only)
 
         data = self.client.post(self._resource_path, body=body)
         return WindCalibration.from_dict(data=data, client=self.client)
