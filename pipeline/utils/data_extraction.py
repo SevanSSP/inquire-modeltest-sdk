@@ -127,7 +127,7 @@ def mat_to_ts(ts_data: dict, test_id: str, test_number: str, df_sensor: pd.DataF
         body = {'data': {'time': time,
                          'value': value}}
         tic = timer.perf_counter()
-        # client_ts_object.post_data_points(ts.id, form_body=body)
+        client_ts_object.post_data_points(ts.id, form_body=body)
         toc = timer.perf_counter()
         print(
             f"Posting timeseries for sensor {key} in test {test_number} took {toc - tic:0.4f}s")
