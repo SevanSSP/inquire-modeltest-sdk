@@ -516,13 +516,13 @@ class DataPointList(ResourceList):
 class Tag(BaseResource):
 
     def __init__(self, name: str, comment: str, test_id: str = None, sensor_id: str = None, timeseries_id: str = None,
-                 tag_id: str = None, client=None):
+                 id: str = None, client=None):
         self.name = name
         self.comment = comment
         self.test_id = test_id
         self.sensor_id = sensor_id
         self.timeseries_id = timeseries_id
-        self.id = tag_id
+        self.id = id
         self._client = client
 
     def __str__(self):
