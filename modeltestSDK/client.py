@@ -231,7 +231,7 @@ class Client:
         """
         return self._do_request("PATCH", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
 
-    def delete(self, resource: str = None, endpoint: str = None, parameters: str = None):
+    def delete(self, resource: str = None, endpoint: str = None, parameters: dict = None):
         """
         Perform DELETE request
 

@@ -1,43 +1,42 @@
 """
-APIs
-
-Abstraction layer between client and resources.
+API methods
 """
-from .utils import format_class_name
 import warnings
+from .utils import format_class_name
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
                         FloaterTest, FloaterTestList, WaveCalibration, WaveCalibrationList, WindCalibration,
                         WindCalibrationList, Tag, TagList, FloaterConfig, FloaterConfigList)
 from .query import create_query_parameters
+from .client import Client
 
 
 class BaseAPI:
+    """Base API with methods common for all APIs."""
+    def __init__(self, client: Client):
+        self._resource_path: str = format_class_name(self.__class__.__name__)
+        self.client: Client = client
 
-    def __init__(self, client):
-        self._resource_path = format_class_name(self.__class__.__name__)
-        self.client = client
+    def delete(self, item_id: str, admin_key: str):
+        """
+        Delete item by id
 
-    def delete(self, item_id: str, parameters: dict = None):
-        resp = self.client.delete(self._resource_path, endpoint=item_id, parameters=parameters)
+        Parameters
+        ----------
+        item_id : str
+            Item identifier
+        admin_key : str
+            Administrator key
+
+        Notes
+        -----
+        Deleting items requires administrator privileges.
+
+        """
+        resp = self.client.delete(self._resource_path, endpoint=item_id, parameters=dict(secret_key=admin_key))
         return resp
 
 
-class NamedBaseAPI(BaseAPI):
-    """
-    Only for database items with names. To retrieve id from name
-    """
-    def get_id(self, name: str) -> str:
-        response = self.client.get(format_class_name(self.__class__.__name__), "", parameters={'name': name})
-        if response:
-            if len(response) != 1:
-                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
-                              f" first was returned")
-            return response[0]['id']
-        else:
-            raise Exception(f"Could not find any object with name {name}")
-
-
-class CampaignAPI(NamedBaseAPI):
+class CampaignAPI(BaseAPI):
 
     def create(self, name: str, description: str, location: str, date: any,
                scale_factor: float, water_depth: float, read_only: bool = False) -> Campaign:
@@ -77,7 +76,7 @@ class CampaignAPI(NamedBaseAPI):
         return Campaign.from_dict(data=data, client=self.client)
 
 
-class TestAPI(NamedBaseAPI):
+class TestAPI(BaseAPI):
 
     def get(self, test_id: str) -> Test:
         data = self.client.get(self._resource_path, test_id)
@@ -213,7 +212,7 @@ class WindCalibrationAPI(TestAPI):
             raise Exception(f"Could not find any object with name {test_number}")
 
 
-class SensorAPI(NamedBaseAPI):
+class SensorAPI(BaseAPI):
 
     def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
                is_local: bool, campaign_id: str, area: float = None,
@@ -312,7 +311,7 @@ class TimeseriesAPI(BaseAPI):
         return data['mean']
 
 
-class TagsAPI(NamedBaseAPI):
+class TagsAPI(BaseAPI):
     def create(self, name: str, comment: str = None, test_id: str = None, sensor_id: str = None,
                timeseries_id: str = None, read_only: bool = False) -> Tag:
         body = dict(name=name, comment=comment, test_id=test_id, sensor_id=sensor_id, timeseries_id=timeseries_id,
@@ -347,7 +346,7 @@ class TagsAPI(NamedBaseAPI):
             raise Exception(f"Could not find any object with name {name}")
 
 
-class FloaterConfigAPI(NamedBaseAPI):
+class FloaterConfigAPI(BaseAPI):
     def create(self, name: str, description: str, campaign_id: str, draft: float, characteristic_length: float = 0,
                read_only: bool = False) -> FloaterConfig:
         body = dict(name=name, description=description, campaign_id=campaign_id,
