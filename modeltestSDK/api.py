@@ -596,43 +596,120 @@ class SensorAPI(BaseAPI):
     def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
                is_local: bool, campaign_id: str, area: float = None,
                read_only: bool = False) -> Sensor:
-        body = dict(name=name, description=description, unit=unit, kind=kind, area=area, x=x,
-                    y=y, z=z, is_local=is_local, campaign_id=campaign_id, read_only=read_only)
+        """
+        Parameters
+        ----------
+        name : str
+            Sensor name
+        description : str
+            A description
+        unit : str
+            Unit of measure
+        kind : str
+            Kind of sensor
+        x : float
+            Position x-coordinate
+        y : float
+            Position y-coordinate
+        z : float
+            Position z-coordinate
+        is_local : bool
+            Is the sensor placed in local coordinate system
+        campaign_id : str
+            Identifier of parent campaign
+        area : float, optional
+            Reference area
+        read_only : bool, optional
+            Make the test read only
+
+        Returns
+        -------
+        Sensor
+            Sensor data
+        """
+        body = dict(
+            name=name,
+            description=description,
+            unit=unit, kind=kind,
+            area=area,
+            x=x,
+            y=y,
+            z=z,
+            is_local=is_local,
+            campaign_id=campaign_id,
+            read_only=read_only
+        )
         data = self.client.post(self._resource_path, body=body)
-        return Sensor.from_dict(data=data, client=self.client)
+        return Sensor(**data, client=self.client)
 
-    def get(self, sensor_id: str) -> Sensor:
-        data = self.client.get(self._resource_path, sensor_id)
-        return Sensor.from_dict(data=data, client=self.client)
+    def get(self, filter_by: list = None, sort_by: list = None) -> SensorList:
+        """
+        Get multiple sensors
 
-    def get_multiple_by_name(self, ids) -> Sensor:
-        return self.client.post(self._resource_path, "ids", body=ids)
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all tests e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
 
-    def get_by_name(self, name: str):
-        response = self.get_all(filter_by=[self.client.filter.sensor.name == name])
-        if response:
-            if len(response) != 1:
-                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
-                              f" first was returned")
-                return response[0]
-            else:
-                return response[0]
-        else:
-            raise Exception(f"Could not find any object with name {name}")
-
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> SensorList:
+        Returns
+        -------
+        SensorList
+            Multiple sensors
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
-        return SensorList(resources=obj_list, client=None)
+        sensors = [Sensor(**item, client=self.client) for item in data]
+        return SensorList(resources=sensors, client=self.client)
 
-    def patch(self, body: dict, sensor_id: str) -> Sensor:
-        data = self.client.patch(self._resource_path, endpoint=f"{sensor_id}", body=body)
-        return Sensor.from_dict(data=data, client=self.client)
+    def get_by_id(self, sensor_id: str) -> Sensor:
+        """
+        Get single sensor by id
+
+        Parameters
+        ----------
+        sensor_id : str
+            Sensor identifier
+
+        Returns
+        -------
+        Sensor
+            Sensor data
+        """
+        data = self.client.get(self._resource_path, sensor_id)
+        return Sensor(**data, client=self.client)
+
+    def get_by_name(self, name: str) -> Union[Sensor, None]:
+        """"
+        Get single sensor by name
+
+        Parameters
+        ----------
+        name : str
+            Sensor name
+
+        Returns
+        -------
+        Sensor
+            Sensor data
+        """
+        campaigns = self.get(filter_by=[self.client.filter.campaign.name == name])
+
+        if len(campaigns.resources) == 0:
+            logging.info(f"Did not find a sensor with name='{name}'.")
+            return None
+        elif len(campaigns.resources) > 1:
+            logging.warning(f"Found multiple sensors with name='{name}'. Returning the first match.")
+            return campaigns.resources[0]
+        else:
+            return campaigns.resources[0]
 
 
 class TimeseriesAPI(BaseAPI):
