@@ -1,13 +1,14 @@
+"""
+Resource models
+"""
 import json
-import pandas as pd
-from typing import List
-from .utils import make_serializable
 import numpy
 import warnings
-
-'''
-User-side classes 
-'''
+import pandas as pd
+from datetime import datetime
+from typing import List, Union
+from .utils import make_serializable
+from .client import Client
 
 
 class BaseResource(object):
@@ -51,10 +52,6 @@ class BaseResource(object):
             if name not in ignore:
                 df.loc[name] = [value]
         return df
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        raise NotImplemented
 
 
 class ResourceList(BaseResource):
