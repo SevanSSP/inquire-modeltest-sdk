@@ -210,10 +210,10 @@ class TestAPI(BaseAPI):
         tests = self.get(filter_by=[self.client.filter.test.number == test_number])
 
         if len(tests.resources) == 0:
-            logging.info(f"Did not find a campaign with name='{test_number}'.")
+            logging.info(f"Did not find a test with number='{test_number}'.")
             return None
         elif len(tests.resources) > 1:
-            logging.warning(f"Found multiple campaigns with name='{test_number}'. Returning the first match.")
+            logging.warning(f"Found multiple tests with number='{test_number}'. Returning the first match.")
             return tests.resources[0]
         else:
             return tests.resources[0]
@@ -224,37 +224,121 @@ class FloaterTestAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
                floater_config_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
-        body = dict(number=number, description=description, type="Floater Test", test_date=test_date,
-                    campaign_id=campaign_id, category=category, orientation=orientation, wave_id=wave_id,
-                    wind_id=wind_id, floaterconfig_id=floater_config_id, read_only=read_only)
+        """
+        Create floater test
+
+        Parameters
+        ----------
+        number : str
+            Test number
+        description : str
+            A description of the test
+        test_date : str
+            Date of testing
+        campaign_id : str
+            Identifier of parent campaign
+        category : str
+            The kind of test
+        orientation : float
+            Orientation (degrees)
+        floater_config_id : id
+            Identifier of the applied floater configuration
+        wave_id : str
+            Identifier of the applied wave
+        wind_id : str
+            Identifier of the applied wind
+        read_only : bool, optional
+            Make the test read only
+
+        Returns
+        -------
+        FloaterTest
+            Test data
+        """
+        body = dict(
+            number=number,
+            description=description,
+            type="Floater Test",
+            test_date=test_date,
+            campaign_id=campaign_id,
+            category=category,
+            orientation=orientation,
+            wave_id=wave_id,
+            wind_id=wind_id,
+            floaterconfig_id=floater_config_id,
+            read_only=read_only
+        )
         data = self.client.post(self._resource_path, body=body)
-        return FloaterTest.from_dict(data=data, client=self.client)
+        return FloaterTest(**data, client=self.client)
 
-    def get(self, floater_id: str) -> FloaterTest:
-        data = self.client.get(self._resource_path, floater_id)
-        return FloaterTest.from_dict(data=data, client=self.client)
+    def get(self, filter_by: list = None, sort_by: list = None) -> FloaterTestList:
+        """
+        Get multiple floater tests
 
-    def get_by_test_number(self, test_number: str) -> FloaterTest:
-        response = self.get_all(filter_by=[self.client.filter.floater_test.number == test_number])
-        if response:
-            if len(response) != 1:
-                warnings.warn(f"Searching {self.__class__.__name__} for test number {test_number} returned several objects,"
-                              f" first was returned")
-                return response[0]
-            else:
-                return response[0]
-        else:
-            raise Exception(f"Could not find any object with name {test_number}")
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all tests e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
 
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> FloaterTestList:
+        Returns
+        -------
+        FloaterTestList
+            Multiple tests
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [FloaterTest.from_dict(data=obj, client=self.client) for obj in data]
-        return FloaterTestList(resources=obj_list, client=None)
+        tests = [FloaterTest(**item, client=self.client) for item in data]
+        return FloaterTestList(resources=tests, client=self.client)
+
+    def get_by_id(self, test_id: str) -> FloaterTest:
+        """
+        Get single floater test by id
+
+        Parameters
+        ----------
+        test_id : str
+            Test identifier
+
+        Returns
+        -------
+        Test
+            Test data
+        """
+        data = self.client.get(self._resource_path, test_id)
+        return FloaterTest(**data, client=self.client)
+
+    def get_by_number(self, test_number: str) -> Union[FloaterTest, None]:
+        """"
+        Get single floater test by number
+
+        Parameters
+        ----------
+        test_number : str
+            Test number
+
+        Returns
+        -------
+        Test
+            Test data
+        """
+        tests = self.get(filter_by=[self.client.filter.floater_test.number == test_number])
+
+        if len(tests.resources) == 0:
+            logging.info(f"Did not find a floater test with name='{test_number}'.")
+            return None
+        elif len(tests.resources) > 1:
+            logging.warning(f"Found multiple floater tests with name='{test_number}'. Returning the first match.")
+            return tests.resources[0]
+        else:
+            return tests.resources[0]
 
 
 class WaveCalibrationAPI(TestAPI):
