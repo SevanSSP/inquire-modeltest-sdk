@@ -5,33 +5,38 @@ import pandas as pd
 from scipy.io import loadmat
 import numpy as np
 import time as timer
-from modeltestSDK.resources import WaveCalibrationList, WindCalibrationList, FloaterTestList, TagList
-from modeltestSDK.api import WaveCalibrationAPI, WindCalibrationAPI, FloaterTestAPI, TimeseriesAPI, TagsAPI
-from modeltestSDK.query import Query
+from modeltestSDK.api import WaveCalibrationAPI, WindCalibrationAPI, FloaterTestAPI, TimeseriesAPI
 from modeltestSDK import Client
 
 
-def sintef_matlab_import(resource: Union[WaveCalibrationList, WindCalibrationList, FloaterTestList],
-                         client_test_object: Union[WaveCalibrationAPI, WindCalibrationAPI, FloaterTestAPI],
+def sintef_matlab_import(client_test_object: Union[WaveCalibrationAPI, WindCalibrationAPI, FloaterTestAPI],
                          client_ts_object: TimeseriesAPI,
                          campaign_id: str, read_only: bool, default_start_time: float, default_end_time: float,
                          data_folder: str, df_test: pd.DataFrame, df_sensor: pd.DataFrame, required_keys: List[str],
                          default_date: datetime.datetime, sensor_huid_mapper: dict,
                          wave_calibration_huid_mapper: dict = None, wind_calibration_huid_mapper: dict = None,
-                         floater_configs_huid_mapper: dict = None, secondary_prefix: str = None):
+                         floater_configs_huid_mapper: dict = None, secondary_prefix: str = None,
+                         secondary_duplicates: list = (),
+                         cals_from_floater_test: list = []):
     huid_mapper = dict()
     for _, test_data in df_test.iterrows():
 
-        if 'wave HUID' in test_data and type(test_data['wave HUID']) is not str \
-                and not np.isnan(test_data['wave HUID']) and wave_calibration_huid_mapper is not None:
-            test_data['wave_id'] = wave_calibration_huid_mapper[test_data['wave HUID']]
+        if 'wave HUID' in test_data and wave_calibration_huid_mapper is not None:
+            if isinstance(test_data['wave HUID'], float) and np.isnan(test_data['wave HUID']):
+                test_data['wave_id'] = None
+            else:
+                test_data['wave_id'] = wave_calibration_huid_mapper[test_data['wave HUID']]
         else:
             test_data['wave_id'] = None
-        if 'wind HUID' in test_data and type(test_data['wind HUID']) is not str \
-                and not np.isnan(test_data['wind HUID']) and wind_calibration_huid_mapper is not None:
-            test_data['wind_id'] = wind_calibration_huid_mapper[test_data['wind HUID']]
+
+        if 'wind HUID' in test_data and wind_calibration_huid_mapper is not None:
+            if isinstance(test_data['wind HUID'], float) and np.isnan(test_data['wind HUID']):
+                test_data['wind_id'] = None
+            else:
+                test_data['wind_id'] = wind_calibration_huid_mapper[test_data['wind HUID']]
         else:
             test_data['wind_id'] = None
+
         if 'floater config HUID' in test_data and floater_configs_huid_mapper is not None:
             test_data['floaterconfig_id'] = floater_configs_huid_mapper[test_data['floater config HUID']]
 
@@ -41,19 +46,21 @@ def sintef_matlab_import(resource: Union[WaveCalibrationList, WindCalibrationLis
             ts_data = loadmat(os.path.join(data_folder, filename))
         except (FileNotFoundError, TypeError) as e:
             test_data_input = {key: test_data[key] for key in required_keys}
+            if 'derive from floater test' in test_data and test_data['derive from floater test'] is True:
+                cals_from_floater_test.append(test_data['HUID'])
+            else:
+                test_data_input['description'] = test_data['description'] + ' Note: timeseries not available'
 
-            test_data_input['description'] = test_data['description'] + ' Note: timeseries not available'
             test_data_input['test_date'] = default_date
 
-            resource.append(
-                client_test_object.create(**test_data_input,
-                                          campaign_id=campaign_id,
-                                          read_only=read_only)
-            )
-            huid_mapper[test_data['HUID']] = test_id = resource[-1].id
-            if e is FileNotFoundError:
+            created_test = client_test_object.create(**test_data_input,
+                                                     campaign_id=campaign_id,
+                                                     read_only=read_only)
+
+            huid_mapper[test_data['HUID']] = test_id = created_test.id
+            if isinstance(e, FileNotFoundError):
                 print(f"Test {test_data['number']} not found in folder {data_folder}. Creating empty test.")
-            elif e is TypeError:
+            elif isinstance(e, TypeError):
                 print(
                     f"Test {test_data['number']} corrupted in folder {data_folder}. Creating empty test.")
             continue
@@ -65,14 +72,13 @@ def sintef_matlab_import(resource: Union[WaveCalibrationList, WindCalibrationLis
                                                                 '%Y-%m-%d %H:%M').isoformat()
         test_data_input = {key: test_data[key] for key in required_keys}
 
-        resource.append(
-            client_test_object.create(**test_data_input,
-                                      campaign_id=campaign_id,
-                                      read_only=read_only)
-        )
-        huid_mapper[test_data['HUID']] = test_id = resource[-1].id
+        created_test = client_test_object.create(**test_data_input,
+                                                 campaign_id=campaign_id,
+                                                 read_only=read_only)
 
-        mat_to_ts(ts_data=ts_data, test_id=test_id, test_number=test_data['number'], df_sensor=df_sensor,
+        huid_mapper[test_data['HUID']] = test_id = created_test.id
+
+        mat_to_ts(ts_data=ts_data, test_id=test_id, df_sensor=df_sensor,
                   sensor_huid_mapper=sensor_huid_mapper,
                   client_ts_object=client_ts_object, default_start_time=default_start_time,
                   default_end_time=default_end_time, read_only=read_only)
@@ -81,7 +87,14 @@ def sintef_matlab_import(resource: Union[WaveCalibrationList, WindCalibrationLis
             filename = secondary_prefix + str(test_data['number'])
             try:
                 secondary_ts_data = loadmat(os.path.join(data_folder, filename))
-                mat_to_ts(ts_data=secondary_ts_data, test_id=test_id, test_number=test_data['number'],
+                for duplicate in secondary_duplicates:
+                    try:
+                        secondary_ts_data.pop(duplicate)
+                    except KeyError:
+                        print(f"failed to pop {duplicate} from secondary input "
+                              f"{filename}. Continuing...")
+
+                mat_to_ts(ts_data=secondary_ts_data, test_id=test_id,
                           df_sensor=df_sensor,
                           sensor_huid_mapper=sensor_huid_mapper, client_ts_object=client_ts_object,
                           default_start_time=default_start_time, default_end_time=default_end_time, read_only=read_only)
@@ -89,10 +102,22 @@ def sintef_matlab_import(resource: Union[WaveCalibrationList, WindCalibrationLis
                 print(f"Secondary file {secondary_prefix}{test_data['number']} not found in folder {data_folder}. "
                       f"No additional timeseries created")
 
-    return huid_mapper
+        if 'wave HUID' in test_data and test_data['wave_id'] in cals_from_floater_test:
+            cals_from_floater_test.pop(test_data['wave_id'])
+
+            cal_ts_data = {'WAVE_1': ts_data['WAVE_1_CAL'],
+                           'WAVE_2': ts_data['WAVE_2_CAL'],
+                           'WAVE_3': ts_data['WAVE_3_CAL']}
+
+            mat_to_ts(ts_data=cal_ts_data, test_id=wave_calibration_huid_mapper[test_data['wave_id']],
+                      df_sensor=df_sensor,
+                      sensor_huid_mapper=sensor_huid_mapper, client_ts_object=client_ts_object,
+                      default_start_time=default_start_time, default_end_time=default_end_time, read_only=read_only)
+
+    return huid_mapper, cals_from_floater_test
 
 
-def mat_to_ts(ts_data: dict, test_id: str, test_number: str, df_sensor: pd.DataFrame,
+def mat_to_ts(ts_data: dict, test_id: str, df_sensor: pd.DataFrame,
               sensor_huid_mapper: dict, client_ts_object: TimeseriesAPI,
               default_start_time: float, default_end_time: float, read_only: bool):
     time = ts_data['Time'][0].tolist()
@@ -127,13 +152,13 @@ def mat_to_ts(ts_data: dict, test_id: str, test_number: str, df_sensor: pd.DataF
         body = {'data': {'time': time,
                          'value': value}}
         tic = timer.perf_counter()
-        client_ts_object.post_data_points(ts.id, form_body=body)
+        # client_ts_object.post_data_points(ts.id, form_body=body)
         toc = timer.perf_counter()
         print(
-            f"Posting timeseries for sensor {key} in test {test_number} took {toc - tic:0.4f}s")
+            f"Posting timeseries for sensor {key} in test {ts_data['test_num'][0][0]} took {toc - tic:0.4f}s")
 
 
-def apply_sensor_tag(tag_list: TagList, client_tag_object: TagsAPI, sensor_id: str,
+def apply_sensor_tag(client: Client, sensor_id: str,
                      sensor_tag_input: str, df_tag: pd.DataFrame, read_only: bool):
     if type(sensor_tag_input) is not str and np.isnan(sensor_tag_input):
         pass
@@ -141,52 +166,49 @@ def apply_sensor_tag(tag_list: TagList, client_tag_object: TagsAPI, sensor_id: s
         for tag in [tg.strip() for tg in sensor_tag_input.split(',')]:
             tag_input = df_tag[df_tag['HUID'] == tag].squeeze()
             if tag_input.size != 0:
-                tag_list.resources.append(
-                    client_tag_object.create(name=tag_input['name'],
-                                             comment=tag_input['comment'],
-                                             sensor_id=sensor_id,
-                                             read_only=read_only)
-                )
+                client.tag.create(name=tag_input['name'],
+                                  comment=tag_input['comment'],
+                                  sensor_id=sensor_id,
+                                  read_only=read_only)
+
             else:
                 print(f'No tag HUID {tag} found. Skipping tag creation')
 
 
-def add_ts_tags(tag_list: TagList, client_tag_object: TagsAPI, df_timeseries_tag: pd.DataFrame, df_tag: pd.DataFrame,
-                ts_client: TimeseriesAPI, filter: Query, test_mapper: dict, sensor_mapper: dict,
+def add_ts_tags(client: Client, df_timeseries_tag: pd.DataFrame, df_tag: pd.DataFrame,
+                test_mapper: dict, sensor_mapper: dict,
                 read_only: bool):
     for _, ts_tag_input in df_timeseries_tag.iterrows():
 
-        tag_input = df_tag[df_tag['HUID'] == ts_tag_input['Tag HUID']].squeeze()
+        tag_input = df_tag[df_tag['HUID'] == ts_tag_input['tag HUID']].squeeze()
         if tag_input.size == 0:
-            print(f"Tag HUID {ts_tag_input['Tag HUID']} not found in tag list. Skipping record")
+            print(f"Tag HUID {ts_tag_input['tag HUID']} not found in tag list. Skipping record")
             continue
 
         try:
-            sensor_id = sensor_mapper[ts_tag_input['Sensor HUID']]
+            sensor_id = sensor_mapper[ts_tag_input['sensor HUID']]
         except KeyError:
-            print(f"Sensor id for HUID {ts_tag_input['Sensor HUID']} not found in tag list. Skipping record")
+            print(f"Sensor id for HUID {ts_tag_input['sensor HUID']} not found in tag list. Skipping record")
             continue
 
         try:
-            test_id = test_mapper[ts_tag_input['Test HUID']]
+            test_id = test_mapper[ts_tag_input['test HUID']]
         except KeyError:
-            print(f"Test id for HUID {ts_tag_input['Test HUID']} not found in test list. Skipping record")
+            print(f"Test id for HUID {ts_tag_input['test HUID']} not found in test list. Skipping record")
             continue
 
         try:
-            ts_id = ts_client.get_all(filter_by=[filter.timeseries.sensor_id == sensor_id,
-                                                 filter.timeseries.test_id == test_id])[0].id
+            ts_id = client.timeseries.get_all(filter_by=[client.filter.timeseries.sensor_id == sensor_id,
+                                                         client.filter.timeseries.test_id == test_id])[0].id
         except IndexError:
-            print(f"Timeseries for sensor HUID {ts_tag_input['Sensor HUID']} and test HUID {ts_tag_input['Test HUID']} "
+            print(f"Timeseries for sensor HUID {ts_tag_input['sensor HUID']} and test HUID {ts_tag_input['test HUID']} "
                   f"not found in test list. Skipping record")
             continue
 
-        tag_list.resources.append(
-            client_tag_object.create(name=tag_input['name'],
-                                     comment=tag_input['comment'],
-                                     timeseries_id=ts_id,
-                                     read_only=read_only)
-        )
+        client.tag.create(name=tag_input['name'],
+                          comment=tag_input['comment'],
+                          timeseries_id=ts_id,
+                          read_only=read_only)
 
 
 def add_derived_sensor_timeseries(client: Client, df_derived_sensor: pd.DataFrame, sensor_huid_mapper: dict,
@@ -272,14 +294,14 @@ def add_derived_sensor_timeseries(client: Client, df_derived_sensor: pd.DataFram
                 body = {'data': {'time': time,
                                  'value': list(value)}}
                 tic = timer.perf_counter()
-                client.timeseries.post_data_points(ts.id, form_body=body)
+                # client.timeseries.post_data_points(ts.id, form_body=body)
                 toc = timer.perf_counter()
                 print(
                     f"Posting derived timeseries for sensor {derived_sensor['HUID']} "
                     f"in test {test_huid} took {toc - tic:0.4f}s")
 
 
-def add_test_tags(tag_list: TagList, client_tag_object: TagsAPI, df_tag: pd.DataFrame,
+def add_test_tags(client: Client, df_tag: pd.DataFrame,
                   df_tests: List[pd.DataFrame], test_mapper: dict, read_only: bool):
     for df_test in df_tests:
         for _, test_data in df_test.iterrows():
@@ -302,9 +324,134 @@ def add_test_tags(tag_list: TagList, client_tag_object: TagsAPI, df_tag: pd.Data
                             f"Test id for HUID {test_huid} not found in tag list. Skipping record")
                         continue
 
-                    tag_list.resources.append(
-                        client_tag_object.create(name=tag_input['name'],
-                                                 comment=tag_input['comment'],
-                                                 test_id=test_id,
-                                                 read_only=read_only)
-                    )
+                    client.tag.create(name=tag_input['name'],
+                                      comment=tag_input['comment'],
+                                      test_id=test_id,
+                                      read_only=read_only)
+
+
+def import_based_on_xls(client: Client, xls_loc: str, data_folder: str):
+    df_campaign = pd.read_excel(xls_loc, sheet_name='Campaign', skiprows=2)
+    df_sensor = pd.read_excel(xls_loc, sheet_name='Sensor', skiprows=2, converters={'HUID': str},
+                              true_values="TRUE", false_values="FALSE")
+    df_derived_sensor = pd.read_excel(xls_loc, sheet_name='DerivedSensor', skiprows=2,
+                                      converters={'HUID': str},
+                                      true_values="TRUE", false_values="FALSE")
+    df_floater_config = pd.read_excel(xls_loc, sheet_name='FloaterConfig', skiprows=2,
+                                      converters={'HUID': str})
+    df_wave_calibration = pd.read_excel(xls_loc, sheet_name='WaveCal', skiprows=2,
+                                        converters={'derive from floater test': bool, 'HUID': str},
+                                        true_values="TRUE", false_values="FALSE")
+    df_wind_calibration = pd.read_excel(xls_loc, sheet_name='WindCal', skiprows=2,
+                                        converters={'HUID': str})
+    df_floater_test = pd.read_excel(xls_loc, sheet_name='FloaterTest', skiprows=2,
+                                    converters={'HUID': str, 'wave HUID': str,
+                                                'wind HUID': str, 'floater config HUID': str})
+    df_tag = pd.read_excel(xls_loc, sheet_name='Tag', skiprows=2, converters={'HUID': str})
+    df_timeseries_tag = pd.read_excel(xls_loc, sheet_name='Tag TS', skiprows=2,
+                                      converters={'test HUID': str, 'sensor HUID': str, 'tag HUID': str})
+
+    restrict_access = True
+
+    campaign = client.campaign.create(name=df_campaign['name'][0],
+                                      description=df_campaign['description'][0],
+                                      location=df_campaign['location'][0],
+                                      date=datetime.datetime(year=df_campaign['campaign_date'][0].year,
+                                                             month=df_campaign['campaign_date'][0].month,
+                                                             day=1).isoformat(),
+                                      scale_factor=df_campaign['scale_factor'][0],
+                                      water_depth=df_campaign['water_depth'][0],
+                                      read_only=restrict_access)
+
+    sensor_huid_mapper = dict()
+
+    for _, sensor in df_sensor.iterrows():
+        sensor_input = {key: sensor[key] for key in ['name', 'description', 'unit', 'kind', 'source', 'x', 'y', 'z',
+                                                     'position_reference', 'position_heading_lock',
+                                                     'position_draft_lock',
+                                                     'positive_direction_definition', 'area']}
+
+        created_sensor = client.sensor.create(**sensor_input,
+                                              campaign_id=campaign.id,
+                                              read_only=restrict_access)
+
+        sensor_huid_mapper[sensor['HUID']] = sensor_id = created_sensor.id
+        apply_sensor_tag(client=client, sensor_id=sensor_id,
+                         sensor_tag_input=sensor['tags'], df_tag=df_tag, read_only=restrict_access)
+
+    for _, sensor in df_derived_sensor.iterrows():
+        sensor_input = {key: sensor[key] for key in ['name', 'description', 'unit', 'kind', 'source', 'x', 'y', 'z',
+                                                     'position_reference', 'position_heading_lock',
+                                                     'position_draft_lock',
+                                                     'positive_direction_definition', 'area']}
+
+        created_sensor = client.sensor.create(**sensor_input,
+                                              campaign_id=campaign.id,
+                                              read_only=restrict_access)
+
+        sensor_huid_mapper[sensor['HUID']] = sensor_id = created_sensor.id
+        apply_sensor_tag(client=client, sensor_id=sensor_id,
+                         sensor_tag_input=sensor['tags'], df_tag=df_tag, read_only=restrict_access)
+
+    floater_configs_huid_mapper = dict()
+
+    for index, floater in df_floater_config.iterrows():
+        floater_input = {key: floater[key] for key in ['name', 'description', 'characteristic_length', 'draft']}
+
+        created_floater_config = client.floater_config.create(**floater_input,
+                                                              campaign_id=campaign.id,
+                                                              read_only=restrict_access)
+
+        floater_configs_huid_mapper[floater['HUID']] = created_floater_config.id
+
+    wave_cal_keys = ['number', 'description', 'test_date', 'wave_spectrum', 'wave_height', 'wave_period', 'gamma',
+                     'wave_direction', 'current_velocity', 'current_direction']
+
+    wave_calibration_huid_mapper, cals_from_floater_test = sintef_matlab_import(
+        client_test_object=client.wave_calibration,
+        client_ts_object=client.timeseries, campaign_id=campaign.id,
+        read_only=restrict_access, default_start_time=1419,
+        default_end_time=1419 + 3 * 60 * 60, data_folder=data_folder,
+        df_test=df_wave_calibration, df_sensor=df_sensor,
+        required_keys=wave_cal_keys, default_date=campaign.date,
+        sensor_huid_mapper=sensor_huid_mapper)
+
+    wind_cal_keys = ['number', 'description', 'test_date', 'wind_spectrum', 'wind_velocity', 'zref', 'wind_direction']
+
+    wind_calibration_huid_mapper, _ = sintef_matlab_import(client_test_object=client.wind_calibration,
+                                                           client_ts_object=client.timeseries, campaign_id=campaign.id,
+                                                           read_only=restrict_access, default_start_time=1419,
+                                                           default_end_time=1419 + 3 * 60 * 60, data_folder=data_folder,
+                                                           df_test=df_wind_calibration, df_sensor=df_sensor,
+                                                           required_keys=wind_cal_keys, default_date=campaign.date,
+                                                           sensor_huid_mapper=sensor_huid_mapper)
+
+    floater_test_keys = ['number', 'description', 'test_date', 'category', 'orientation', 'wave_id', 'wind_id',
+                         'floaterconfig_id']
+
+    floater_test_huid_mapper, _ = sintef_matlab_import(client_test_object=client.floater_test,
+                                                       client_ts_object=client.timeseries, campaign_id=campaign.id,
+                                                       read_only=restrict_access, default_start_time=1419,
+                                                       default_end_time=1419 + 3 * 60 * 60, data_folder=data_folder,
+                                                       df_test=df_floater_test, df_sensor=df_sensor,
+                                                       required_keys=floater_test_keys, default_date=campaign.date,
+                                                       sensor_huid_mapper=sensor_huid_mapper,
+                                                       wave_calibration_huid_mapper=wave_calibration_huid_mapper,
+                                                       wind_calibration_huid_mapper=wind_calibration_huid_mapper,
+                                                       floater_configs_huid_mapper=floater_configs_huid_mapper)
+
+    add_derived_sensor_timeseries(client=client, df_derived_sensor=df_derived_sensor,
+                                  sensor_huid_mapper=sensor_huid_mapper,
+                                  test_mapper={**wave_calibration_huid_mapper, **wind_calibration_huid_mapper,
+                                               **floater_test_huid_mapper})
+
+    add_test_tags(client=client, df_tag=df_tag,
+                  df_tests=[df_wave_calibration, df_wind_calibration, df_floater_test],
+                  test_mapper={**wave_calibration_huid_mapper, **wind_calibration_huid_mapper,
+                               **floater_test_huid_mapper},
+                  read_only=restrict_access)
+
+    add_ts_tags(client=client, df_timeseries_tag=df_timeseries_tag, df_tag=df_tag,
+                test_mapper={**wave_calibration_huid_mapper, **wind_calibration_huid_mapper,
+                             **floater_test_huid_mapper},
+                sensor_mapper=sensor_huid_mapper, read_only=restrict_access)

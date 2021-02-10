@@ -9,7 +9,7 @@ from pipeline.utils import import_based_on_xls
 
 client = Client()
 
-xls_loc = "Pipeline_Input_Luva_I.xls"
+xls_loc = "Pipeline_Input_Luva_II.xls"
 data_folder = r"C:\MTDBimport\Luva"
 
 import_based_on_xls(client=client, xls_loc=xls_loc, data_folder=data_folder)

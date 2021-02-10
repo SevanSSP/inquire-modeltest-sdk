@@ -1,3 +1,10 @@
+import os
+
+os.environ["INQUIRE_MODELTEST_API_USER"] = "ebg"
+os.environ["INQUIRE_MODELTEST_API_PASSWORD"] = "pass"
+os.environ["INQUIRE_MODELTEST_API_HOST"] = r"http://127.0.0.1:8000"
+
+
 from modeltestSDK import Client
 
 client = Client()
