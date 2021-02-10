@@ -167,10 +167,10 @@ class Sensor(BaseResource):
         self.x = x
         self.y = y
         self.z = z
-        self.position_reference = position_reference,
-        self.position_heading_lock = position_heading_lock,
-        self.position_draft_lock = position_draft_lock,
-        self.positive_direction_definition = positive_direction_definition,
+        self.position_reference = position_reference
+        self.position_heading_lock = position_heading_lock
+        self.position_draft_lock = position_draft_lock
+        self.positive_direction_definition = positive_direction_definition
         self.campaign_id = campaign_id
         self._client = client
 
