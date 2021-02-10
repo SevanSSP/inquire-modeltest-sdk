@@ -64,7 +64,7 @@ class CampaignAPI(BaseAPI):
         Returns
         -------
         Campaign
-            Campaign data model
+            Campaign data
         """
         body = dict(
             name=name,
@@ -117,7 +117,7 @@ class CampaignAPI(BaseAPI):
         Returns
         -------
         Campaign
-            Campaign data model
+            Campaign data
         """
         data = self.client.get(self._resource_path, campaign_id)
         return Campaign(**data, client=self.client)
@@ -134,7 +134,7 @@ class CampaignAPI(BaseAPI):
         Returns
         -------
         Campaign
-            Campaign data model
+            Campaign data
         """
         campaigns = self.get(filter_by=[self.client.filter.campaign.name == name])
 
@@ -149,20 +149,74 @@ class CampaignAPI(BaseAPI):
 
 
 class TestAPI(BaseAPI):
+    def get(self, filter_by: list = None, sort_by: list = None) -> TestList:
+        """
+        Get multiple tests
 
-    def get(self, test_id: str) -> Test:
-        data = self.client.get(self._resource_path, test_id)
-        return Test.from_dict(data=data, client=self.client)
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all tests e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
 
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> TestList:
+        Returns
+        -------
+        TestList
+            Multiple tests
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [Test.from_dict(data=obj, client=self.client) for obj in data]
-        return TestList(resources=obj_list, client=None)
+        tests = [Test(**item, client=self.client) for item in data]
+        return TestList(resources=tests, client=self.client)
+
+    def get_by_id(self, test_id: str) -> Test:
+        """
+        Get single campaign by id
+
+        Parameters
+        ----------
+        test_id : str
+            Campaign identifier
+
+        Returns
+        -------
+        Test
+            Test data
+        """
+        data = self.client.get(self._resource_path, test_id)
+        return Test(**data, client=self.client)
+
+    def get_by_number(self, test_number: str) -> Union[Test, None]:
+        """"
+        Get single test by number
+
+        Parameters
+        ----------
+        test_number : str
+            Test number
+
+        Returns
+        -------
+        Test
+            Test data
+        """
+        tests = self.get(filter_by=[self.client.filter.test.number == test_number])
+
+        if len(tests.resources) == 0:
+            logging.info(f"Did not find a campaign with name='{test_number}'.")
+            return None
+        elif len(tests.resources) > 1:
+            logging.warning(f"Found multiple campaigns with name='{test_number}'. Returning the first match.")
+            return tests.resources[0]
+        else:
+            return tests.resources[0]
 
 
 class FloaterTestAPI(TestAPI):
