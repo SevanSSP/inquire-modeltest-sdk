@@ -1,7 +1,9 @@
 """
 API methods
 """
+import logging
 import warnings
+from typing import Union
 from .utils import format_class_name
 from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
                         FloaterTest, FloaterTestList, WaveCalibration, WaveCalibrationList, WindCalibration,
@@ -37,43 +39,113 @@ class BaseAPI:
 
 
 class CampaignAPI(BaseAPI):
+    def create(self, name: str, description: str, location: str, date: str, scale_factor: float, water_depth: float,
+               read_only: bool = False) -> Campaign:
+        """
+        Create a campaign
 
-    def create(self, name: str, description: str, location: str, date: any,
-               scale_factor: float, water_depth: float, read_only: bool = False) -> Campaign:
-        body = dict(name=name, description=description, location=location, date=date,
-                    scale_factor=scale_factor, water_depth=water_depth, read_only=read_only)
+        Parameters
+        ----------
+        name : str
+            Campaign name
+        description : str
+            A description
+        location : str
+            Location for the campaign
+        date : str
+            Date time string
+        scale_factor : float
+            Model scale
+        water_depth : float
+            Water depth (m)
+        read_only : bool, optional
+            Make the this campaign read only.
+
+        Returns
+        -------
+        Campaign
+            Campaign data model
+        """
+        body = dict(
+            name=name,
+            description=description,
+            location=location,
+            date=date,
+            scale_factor=scale_factor,
+            water_depth=water_depth,
+            read_only=read_only
+        )
         data = self.client.post(self._resource_path, body=body)
-        return Campaign.from_dict(data=data, client=self.client)
+        return Campaign(**data, client=self.client)
 
-    def get(self, campaign_id: str) -> Campaign:
-        data = self.client.get(self._resource_path, campaign_id)
-        return Campaign.from_dict(data=data, client=self.client)
+    def get(self, filter_by: list = None, sort_by: list = None) -> CampaignList:
+        """
+        Get multiple campaigns
 
-    def get_by_name(self, name: str) -> Campaign:
-        response = self.get_all(filter_by=[self.client.filter.campaign.name == name])
-        if response:
-            if len(response) != 1:
-                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
-                              f" first was returned")
-                return response[0]
-            else:
-                return response[0]
-        else:
-            raise Exception(f"Could not find any object with name {name}")
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all campaigns e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
 
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> CampaignList:
+        Returns
+        -------
+        CampaignList
+            Multiple campaigns
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
-        return CampaignList(resources=obj_list, client=None)
+        campaigns = [Campaign(**item, client=self.client) for item in data]
+        return CampaignList(resources=campaigns, client=self.client)
 
-    def patch(self, body: dict, campaign_id: str) -> Campaign:
-        data = self.client.patch(self._resource_path, endpoint=f"{campaign_id}", body=body)
-        return Campaign.from_dict(data=data, client=self.client)
+    def get_by_id(self, campaign_id: str) -> Campaign:
+        """
+        Get single campaign by id
+
+        Parameters
+        ----------
+        campaign_id : str
+            Campaign identifier
+
+        Returns
+        -------
+        Campaign
+            Campaign data model
+        """
+        data = self.client.get(self._resource_path, campaign_id)
+        return Campaign(**data, client=self.client)
+
+    def get_by_name(self, name: str) -> Union[Campaign, None]:
+        """"
+        Get single campaign by name
+
+        Parameters
+        ----------
+        name : str
+            Campaign name
+
+        Returns
+        -------
+        Campaign
+            Campaign data model
+        """
+        campaigns = self.get(filter_by=[self.client.filter.campaign.name == name])
+
+        if len(campaigns.resources) == 0:
+            logging.info(f"Did not find a campaign with name='{name}'.")
+            return None
+        elif len(campaigns.resources) > 1:
+            logging.warning(f"Found multiple campaigns with name='{name}'. Returning the first match.")
+            return campaigns.resources[0]
+        else:
+            return campaigns.resources[0]
 
 
 class TestAPI(BaseAPI):
