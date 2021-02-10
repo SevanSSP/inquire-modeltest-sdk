@@ -342,84 +342,253 @@ class FloaterTestAPI(TestAPI):
 
 
 class WaveCalibrationAPI(TestAPI):
-
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
-               wave_calibration_id: str = None, read_only: bool = False) -> WaveCalibration:
-        body = dict(number=number, description=description, type="Wave Calibration", test_date=test_date,
-                    campaign_id=campaign_id,
-                    wave_spectrum=wave_spectrum, wave_period=wave_period, wave_height=wave_height,
-                    gamma=gamma, wave_direction=wave_direction, current_velocity=current_velocity,
-                    current_direction=current_direction, id=wave_calibration_id, read_only=read_only)
+               read_only: bool = False) -> WaveCalibration:
+        """
+        Create wave calibration test
+
+        Parameters
+        ----------
+        number : str
+            Test number
+        description : str
+            A description
+        test_date : str
+            Date of testing
+        campaign_id : str
+            Identifier of parent campaign
+        wave_spectrum : str
+            Wave spectrum type
+        wave_height : float
+            Wave height (m)
+        wave_period : float
+            Wave period (s)
+        gamma : float
+            Wave spectrum peak enhancement factor (-)
+        wave_direction : float
+            Wave direction (degrees)
+        current_velocity : float
+            Current velocity (m/s)
+        current_direction : float
+            Current direction (degrees)
+        read_only : bool, optional
+            Make the test read only
+
+        Returns
+        -------
+        WaveCalibration
+            Test data
+        """
+        body = dict(
+            number=number,
+            description=description,
+            type="Wave Calibration",
+            test_date=test_date,
+            campaign_id=campaign_id,
+            wave_spectrum=wave_spectrum,
+            wave_period=wave_period,
+            wave_height=wave_height,
+            gamma=gamma,
+            wave_direction=wave_direction,
+            current_velocity=current_velocity,
+            current_direction=current_direction,
+            read_only=read_only
+        )
 
         data = self.client.post(self._resource_path, body=body)
-        return WaveCalibration.from_dict(data=data, client=self.client)
+        return WaveCalibration(**data, client=self.client)
 
-    def get(self, wave_calibration_id: str) -> WaveCalibration:
-        data = self.client.get(self._resource_path, wave_calibration_id)
-        return WaveCalibration.from_dict(data=data, client=self.client)
+    def get(self, filter_by: list = None, sort_by: list = None) -> WaveCalibrationList:
+        """
+        Get multiple wave calibration tests
 
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> WaveCalibrationList:
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all tests e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
+
+        Returns
+        -------
+        WaveCalibrationList
+            Multiple tests
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [WaveCalibration.from_dict(data=obj, client=self.client) for obj in data]
-        return WaveCalibrationList(resources=obj_list, client=None)
+        tests = [WaveCalibration(**item, client=self.client) for item in data]
+        return WaveCalibrationList(resources=tests, client=self.client)
 
-    def get_by_test_number(self, test_number: str) -> WaveCalibration:
-        response = self.get_all(filter_by=[self.client.filter.wave_calibration.number == test_number])
-        if response:
-            if len(response) != 1:
-                warnings.warn(f"Searching {self.__class__.__name__} for test number {test_number} returned several objects,"
-                              f" first was returned")
-                return response[0]
-            else:
-                return response[0]
+    def get_by_id(self, test_id: str) -> WaveCalibration:
+        """
+        Get single wave calibration test by id
+
+        Parameters
+        ----------
+        test_id : str
+            Test identifier
+
+        Returns
+        -------
+        Test
+            Test data
+        """
+        data = self.client.get(self._resource_path, test_id)
+        return WaveCalibration(**data, client=self.client)
+
+    def get_by_number(self, test_number: str) -> Union[WaveCalibration, None]:
+        """"
+        Get single wave calibration test by number
+
+        Parameters
+        ----------
+        test_number : str
+            Test number
+
+        Returns
+        -------
+        Test
+            Test data
+        """
+        tests = self.get(filter_by=[self.client.filter.wave_calibration.number == test_number])
+
+        if len(tests.resources) == 0:
+            logging.info(f"Did not find a wave calibration test with name='{test_number}'.")
+            return None
+        elif len(tests.resources) > 1:
+            logging.warning(f"Found multiple wave calibration tests with name='{test_number}'. "
+                            f"Returning the first match.")
+            return tests.resources[0]
         else:
-            raise Exception(f"Could not find any object with name {test_number}")
+            return tests.resources[0]
 
 
 class WindCalibrationAPI(TestAPI):
-
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
-               wind_condition_id: str = None, read_only: bool = False) -> WindCalibration:
-        body = dict(number=number, description=description, test_date=test_date, type="Wind Calibration",
-                    campaign_id=campaign_id, wind_spectrum=wind_spectrum, wind_velocity=wind_velocity, zref=zref,
-                    wind_direction=wind_direction, id=wind_condition_id, read_only=read_only)
+               read_only: bool = False) -> WindCalibration:
+        """
+        Create wind calibration test
+
+        Parameters
+        ----------
+        number : str
+            Test number
+        description : str
+            A description
+        test_date : str
+            Date of testing
+        campaign_id : str
+            Identifier of parent campaign
+        wind_spectrum : str
+            Wind spectrum type
+        wind_velocity : float
+            Wind velocity (m/s)
+        zref : float
+            Vertical reference heigh (m)
+        wind_direction : float
+            Wave direction (degrees)
+        read_only : bool, optional
+            Make the test read only
+
+        Returns
+        -------
+        WindCalibration
+            Wind calibration data
+        """
+        body = dict(
+            number=number,
+            description=description,
+            test_date=test_date,
+            type="Wind Calibration",
+            campaign_id=campaign_id,
+            wind_spectrum=wind_spectrum,
+            wind_velocity=wind_velocity,
+            zref=zref,
+            wind_direction=wind_direction,
+            read_only=read_only
+        )
 
         data = self.client.post(self._resource_path, body=body)
-        return WindCalibration.from_dict(data=data, client=self.client)
+        return WindCalibration(**data, client=self.client)
 
-    def get(self, wind_condition_id: str) -> WindCalibration:
-        data = self.client.get(self._resource_path, wind_condition_id)
-        return WindCalibration.from_dict(data=data, client=self.client)
+    def get(self, filter_by: list = None, sort_by: list = None) -> WindCalibrationList:
+        """
+        Get multiple wind calibration tests
 
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> WindCalibrationList:
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all tests e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
+
+        Returns
+        -------
+        WindCalibrationList
+            Multiple tests
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [WindCalibration.from_dict(data=obj, client=self.client) for obj in data]
-        return WindCalibrationList(resources=obj_list, client=None)
+        tests = [WindCalibration(**item, client=self.client) for item in data]
+        return WindCalibrationList(resources=tests, client=self.client)
 
-    def get_by_test_number(self, test_number: str) -> WindCalibration:
-        response = self.get_all(filter_by=[self.client.filter.wind_calibration.number == test_number])
-        if response:
-            if len(response) != 1:
-                warnings.warn(f"Searching {self.__class__.__name__} for test number {test_number} returned several objects,"
-                              f" first was returned")
-                return response[0]
-            else:
-                return response[0]
+    def get_by_id(self, test_id: str) -> WindCalibration:
+        """
+        Get single wind calibration test by id
+
+        Parameters
+        ----------
+        test_id : str
+            Test identifier
+
+        Returns
+        -------
+        Test
+            Test data
+        """
+        data = self.client.get(self._resource_path, test_id)
+        return WindCalibration(**data, client=self.client)
+
+    def get_by_number(self, test_number: str) -> Union[WindCalibration, None]:
+        """"
+        Get single wind calibration test by number
+
+        Parameters
+        ----------
+        test_number : str
+            Test number
+
+        Returns
+        -------
+        Test
+            Test data
+        """
+        tests = self.get(filter_by=[self.client.filter.wind_calibration.number == test_number])
+
+        if len(tests.resources) == 0:
+            logging.info(f"Did not find a wind calibration test with name='{test_number}'.")
+            return None
+        elif len(tests.resources) > 1:
+            logging.warning(f"Found multiple wind calibration tests with name='{test_number}'. "
+                            f"Returning the first match.")
+            return tests.resources[0]
         else:
-            raise Exception(f"Could not find any object with name {test_number}")
+            return tests.resources[0]
 
 
 class SensorAPI(BaseAPI):
