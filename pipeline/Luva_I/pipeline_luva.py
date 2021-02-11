@@ -12,4 +12,5 @@ client = Client()
 xls_loc = "Pipeline_Input_Luva_I.xls"
 data_folder = r"C:\MTDBimport\Luva"
 
-import_based_on_xls(client=client, xls_loc=xls_loc, data_folder=data_folder)
+import_based_on_xls(client=client, xls_loc=xls_loc, data_folder=data_folder,
+                    default_start_time=1506, default_end_time=1506+3*60*60)

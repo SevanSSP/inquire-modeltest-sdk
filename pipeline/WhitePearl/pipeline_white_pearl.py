@@ -12,4 +12,6 @@ client = Client()
 xls_loc = "Pipeline_Input_White_Pearl.xls"
 data_folder = r"C:\MTDBimport\WhitePearl"
 
-import_based_on_xls(client=client, xls_loc=xls_loc, data_folder=data_folder)
+import_based_on_xls(client=client, xls_loc=xls_loc, data_folder=data_folder,
+                    dateformat='%H:%M %d/%m/%y',
+                    default_start_time=1419, default_end_time=1419+3*60*60)

@@ -13,7 +13,7 @@ def sintef_matlab_import(client_test_object: Union[WaveCalibrationAPI, WindCalib
                          client_ts_object: TimeseriesAPI,
                          campaign_id: str, read_only: bool, default_start_time: float, default_end_time: float,
                          data_folder: str, df_test: pd.DataFrame, df_sensor: pd.DataFrame, required_keys: List[str],
-                         default_date: datetime.datetime, sensor_huid_mapper: dict,
+                         default_date: datetime.datetime, sensor_huid_mapper: dict, dateformat: str = '%Y-%m-%d %H:%M',
                          wave_calibration_huid_mapper: dict = None, wind_calibration_huid_mapper: dict = None,
                          floater_configs_huid_mapper: dict = None, secondary_prefix: str = None,
                          secondary_duplicates: list = (),
@@ -69,7 +69,7 @@ def sintef_matlab_import(client_test_object: Union[WaveCalibrationAPI, WindCalib
             test_data["description"] = ts_data['comment'][0]
         if test_data["test_date"] == '*':
             test_data["test_date"] = datetime.datetime.strptime(str(ts_data['test_date'][0]),
-                                                                '%Y-%m-%d %H:%M').isoformat()
+                                                                dateformat).isoformat()
         test_data_input = {key: test_data[key] for key in required_keys}
 
         created_test = client_test_object.create(**test_data_input,
@@ -102,14 +102,17 @@ def sintef_matlab_import(client_test_object: Union[WaveCalibrationAPI, WindCalib
                 print(f"Secondary file {secondary_prefix}{test_data['number']} not found in folder {data_folder}. "
                       f"No additional timeseries created")
 
-        if 'wave HUID' in test_data and test_data['wave_id'] in cals_from_floater_test:
-            cals_from_floater_test.pop(test_data['wave_id'])
+        if 'wave HUID' in test_data and test_data['wave HUID'] in cals_from_floater_test:
+            cals_from_floater_test.remove(test_data['wave HUID'])
 
             cal_ts_data = {'WAVE_1': ts_data['WAVE_1_CAL'],
                            'WAVE_2': ts_data['WAVE_2_CAL'],
-                           'WAVE_3': ts_data['WAVE_3_CAL']}
+                           'WAVE_3': ts_data['WAVE_3_CAL'],
+                           'Time': ts_data['Time'],
+                           'fs': ts_data['fs'],
+                           'test_num': [[test_data['wave HUID']]]}
 
-            mat_to_ts(ts_data=cal_ts_data, test_id=wave_calibration_huid_mapper[test_data['wave_id']],
+            mat_to_ts(ts_data=cal_ts_data, test_id=wave_calibration_huid_mapper[test_data['wave HUID']],
                       df_sensor=df_sensor,
                       sensor_huid_mapper=sensor_huid_mapper, client_ts_object=client_ts_object,
                       default_start_time=default_start_time, default_end_time=default_end_time, read_only=read_only)
@@ -330,7 +333,8 @@ def add_test_tags(client: Client, df_tag: pd.DataFrame,
                                       read_only=read_only)
 
 
-def import_based_on_xls(client: Client, xls_loc: str, data_folder: str):
+def import_based_on_xls(client: Client, xls_loc: str, data_folder: str,
+                        default_start_time: float, default_end_time: float, dateformat: str = '%Y-%m-%d %H:%M'):
     df_campaign = pd.read_excel(xls_loc, sheet_name='Campaign', skiprows=2)
     df_sensor = pd.read_excel(xls_loc, sheet_name='Sensor', skiprows=2, converters={'HUID': str},
                               true_values="TRUE", false_values="FALSE")
@@ -410,35 +414,40 @@ def import_based_on_xls(client: Client, xls_loc: str, data_folder: str):
     wave_calibration_huid_mapper, cals_from_floater_test = sintef_matlab_import(
         client_test_object=client.wave_calibration,
         client_ts_object=client.timeseries, campaign_id=campaign.id,
-        read_only=restrict_access, default_start_time=1419,
-        default_end_time=1419 + 3 * 60 * 60, data_folder=data_folder,
+        read_only=restrict_access, default_start_time=default_start_time,
+        default_end_time=default_end_time, data_folder=data_folder,
         df_test=df_wave_calibration, df_sensor=df_sensor,
         required_keys=wave_cal_keys, default_date=campaign.date,
-        sensor_huid_mapper=sensor_huid_mapper)
+        sensor_huid_mapper=sensor_huid_mapper,
+        dateformat=dateformat)
 
     wind_cal_keys = ['number', 'description', 'test_date', 'wind_spectrum', 'wind_velocity', 'zref', 'wind_direction']
 
     wind_calibration_huid_mapper, _ = sintef_matlab_import(client_test_object=client.wind_calibration,
                                                            client_ts_object=client.timeseries, campaign_id=campaign.id,
-                                                           read_only=restrict_access, default_start_time=1419,
-                                                           default_end_time=1419 + 3 * 60 * 60, data_folder=data_folder,
+                                                           read_only=restrict_access,
+                                                           default_start_time=default_start_time,
+                                                           default_end_time=default_end_time, data_folder=data_folder,
                                                            df_test=df_wind_calibration, df_sensor=df_sensor,
                                                            required_keys=wind_cal_keys, default_date=campaign.date,
-                                                           sensor_huid_mapper=sensor_huid_mapper)
+                                                           sensor_huid_mapper=sensor_huid_mapper,
+                                                           dateformat=dateformat)
 
     floater_test_keys = ['number', 'description', 'test_date', 'category', 'orientation', 'wave_id', 'wind_id',
                          'floaterconfig_id']
 
     floater_test_huid_mapper, _ = sintef_matlab_import(client_test_object=client.floater_test,
                                                        client_ts_object=client.timeseries, campaign_id=campaign.id,
-                                                       read_only=restrict_access, default_start_time=1419,
-                                                       default_end_time=1419 + 3 * 60 * 60, data_folder=data_folder,
+                                                       read_only=restrict_access, default_start_time=default_start_time,
+                                                       default_end_time=default_end_time, data_folder=data_folder,
                                                        df_test=df_floater_test, df_sensor=df_sensor,
                                                        required_keys=floater_test_keys, default_date=campaign.date,
                                                        sensor_huid_mapper=sensor_huid_mapper,
                                                        wave_calibration_huid_mapper=wave_calibration_huid_mapper,
                                                        wind_calibration_huid_mapper=wind_calibration_huid_mapper,
-                                                       floater_configs_huid_mapper=floater_configs_huid_mapper)
+                                                       floater_configs_huid_mapper=floater_configs_huid_mapper,
+                                                       dateformat=dateformat,
+                                                       cals_from_floater_test=cals_from_floater_test)
 
     add_derived_sensor_timeseries(client=client, df_derived_sensor=df_derived_sensor,
                                   sensor_huid_mapper=sensor_huid_mapper,
