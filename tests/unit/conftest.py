@@ -23,10 +23,14 @@ def new_sensor():
         description="eghj dfj dfgh",
         unit="kg",
         kind="length",
+        source="fantasy",
         x=1.4,
         y=-1.9,
         z=1.0,
-        is_local=True,
+        position_reference='global',
+        positive_direction_definition='onwards,',
+        position_heading_lock=False,
+        position_draft_lock=False,
         campaign_id="rthjkjnfd"
     )
     return sens
@@ -37,6 +41,9 @@ def new_timeseries():
     ts = Timeseries(
         sensor_id="12345678123456781234567812345678",
         test_id="12345678123456781234567812345678",
-        fs=2.5
+        fs=2.5,
+        default_start_time=1,
+        default_end_time=2,
+
     )
     return ts

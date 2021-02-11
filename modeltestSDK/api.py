@@ -27,7 +27,7 @@ class NamedBaseAPI(BaseAPI):
     Only for database items with names. To retrieve id from name
     """
     def get_id(self, name: str) -> str:
-        response = self.client.get(format_class_name(self.__class__.__name__), "", parameters={'name': name})
+        response = self.client.get(format_class_name(self.__class__.__name__), parameters={'name': name})
         if response:
             if len(response) != 1:
                 warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
@@ -43,7 +43,7 @@ class CampaignAPI(NamedBaseAPI):
                scale_factor: float, water_depth: float, read_only: bool = False) -> Campaign:
         body = dict(name=name, description=description, location=location, date=date,
                     scale_factor=scale_factor, water_depth=water_depth, read_only=read_only)
-        data = self.client.post(self._resource_path, body=body)
+        data = self.client.post(resource=self._resource_path, body=body)
         return Campaign.from_dict(data=data, client=self.client)
 
     def get(self, campaign_id: str) -> Campaign:
@@ -68,7 +68,7 @@ class CampaignAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Campaign.from_dict(data=obj, client=self.client) for obj in data]
         return CampaignList(resources=obj_list, client=None)
 
@@ -89,7 +89,7 @@ class TestAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Test.from_dict(data=obj, client=self.client) for obj in data]
         return TestList(resources=obj_list, client=None)
 
@@ -97,11 +97,11 @@ class TestAPI(NamedBaseAPI):
 class FloaterTestAPI(TestAPI):
 
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               floater_config_id: str = None, wave_id: str = None, wind_id: str = None,
+               floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
         body = dict(number=number, description=description, type="Floater Test", test_date=test_date,
                     campaign_id=campaign_id, category=category, orientation=orientation, wave_id=wave_id,
-                    wind_id=wind_id, floaterconfig_id=floater_config_id, read_only=read_only)
+                    wind_id=wind_id, floaterconfig_id=floaterconfig_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return FloaterTest.from_dict(data=data, client=self.client)
 
@@ -127,7 +127,7 @@ class FloaterTestAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [FloaterTest.from_dict(data=obj, client=self.client) for obj in data]
         return FloaterTestList(resources=obj_list, client=None)
 
@@ -137,12 +137,12 @@ class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
-               wave_calibration_id: str = None, read_only: bool = False) -> WaveCalibration:
+               id: str = None, read_only: bool = False) -> WaveCalibration:
         body = dict(number=number, description=description, type="Wave Calibration", test_date=test_date,
                     campaign_id=campaign_id,
                     wave_spectrum=wave_spectrum, wave_period=wave_period, wave_height=wave_height,
                     gamma=gamma, wave_direction=wave_direction, current_velocity=current_velocity,
-                    current_direction=current_direction, id=wave_calibration_id, read_only=read_only)
+                    current_direction=current_direction, id=id, read_only=read_only)
 
         data = self.client.post(self._resource_path, body=body)
         return WaveCalibration.from_dict(data=data, client=self.client)
@@ -157,7 +157,7 @@ class WaveCalibrationAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [WaveCalibration.from_dict(data=obj, client=self.client) for obj in data]
         return WaveCalibrationList(resources=obj_list, client=None)
 
@@ -178,10 +178,10 @@ class WindCalibrationAPI(TestAPI):
 
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
-               wind_condition_id: str = None, read_only: bool = False) -> WindCalibration:
+               id: str = None, read_only: bool = False) -> WindCalibration:
         body = dict(number=number, description=description, test_date=test_date, type="Wind Calibration",
                     campaign_id=campaign_id, wind_spectrum=wind_spectrum, wind_velocity=wind_velocity, zref=zref,
-                    wind_direction=wind_direction, id=wind_condition_id, read_only=read_only)
+                    wind_direction=wind_direction, id=id, read_only=read_only)
 
         data = self.client.post(self._resource_path, body=body)
         return WindCalibration.from_dict(data=data, client=self.client)
@@ -196,7 +196,7 @@ class WindCalibrationAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [WindCalibration.from_dict(data=obj, client=self.client) for obj in data]
         return WindCalibrationList(resources=obj_list, client=None)
 
@@ -215,11 +215,15 @@ class WindCalibrationAPI(TestAPI):
 
 class SensorAPI(NamedBaseAPI):
 
-    def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-               is_local: bool, campaign_id: str, area: float = None,
+    def create(self, name: str, description: str, unit: str, kind: str, source: str, x: float, y: float, z: float,
+               position_reference: str, position_heading_lock: bool, position_draft_lock: bool,
+               positive_direction_definition: str, campaign_id: str, area: float = None,
                read_only: bool = False) -> Sensor:
-        body = dict(name=name, description=description, unit=unit, kind=kind, area=area, x=x,
-                    y=y, z=z, is_local=is_local, campaign_id=campaign_id, read_only=read_only)
+        body = dict(name=name, description=description, unit=unit, kind=kind, source=source, area=area, x=x,
+                    y=y, z=z, position_reference=position_reference, position_heading_lock=position_heading_lock,
+                    position_draft_lock=position_draft_lock,
+                    positive_direction_definition=positive_direction_definition,
+                    campaign_id=campaign_id, read_only=read_only)
         data = self.client.post(self._resource_path, body=body)
         return Sensor.from_dict(data=data, client=self.client)
 
@@ -248,7 +252,7 @@ class SensorAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Sensor.from_dict(data=obj, client=self.client) for obj in data]
         return SensorList(resources=obj_list, client=None)
 
@@ -276,7 +280,7 @@ class TimeseriesAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
         return TimeseriesList(resources=obj_list, client=None)
 
@@ -284,7 +288,7 @@ class TimeseriesAPI(BaseAPI):
         return self.client.patch(resource=self._resource_path, endpoint=f"{ts_id}", body=body)
 
     def get_data_points(self, ts_id: str) -> dict:
-        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data/?all_data=true")
+        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data?all_data=true")
         return data['data']
 
     def post_data_points(self, ts_id, body=None, form_body=None):
@@ -293,22 +297,22 @@ class TimeseriesAPI(BaseAPI):
             for p in body:
                 form_body['data']['time'].append(p['time'])
                 form_body['data']['value'].append(p['value'])
-        self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data/", body=form_body)
+        self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=form_body)
 
     def get_standard_deviation(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics")
         return data['std']
 
     def get_max_value(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics")
         return data['max']
 
     def get_min_value(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics")
         return data['min']
 
     def get_mean(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/")
+        data = self.client.get(self._resource_path, f"{ts_id}/statistics")
         return data['mean']
 
 
@@ -330,7 +334,7 @@ class TagsAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [Tag.from_dict(data=obj, client=self.client) for obj in data]
         return TagList(resources=obj_list, client=None)
 
@@ -365,7 +369,7 @@ class FloaterConfigAPI(NamedBaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         obj_list = [FloaterConfig.from_dict(data=obj, client=self.client) for obj in data]
         return FloaterConfigList(resources=obj_list, client=None)
 

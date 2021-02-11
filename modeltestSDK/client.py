@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 import logging
+import numpy as np
 from datetime import datetime
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
@@ -27,6 +28,7 @@ class Client:
 
         INQUIRE_MODELTEST_API_USER - Your username
         INQUIRE_MODELTEST_API_PASSWORD - Your password
+        INQUIRE_MODELTEST_API_HOST - Model test API host
 
     """
     def __init__(self, config=Config):
@@ -119,14 +121,15 @@ class Client:
         Notes
         -----
         The full request url is like
-           'https://{host}/{base_url}/{version}/{resource}/{endpoint}'
+           '{host}/{base_url}/{version}/{resource}/{endpoint}'
 
         """
-        url = f"https://{self.config.host}/{self.config.base_url}/{self.config.version}/"
+        url = f"{self.config.host}/{self.config.base_url}/{self.config.version}/"
         url += "/".join([p for p in [resource, endpoint] if p is not None])
         return url
 
-    def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
+    def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None,
+                    body: dict = None):
         """
         Carry out request.
 
@@ -165,9 +168,11 @@ class Client:
         }
         # do request (also encodes parameters)
         try:
-            r = requests.request(method, url, params=parameters, data=body, headers=headers)
+            r = requests.request(method, url, params=parameters, json=body, headers=headers)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
+            logging.error("Request body:  " + str(body))
+            logging.error("Request response: " + r.text)
             raise e
         except requests.exceptions.ConnectionError as e:
             raise e
@@ -177,6 +182,35 @@ class Client:
             raise e
         else:
             return r.json()
+
+    def _ensure_serializable(self, body: dict):
+        """
+        change data types not natively supported by json encoder
+
+        Parameters
+        ----------
+        body : dict
+            Request body.
+
+        Returns
+        -------
+        dict
+            Request body with json encoder supported data types
+        """
+
+        serializable_body = dict()
+        for key, value in body.items():
+            if type(value) == np.int64 or type(value) == np.int32:
+                value = int(value)
+            elif type(value) == np.float64 or type(value) == np.float32:
+                value = float(value)
+
+            if (type(value) == float or type(value) == int) and np.isnan(value):
+                value = None
+
+            serializable_body[key] = value
+
+        return serializable_body
 
     def get(self, resource: str = None, endpoint: str = None, parameters: dict = None):
         """
@@ -219,6 +253,8 @@ class Client:
         dict
             Request response
         """
+        body = self._ensure_serializable(body)
+
         return self._do_request("POST", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
 
     def patch(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):

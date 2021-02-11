@@ -18,8 +18,8 @@ def main():
     tic = time.perf_counter()
 
     # Specify path to folder where campaign is locally stored
-    # campaign_dir = "C:/Users/jen.SEVAN/Documents/505 Stockman FPU_2008"
-    campaign_dir = r"C:/Users/ebg/Documents/White_Pearl_MT/505 Stockman FPU_2008"
+    campaign_dir = "C:/Users/jen.SEVAN/Documents/505 Stockman FPU_2008"
+    #campaign_dir = r"C:/Users/ebg/Documents/White_Pearl_MT/505 Stockman FPU_2008"
 
     client = Client()
     # Create initial campaign in database
