@@ -162,7 +162,7 @@ class Client:
         headers = {
             "Authorization": f"Bearer {token}",
             "Connection": "keep-alive",
-            "Host": self.config.host,
+            # "Host": self.config.host,
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
