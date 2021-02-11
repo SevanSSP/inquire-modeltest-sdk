@@ -155,7 +155,7 @@ def mat_to_ts(ts_data: dict, test_id: str, df_sensor: pd.DataFrame,
         body = {'data': {'time': time,
                          'value': value}}
         tic = timer.perf_counter()
-        # client_ts_object.post_data_points(ts.id, form_body=body)
+        client_ts_object.post_data_points(ts.id, form_body=body)
         toc = timer.perf_counter()
         print(
             f"Posting timeseries for sensor {key} in test {ts_data['test_num'][0][0]} took {toc - tic:0.4f}s")
@@ -297,7 +297,7 @@ def add_derived_sensor_timeseries(client: Client, df_derived_sensor: pd.DataFram
                 body = {'data': {'time': time,
                                  'value': list(value)}}
                 tic = timer.perf_counter()
-                # client.timeseries.post_data_points(ts.id, form_body=body)
+                client.timeseries.post_data_points(ts.id, form_body=body)
                 toc = timer.perf_counter()
                 print(
                     f"Posting derived timeseries for sensor {derived_sensor['HUID']} "
