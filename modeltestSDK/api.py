@@ -916,36 +916,175 @@ class TimeseriesAPI(BaseAPI):
 class TagsAPI(BaseAPI):
     def create(self, name: str, comment: str = None, test_id: str = None, sensor_id: str = None,
                timeseries_id: str = None, read_only: bool = False) -> Tag:
-        body = dict(name=name, comment=comment, test_id=test_id, sensor_id=sensor_id, timeseries_id=timeseries_id,
-                    read_only=read_only)
+        """
+        Tag a test, a sensor or a time series.
+
+        Parameters
+        ----------
+        name : str
+            Tag name, see API documentation for valid tag names.
+        comment : str, optional
+            Add a comment.
+        test_id : str, optional
+            Test identifier
+        sensor_id: str, optional
+            Sensor identifier
+        timeseries_id: str, optional
+            Time series identifier
+        read_only : bool, optional
+            Make the tag read only
+
+        Returns
+        -------
+        Tag
+            Tag information
+
+        """
+        assert test_id is not None or sensor_id is not None or timeseries_id is not None, \
+            "Specify which test, sensor or time series the tag applies to."
+
+        body = dict(
+            name=name,
+            comment=comment,
+            test_id=test_id,
+            sensor_id=sensor_id,
+            timeseries_id=timeseries_id,
+            read_only=read_only
+        )
         data = self.client.post(self._resource_path, body=body)
-        return Tag.from_dict(data=data, client=self.client)
+        return Tag(**data, client=self.client)
 
-    def get(self, tag_id: str) -> Tag:
-        data = self.client.get(self._resource_path, tag_id)
-        return Tag.from_dict(data=data, client=self.client)
+    def get(self, filter_by: list = None, sort_by: list = None) -> TagList:
+        """
+        Get multiple tags
 
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> TagList:
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all tests e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
+
+        Returns
+        -------
+        TagList
+            Multiple tags
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [Tag.from_dict(data=obj, client=self.client) for obj in data]
-        return TagList(resources=obj_list, client=None)
+        tags = [Tag(**item, client=self.client) for item in data]
+        return TagList(resources=tags, client=self.client)
 
-    def get_by_name(self, name: str) -> Tag:
-        response = self.get_all(filter_by=[self.client.filter.campaign.name == name])
-        if response:
-            if len(response) != 1:
-                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
-                              f" first was returned")
-                return response[0]
-            else:
-                return response[0]
+    def get_by_id(self, tag_id: str) -> Tag:
+        """
+        Get single time series by id
+
+        Parameters
+        ----------
+        tag_id : str
+            Tag identifier
+
+        Returns
+        -------
+        Tag
+            Item tag
+        """
+        data = self.client.get(self._resource_path, tag_id)
+        return Tag(**data, client=self.client)
+
+    def get_by_sensor_id(self, sensor_id: str) -> Union[TagList, None]:
+        """"
+        Get tags by sensor id
+
+        Parameters
+        ----------
+        sensor_id : str
+            Sensor id
+
+        Returns
+        -------
+        TagList
+            Sensor tags
+        """
+        tags = self.get(filter_by=[self.client.filter.tags.sensor_id == sensor_id])
+
+        if len(tags.resources) == 0:
+            logging.info(f"Did not find any tags on sensor '{sensor_id}'.")
+            return None
         else:
-            raise Exception(f"Could not find any object with name {name}")
+            return tags
+
+    def get_by_test_id(self, test_id: str) -> Union[TagList, None]:
+        """"
+        Get tags by test id
+
+        Parameters
+        ----------
+        test_id : str
+            Test id
+
+        Returns
+        -------
+        TagList
+            Test tags
+        """
+        tags = self.get(filter_by=[self.client.filter.tags.test_id == test_id])
+
+        if len(tags.resources) == 0:
+            logging.info(f"Did not find any tags on test '{test_id}'.")
+            return None
+        else:
+            return tags
+
+    def get_by_timeseries_id(self, ts_id: str) -> Union[TagList, None]:
+        """"
+        Get tags by time series id
+
+        Parameters
+        ----------
+        ts_id : str
+            Time series id
+
+        Returns
+        -------
+        TagList
+            Time series tags
+        """
+        tags = self.get(filter_by=[self.client.filter.tags.timeseries_id == ts_id])
+
+        if len(tags.resources) == 0:
+            logging.info(f"Did not find any tags on time series '{ts_id}'.")
+            return None
+        else:
+            return tags
+
+    def get_by_name(self, name: str) -> Union[TagList, None]:
+        """"
+        Get tags by name
+
+        Parameters
+        ----------
+        name : str
+            Tag name
+
+        Returns
+        -------
+        TagList
+            Tags
+        """
+        tags = self.get(filter_by=[self.client.filter.tags.name == name])
+
+        if len(tags.resources) == 0:
+            logging.info(f"Did not find any tags with name '{name}'.")
+            return None
+        else:
+            return tags
 
 
 class FloaterConfigAPI(BaseAPI):
