@@ -1,12 +1,22 @@
 import os
 import datetime
-from modeltestSDK.utils import get_datetime_date, get_parent_dir
 from modeltestSDK.resources import Campaign
 from modeltestSDK.client import Client
 from pipeline.STT.add_timeseries import read_datapoints_from_csv_with_pandas
 from modeltestSDK.utils import TwoWayDict
 
 # It is recommended to open the file system for the STT campaign, to understand how floater tests are added in order
+
+
+def get_datetime_date(date):
+    year = "20" + date[4:6]
+    year = int(year)
+    month = int(date[2:4])
+    day = int(date[0:2])
+    hour = int(date[6:8])
+    minute = int(date[8:10])
+    second = int(date[10:12])
+    return datetime(year, month, day, hour, minute, second).isoformat()
 
 
 def fill_campaign_with_floater_tests(campaign: Campaign, concept_ids, client: Client, campaign_dir: str):
@@ -42,9 +52,9 @@ def fill_campaign_with_floater_tests(campaign: Campaign, concept_ids, client: Cl
                                  concept_id=concept_id,
                                  client=client)
 
-                os.chdir(get_parent_dir(os.getcwd()))
-            os.chdir(get_parent_dir(os.getcwd()))
-        os.chdir(get_parent_dir(os.getcwd()))
+                os.chdir(os.path.dirname(os.getcwd()))
+            os.chdir(os.path.dirname(os.getcwd()))
+        os.chdir(os.path.dirname(os.getcwd()))
 
 
 waveCalibDict = TwoWayDict()

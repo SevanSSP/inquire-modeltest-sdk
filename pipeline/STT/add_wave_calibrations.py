@@ -1,7 +1,7 @@
 import os
 from modeltestSDK.resources import Campaign
 from modeltestSDK.client import Client
-from modeltestSDK.utils import get_datetime_date, get_parent_dir
+from .add_floater_tests import get_datetime_date
 from .add_timeseries import read_datapoints_from_csv_with_pandas
 
 # It is recommended to open the file system for the STT campaign, to understand how calibration tests are added in order
@@ -63,9 +63,9 @@ def fill_campaign_with_wave_calibrations(campaign: Campaign, client: Client, cam
 
             for file in files:
                 read_datapoints_from_csv_with_pandas(file=file, test_id=wave_current_calibration.id, client=client)
-            os.chdir(get_parent_dir(os.getcwd()))
+            os.chdir(os.path.dirname(os.getcwd()))
 
-        os.chdir(get_parent_dir(os.getcwd()))
+        os.chdir(os.path.dirname(os.getcwd()))
 
 
 # Find gamma based on Hs and Tp pairs. Values given in the STT reports.

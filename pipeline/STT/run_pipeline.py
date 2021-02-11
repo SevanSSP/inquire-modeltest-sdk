@@ -1,10 +1,9 @@
-from modeltestSDK.client import Client
-from modeltestSDK.utils import get_datetime_date
-from pipeline.STT.add_sensors import add_sensors, sensorDict
-from pipeline.STT.add_wave_calibrations import fill_campaign_with_wave_calibrations
-from pipeline.STT.add_floater_tests import fill_campaign_with_floater_tests
-
 import time
+from modeltestSDK.client import Client
+from .add_floater_tests import get_datetime_date
+from .add_sensors import add_sensors, sensorDict
+from .add_wave_calibrations import fill_campaign_with_wave_calibrations
+from .add_floater_tests import fill_campaign_with_floater_tests
 
 
 def main():
