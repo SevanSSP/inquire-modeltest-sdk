@@ -109,7 +109,7 @@ class Client:
            'https://{host}/{base_url}/{version}/{resource}/{endpoint}'
 
         """
-        url = f"https://{self.config.host}/{self.config.base_url}/{self.config.version}/"
+        url = f"{self.config.host}/{self.config.base_url}/{self.config.version}/"
         url += "/".join([p for p in [resource, endpoint] if p is not None])
         return url
 
@@ -146,7 +146,7 @@ class Client:
         headers = {
             "Authorization": f"bearer {token}",
             "Connection": "keep-alive",
-            "Host": self.config.host,
+            "Host": self.config.host.split("://")[-1],  # remove leading http/https
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
