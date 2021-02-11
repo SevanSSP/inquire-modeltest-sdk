@@ -1,4 +1,4 @@
-from modeltestSDK.resources import DataPoint
+from modeltestSDK.resources import DataPoints
 from modeltestSDK.client import Client
 import datetime
 import pandas as pd
@@ -48,14 +48,14 @@ def read_datapoints_from_csv_with_pandas(file, test_id, client: Client):
                 continue
             time_point = str_to_datetime(time)
 
-            datapoint = DataPoint(timeseries_id=timeseries.id,
-                                  time=(time_point - start_time).total_seconds(),
-                                  value=value,
-                                  client=client)
+            datapoint = DataPoints(timeseries_id=timeseries.id,
+                                   time=(time_point - start_time).total_seconds(),
+                                   value=value,
+                                   client=client)
             timeseries.data_points.append(datapoint)
 
-        # Post all datapoints for a single timeseries at the same time with post_data_points() for faster uploading
-        timeseries.post_data_points()
+        # Post all datapoints for a single timeseries at the same time with add_data_points() for faster uploading
+        timeseries.add_data_points()
 
         toc = timer.perf_counter()
         print(f"Posting timeseries for sensor {sensor} in file {file} took  {toc - tic:0.4f} seconds")

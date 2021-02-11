@@ -504,10 +504,8 @@ class TimeseriesList(ResourceList):
         return f"<Timeseries: \n{self.to_pandas()}>"
 
 
-class DataPoint(BaseResource):
-
-    def __init__(self, time: float, value: float, client=None):
-
+class DataPoints(BaseResource):
+    def __init__(self, time: float, value: float, client: Client = None):
         self.time = time
         self.value = value
         self._client = client
@@ -526,20 +524,10 @@ class DataPoint(BaseResource):
             return cls(time=None, value=float(None),
                        client=client)
 
-
-class DataPointList(ResourceList):
-
-    def __init__(self, resources: List[DataPoint], client=None):
+class DataPointsList(ResourceList):
+    def __init__(self, resources: List[DataPoints], client: Client = None):
         self.resources = resources
         self._client = client
-
-
-'''
-    def from_dict(cls, data: dict, client=None):
-        dp_list = []
-        for dp in data['data']:
-            dp_list.append(DataPoint(time))
-'''
 
 
 class Tag(BaseResource):
@@ -599,4 +587,18 @@ class FloaterConfigList(ResourceList):
 
     def __init__(self, resources: List[Tag], client=None):
         self.resources = resources
+        self._client = client
+
+
+class Statistics(BaseResource):
+    def __init__(self, min: float = None, max: float = None, std: float = None, mean: float = None, m0: float = None,
+                 m1: float = None, m2: float = None, m4: float = None, client: Client = None):
+        self.min = min
+        self.max = max
+        self.std = std
+        self.mean = mean
+        self.m0 = m0
+        self.m1 = m1
+        self.m2 = m2
+        self.m4 = m4
         self._client = client

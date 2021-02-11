@@ -5,9 +5,11 @@ import logging
 import warnings
 from typing import Union
 from .utils import format_class_name
-from .resources import (Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList,
-                        FloaterTest, FloaterTestList, WaveCalibration, WaveCalibrationList, WindCalibration,
-                        WindCalibrationList, Tag, TagList, FloaterConfig, FloaterConfigList)
+from .resources import (
+    Campaign, CampaignList, Test, TestList, Sensor, SensorList, Timeseries, TimeseriesList, DataPoints,
+    FloaterTest, FloaterTestList, WaveCalibration, WaveCalibrationList, WindCalibration, WindCalibrationList, Tag,
+    TagList, FloaterConfig, FloaterConfigList, Statistics
+)
 from .query import create_query_parameters
 from .client import Client
 
@@ -713,58 +715,202 @@ class SensorAPI(BaseAPI):
 
 
 class TimeseriesAPI(BaseAPI):
-
     def create(self, sensor_id: str, test_id: str, default_start_time: float, default_end_time: float, fs: float,
                intermittent: bool = False, read_only: bool = False) -> Timeseries:
-        body = dict(sensor_id=sensor_id, test_id=test_id, default_start_time=default_start_time,
-                    default_end_time=default_end_time, fs=fs, intermittent=intermittent, read_only=read_only)
+        """
+        Create time series
+
+        Parameters
+        ----------
+        sensor_id : str
+            Identifier of parent sensor
+        test_id : str
+            Identifier of parent test
+        default_start_time : float
+            Default start time used when computing statistics etc.
+        default_end_time : float
+            Default end time used when computing statistics etc.
+        fs : float
+            Sampling rate
+        intermittent : bool, optional
+            Is the time series intermittent
+        read_only : bool, optional
+            Make the time series read only
+
+        Returns
+        -------
+        Timeseries'
+            Timeseries data
+
+        """
+        body = dict(
+            sensor_id=sensor_id,
+            test_id=test_id,
+            default_start_time=default_start_time,
+            default_end_time=default_end_time,
+            fs=fs,
+            intermittent=intermittent,
+            read_only=read_only
+        )
         data = self.client.post(self._resource_path, body=body)
-        return Timeseries.from_dict(data=data, client=self.client)
+        return Timeseries(**data, client=self.client)
 
-    def get(self, ts_id: str) -> Timeseries:
-        data = self.client.get(self._resource_path, ts_id)
-        return Timeseries.from_dict(data=data, client=self.client)
+    def get(self, filter_by: list = None, sort_by: list = None) -> TimeseriesList:
+        """
+        Get multiple time series
 
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> TimeseriesList:
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all tests e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
+
+        Returns
+        -------
+        TimeseriesList
+            Multiple time series
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [Timeseries.from_dict(data=obj, client=self.client) for obj in data]
-        return TimeseriesList(resources=obj_list, client=None)
+        timeseries = [Timeseries(**item, client=self.client) for item in data]
+        return TimeseriesList(resources=timeseries, client=self.client)
 
-    def patch(self, body: dict, ts_id: str):
-        return self.client.patch(resource=self._resource_path, endpoint=f"{ts_id}", body=body)
+    def get_by_id(self, timeseries_id: str) -> Timeseries:
+        """
+        Get single time series by id
 
-    def get_data_points(self, ts_id: str) -> dict:
-        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data")
-        return data
+        Parameters
+        ----------
+        timeseries_id : str
+            Time series identifier
 
-    def post_data_points(self, ts_id, body=None, form_body=None):
-        if form_body is None:
-            form_body = {'data': {'time': [], 'value': []}}
-            for p in body:
-                form_body['data']['time'].append(p['time'])
-                form_body['data']['value'].append(p['value'])
-        self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=form_body)
+        Returns
+        -------
+        Timeseries
+            Time series
+        """
+        data = self.client.get(self._resource_path, timeseries_id)
+        return Timeseries(**data, client=self.client)
 
-    def get_standard_deviation(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats")
-        return data['std']
+    def get_by_sensor_id(self, sensor_id: str) -> Union[TimeseriesList, None]:
+        """"
+        Get time series by sensor id
 
-    def get_max_value(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats")
-        return data['max']
+        Parameters
+        ----------
+        sensor_id : str
+            Sensor id
 
-    def get_min_value(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats=min")
-        return data['min']
+        Returns
+        -------
+        TimeseriesList
+            Time series
+        """
+        timeseries = self.get(filter_by=[self.client.filter.timeseries.sensor_id == sensor_id])
 
-    def get_mean(self, ts_id: str):
-        data = self.client.get(self._resource_path, f"{ts_id}/statistics/?stats")
-        return data['mean']
+        if len(timeseries.resources) == 0:
+            logging.info(f"Did not find any time series with with sensor '{sensor_id}'.")
+            return None
+        else:
+            return timeseries
+
+    def get_by_test_id(self, test_id: str) -> Union[TimeseriesList, None]:
+        """"
+        Get time series by test id
+
+        Parameters
+        ----------
+        test_id : str
+            Test id
+
+        Returns
+        -------
+        TimeseriesList
+            Time series
+        """
+        timeseries = self.get(filter_by=[self.client.filter.timeseries.test_id == test_id])
+
+        if len(timeseries.resources) == 0:
+            logging.info(f"Did not find any time series with with test '{test_id}'.")
+            return None
+        else:
+            return timeseries
+
+    def get_data_points(self, ts_id: str, start: float = None, end: float = None, scaling_length: float = None) \
+            -> DataPoints:
+        """
+        Fetch data points for time series by id.
+
+        Parameters
+        ----------
+        ts_id : str
+            Time series identifier
+        start : float, optional
+            Fetch data point after this start time (s).
+        end : float, optional
+            Fetch data point before this end time (s)
+        scaling_length : float, optional
+            Scale data points to the the specified scaling length according to Froude law from the original
+            reference length.
+
+        Returns
+        -------
+        DataPoints
+            Data points
+        """
+        parameters = dict(start_time=start, end_time=end, scaling_length=scaling_length)
+        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data", parameters=parameters)
+        return DataPoints(**data, client=self.client)
+
+    def add_data_points(self, ts_id: str, time: list, values: list) -> DataPoints:
+        """
+        Add data points to timeseries
+
+        Parameters
+        ----------
+        ts_id : str
+            Time series identifier
+        time : list
+            Time (s)
+        values : list
+            Values corresponding to time
+
+        Returns
+        -------
+        DataPoints
+            Data points
+        """
+        body = dict(data=dict(time=time, value=values))
+        data = self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=body)
+        return DataPoints(**data, client=self.client)
+
+    def get_statistics(self, ts_id: str, scaling_length: float = None) -> Statistics:
+        """
+        Fetch time series statistics.
+
+        Parameters
+        ----------
+        ts_id : str
+            Time series identifier
+        scaling_length : float, optional
+            Scale data points to the the specified scaling length according to Froude law from the original
+            reference length.
+
+        Returns
+        -------
+        DataPoints
+            Data points
+        """
+        parameters = dict(scaling_length=scaling_length)
+        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/statistics", parameters=parameters)
+        return Statistics(**data, client=self.client)
 
 
 class TagsAPI(BaseAPI):

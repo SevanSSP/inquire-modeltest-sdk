@@ -28,7 +28,7 @@ def read_datapoints_from_mat_with_pandas(data, test: Test, client: Client, skip_
 
             body = {'data': {'time': time, 'value': channel_values}}
             tic = timer.perf_counter()
-            client.timeseries.post_data_points(ts.id, form_body=body)
+            client.timeseries.add_data_points(ts.id, form_body=body)
             toc = timer.perf_counter()
             print(f"Posting timeseries for sensor {name} in test {str(data['comment'])[2:-2]} took  {toc - tic:0.4f} seconds")
 
@@ -55,7 +55,7 @@ def read_datapoints_from_mat_with_pandas(data, test: Test, client: Client, skip_
                 body = {'data': {'time': time, 'value': channel_values}}
 
                 tic = timer.perf_counter()
-                client.timeseries.post_data_points(ts.id, form_body=body)
+                client.timeseries.add_data_points(ts.id, form_body=body)
                 toc = timer.perf_counter()
                 print(
                     f"Posting timeseries for sensor {name} in test {str(data['comment'])[2:-2]} took  {toc - tic:0.4f} seconds")
@@ -81,7 +81,7 @@ def read_wave_calibration_from_mat_with_pandas(data, test: Test, calibration_sen
                                       read_only=True)
 
         body = {'data': {'time': time, 'value': channel_values}}
-        client.timeseries.post_data_points(ts.id, form_body=body)
+        client.timeseries.add_data_points(ts.id, form_body=body)
 
     channel_values = data['WAVE_3_CAL'][0].tolist()
     sensor = client.sensor.get_by_name('WAVE_3_Sevan')
@@ -94,7 +94,7 @@ def read_wave_calibration_from_mat_with_pandas(data, test: Test, calibration_sen
                                   read_only=True)
 
     body = {'data': {'time': time, 'value': channel_values}}
-    client.timeseries.post_data_points(ts.id, form_body=body)
+    client.timeseries.add_data_points(ts.id, form_body=body)
 
 
 '''
