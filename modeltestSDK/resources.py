@@ -55,7 +55,8 @@ class BaseResource:
     @classmethod
     def from_dict(cls, data: dict, client=None):
         # noinspection PyArgumentList
-        data.pop('read_only')
+        if 'read_only' in data:
+            data.pop('read_only')
         if cls in [WaveCalibration, WindCalibration, FloaterTest]:
             data.pop('type')
         elif cls is Timeseries:
@@ -200,7 +201,7 @@ class SensorList(ResourceList):
 
 
 class Test(BaseResource):
-    def __init__(self, number: str, description: str, test_date: str, test_type: str, campaign_id: str = None,
+    def __init__(self, number: str, description: str, test_date: str, type: str, campaign_id: str = None,
                  id: str = None,
                  client=None):
 
@@ -208,7 +209,7 @@ class Test(BaseResource):
         self.description = description
         self.test_date = test_date
         self.campaign_id = campaign_id
-        self.type = test_type
+        self.type = type
         self.id = id
         self._client = client
 
