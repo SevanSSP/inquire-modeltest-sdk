@@ -55,7 +55,8 @@ class BaseResource:
     @classmethod
     def from_dict(cls, data: dict, client=None):
         # noinspection PyArgumentList
-        data.pop('read_only')
+        if 'read_only' in data:
+            data.pop('read_only')
         if cls in [WaveCalibration, WindCalibration, FloaterTest]:
             data.pop('type')
         elif cls is Timeseries:
