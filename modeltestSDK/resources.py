@@ -585,7 +585,7 @@ class FloaterConfig(BaseResource):
 
 class FloaterConfigList(ResourceList):
 
-    def __init__(self, resources: List[Tag], client=None):
+    def __init__(self, resources: List[FloaterConfig], client=None):
         self.resources = resources
         self._client = client
 

@@ -1088,35 +1088,108 @@ class TagsAPI(BaseAPI):
 
 
 class FloaterConfigAPI(BaseAPI):
-    def create(self, name: str, description: str, campaign_id: str, draft: float, characteristic_length: float = 0,
+    def create(self, name: str, description: str, campaign_id: str, draft: float, characteristic_length: float,
                read_only: bool = False) -> FloaterConfig:
-        body = dict(name=name, description=description, campaign_id=campaign_id,
-                    characteristic_length=characteristic_length, draft=draft, read_only=read_only)
+        """
+        Create a floater config
+
+        Parameters
+        ----------
+        name : str
+            Name
+        description : str
+            A description
+        campaign_id : str
+            Identifier of parent campaign
+        draft : float
+            Floater draft (m)
+        characteristic_length : float
+            Reference length for scaling according to Froude law.
+        read_only : float
+            Make it read only
+
+        Returns
+        -------
+        FloaterConfig
+            Floater configuration
+        """
+        body = dict(
+            name=name,
+            description=description,
+            campaign_id=campaign_id,
+            characteristic_length=characteristic_length,
+            draft=draft,
+            read_only=read_only
+        )
         data = self.client.post(self._resource_path, body=body)
-        return FloaterConfig.from_dict(data=data, client=self.client)
+        return FloaterConfig(**data, client=self.client)
 
-    def get(self, floater_id: str) -> FloaterConfig:
-        data = self.client.get(self._resource_path, floater_id)
-        return FloaterConfig.from_dict(data=data, client=self.client)
+    def get(self, filter_by: list = None, sort_by: list = None) -> FloaterConfigList:
+        """
+        Get multiple floater configuration
 
-    def get_all(self, filter_by: list = None, sort_by: list = None) -> FloaterConfigList:
+        Parameters
+        ----------
+        filter_by : list, optional
+            Expressions for selecting a subset of all tests e.g.
+                [Client.filter.campaign.name == name,]
+        sort_by : list, optional
+            Expressions for sorting selection e.g.
+                [{'name': height, 'op': asc}]
+
+        Returns
+        -------
+        FloaterConfigList
+            Multiple floater configurations
+        """
         if filter_by is None:
             filter_by = list()
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, "", parameters=params)
-        obj_list = [FloaterConfig.from_dict(data=obj, client=self.client) for obj in data]
-        return FloaterConfigList(resources=obj_list, client=None)
+        configs = [FloaterConfig(**item, client=self.client) for item in data]
+        return FloaterConfigList(resources=configs, client=self.client)
 
-    def get_by_name(self, name: str) -> FloaterConfig:
-        response = self.get_all(filter_by=[self.client.filter.campaign.name == name])
-        if response:
-            if len(response) != 1:
-                warnings.warn(f"Searching {self.__class__.__name__} for name {name} returned several objects,"
-                              f" first was returned")
-                return response[0]
-            else:
-                return response[0]
+    def get_by_id(self, config_id: str) -> FloaterConfig:
+        """
+        Get single floater configuration by id
+
+        Parameters
+        ----------
+        config_id : str
+            Configuration identifier
+
+        Returns
+        -------
+        FloaterConfig
+            Floater configuration
+        """
+        data = self.client.get(self._resource_path, config_id)
+        return FloaterConfig(**data, client=self.client)
+
+    def get_by_campaign_id_and_name(self, campaign_id: str, name: str) -> Union[FloaterConfig, None]:
+        """"
+        Get configuration by name and campaign id
+
+        Parameters
+        ----------
+        campaign_id : str
+            Campaign identifier
+        name : str
+            Configuration name
+
+        Returns
+        -------
+        FloaterConfig
+            Floater configuration
+        """
+        configs = self.get(
+            filter_by=[self.client.filter.campaign.id == campaign_id, self.client.filter.floater_config.name == name]
+        )
+
+        if len(configs.resources) == 0:
+            logging.info(f"Did not find any floater configuration with name '{name}' in campaign '{campaign_id}'.")
+            return None
         else:
-            raise Exception(f"Could not find any object with name {name}")
+            return configs
