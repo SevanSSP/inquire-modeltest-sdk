@@ -1,83 +1,61 @@
 """
 Resource models
 """
-import json
 import numpy
 import warnings
 import pandas as pd
+from pydantic import BaseModel
 from datetime import datetime
 from typing import List, Union
-from .utils import make_serializable
 from .client import Client
 
 
-class BaseResource(object):
-    def __str__(self):
-        return json.dumps(make_serializable(self.dump()), indent=2)
-
-    def __repr__(self):
-        return self.__str__()
-
-    def dump(self):
-        """
-        Dump the instance into a json serializable Python data type.
-
-        Returns
-        -------
-        Dict[str, Any]
-            A dictionary representation of the instance.
-        """
-        d = {key: value for key, value in self.__dict__.items() if value is not None and not key.startswith("_")}
-        return d
-
-    def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
+class BaseResource(BaseModel):
+    def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
         Convert the instance into a pandas DataFrame.
 
-        Parameters
-        ----------
-        ignore : List[str]
-            List of row keys to not include when converting to a data frame.
-
-         Returns
-         -------
+        Returns
+        -------
         pandas.DataFrame
             The dataframe.
+
+        See Also
+        --------
+        See keyword arguments on pydantic.BaseModel.dict()
         """
-        ignore = list() if ignore is None else ignore
-        dumped = self.dump()
-
-        df = pd.DataFrame(columns=["value"])
-        for name, value in dumped.items():
-            if name not in ignore:
-                df.loc[name] = [value]
-        return df
+        return pd.DataFrame(self.dict(**kwargs))
 
 
-class ResourceList(BaseResource):
-    resources = list()
+class BaseResources(BaseModel):
+    __root__: List[BaseResource]
 
     def __iter__(self):
-        for r in self.resources:
-            yield r
+        return iter(self.__root__)
 
-    def __getitem__(self, key):
-        return self.resources[key]
+    def __getitem__(self, item):
+        return self.__root__[item]
 
     def __len__(self):
-        return len(self.resources)
+        return len(self.__root__)
 
-    def __str__(self):
-        return f"<{self.to_pandas()}>"
+    def append(self, item: BaseResource):
+        self.__root__.append(item)
 
-    def dump(self):
-        return [_.dump() for _ in self]
+    def to_pandas(self, **kwargs) -> pd.DataFrame:
+        """
+        Convert the instance into a pandas DataFrame.
 
-    def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
-        return pd.DataFrame(self.dump())
+        Returns
+        -------
+        pandas.DataFrame
+            The dataframe.
 
-    def append(self, data: any):
-        self.resources.append(data)
+        See Also
+        --------
+        See keyword arguments on pydantic.BaseModel.dict()
+        """
+        return pd.DataFrame([_.dict(**kwargs) for _ in self.__root__])
 
 
 class Campaign(BaseResource):
