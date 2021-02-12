@@ -254,7 +254,7 @@ class FloaterTest(Test):
                  category: str, orientation: float, floaterconfig_id: str = None, wave_id: str = None,
                  wind_id: str = None, id: str = None, client=None):
         super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         test_type=self.type, id=id, client=client)
+                         type=self.type, id=id, client=client)
 
         self.category = category
         self.orientation = orientation
@@ -280,7 +280,7 @@ class WaveCalibration(Test):
                  gamma: float = None, wave_direction: float = None, current_velocity: float = None,
                  current_direction: float = None, id: str = None, client=None):
         super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         test_type=self.type, id=id, client=client)
+                         type=self.type, id=id, client=client)
 
         self.wave_spectrum = wave_spectrum
         self.wave_height = wave_height
@@ -305,7 +305,7 @@ class WindCalibration(Test):
                  wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
                  wind_direction: float = None, id: str = None, client=None):
         super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         test_type=self.type, id=id, client=client)
+                         type=self.type, id=id, client=client)
 
         self.wind_spectrum = wind_spectrum
         self.wind_velocity = wind_velocity
