@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from pydantic import BaseModel
 from pydantic.typing import Literal
 from typing import List, Optional, Union
-from .client import Client
 
 
 class Resource(BaseModel):
@@ -64,7 +63,7 @@ class FloaterConfiguration(Resource):
     campaign_id: str
     characteristic_length: float
     draft: float
-    _client: Optional[Client]
+    _client: None
 
 
 class FloaterConfigurations(Resources):
@@ -83,7 +82,7 @@ class Statistics(Resource):
     m1: float
     m2: float
     m4: float
-    _client: Optional[Client]
+    _client: None
 
 
 class Tag(Resource):
@@ -93,7 +92,7 @@ class Tag(Resource):
     test_id: Optional[str]
     sensor_id: Optional[str]
     timeseries_id: Optional[str]
-    _client: Optional[Client]
+    _client: None
 
     def create(self):
         """Add it to the database."""
@@ -122,7 +121,7 @@ class Tags(Resources):
 class DataPoints(Resource):
     time: List[float]
     value: List[float]
-    _client: Optional[Client]
+    _client: None
 
     def plot(self, **kwargs):
         """
@@ -193,7 +192,7 @@ class TimeSerie(Resource):
     default_start_time: Optional[float]
     default_end_time: Optional[float]
     read_only: Optional[bool] = False
-    _client: Optional[Client]
+    _client: None
 
     def create(self):
         """Add it to the database."""
@@ -347,7 +346,7 @@ class Sensor(Resource):
     positive_direction_definition: str
     area: Optional[float]
     read_only: Optional[bool]
-    _client: Optional[Client]
+    _client: None
 
     def create(self):
         """Add it to the database."""
@@ -388,7 +387,7 @@ class Test(Resource):
     test_date: str
     campaign_id: str
     type: str
-    _client: Optional[Client]
+    _client: None
 
     def delete(self, admin_key: str):
         """
@@ -471,7 +470,7 @@ class Campaign(Resource):
     date: str
     scale_factor: float
     water_depth: float
-    _client: Optional[Client]
+    _client: None
 
     def create(self):
         """Create this campaign."""

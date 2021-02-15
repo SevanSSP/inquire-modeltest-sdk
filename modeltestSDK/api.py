@@ -9,14 +9,13 @@ from .resources import (
     WaveCalibrationTest, WindCalibrationTest, Tag, Tags, FloaterConfiguration, FloaterConfigurations, Statistics
 )
 from .query import create_query_parameters
-from .client import Client
 
 
 class BaseAPI:
     """Base API with methods common for all APIs."""
-    def __init__(self, client: Client):
+    def __init__(self, client):
         self._resource_path: str = format_class_name(self.__class__.__name__)
-        self.client: Client = client
+        self.client = client
 
     def delete(self, item_id: str, admin_key: str):
         """
