@@ -1,16 +1,15 @@
 """
 Resource models
 """
-import numpy
 import warnings
 import pandas as pd
+import matplotlib.pyplot as plt
 from pydantic import BaseModel
-from datetime import datetime
-from typing import List, Union
+from typing import List, Optional, Literal, Union
 from .client import Client
 
 
-class BaseResource(BaseModel):
+class Resource(BaseModel):
     def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
         Convert the instance into a pandas DataFrame.
@@ -27,19 +26,19 @@ class BaseResource(BaseModel):
         return pd.DataFrame(self.dict(**kwargs))
 
 
-class BaseResources(BaseModel):
-    __root__: List[BaseResource]
+class Resources(BaseModel):
+    __root__: List[Resource]
 
     def __iter__(self):
         return iter(self.__root__)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item: int):
         return self.__root__[item]
 
     def __len__(self):
         return len(self.__root__)
 
-    def append(self, item: BaseResource):
+    def append(self, item: Resource):
         self.__root__.append(item)
 
     def to_pandas(self, **kwargs) -> pd.DataFrame:
@@ -58,525 +57,450 @@ class BaseResources(BaseModel):
         return pd.DataFrame([_.dict(**kwargs) for _ in self.__root__])
 
 
-class Campaign(BaseResource):
-
-    def __init__(self, name: str, description: str, location: str, date: any,
-                 scale_factor: float, water_depth: float, campaign_id: str = None,
-                 client=None):
-
-        self.id = campaign_id
-        self.name = name
-        self.description = description
-        self.location = location
-        self.date = date
-        self.scale_factor = scale_factor
-        self.water_depth = water_depth
-        self._client = client
-        self.test = TestList(resources=[], client=client)
-        self.sensor = SensorList(resources=[], client=client)
-
-    def __str__(self):
-        return f"<Campaign {self.name}: \n{self.to_pandas()}>"
-
-    def update(self):
-        return self._client.campaign.patch(body=self.dump(), campaign_id=self.id)
-
-    def delete(self):
-        warnings.warn("\nDeleting a campaign cascade deletes all underlying data.\n"
-                      "If the campaign is large this can take several minutes.\n")
-        ans = input("\nAre you sure you still want to continue the delete? [y/N] ")
-        if ans == "y":
-            self._client.campaign.delete(id=self.id)
-
-    def get_sensors(self):
-        if not self.id:
-            raise Exception(f'Cannot get sensor for {self.name}. Campaign has not yet been created')
-        return self._client.campaign.get_sensors(id=self.id)
-
-    def get_tests(self, test_type: str = None):
-        if not self.id:
-            raise Exception(f'Cannot get tests for {self.name}. Campaign has not yet been created')
-        return self._client.campaign.get_tests(id=self.id, type=test_type)
-
-    def populate_test(self, child):
-        if isinstance(child, TestList):
-            for item in child:
-                self.test.append(item)
-        else:
-            self.test.append(child)
-
-    def populate_sensor(self, child):
-        if isinstance(child, SensorList):
-            for item in child:
-                self.sensor.append(item)
-        else:
-            self.sensor.append(child)
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        return cls(name=data['name'], description=data['description'], location=data['location'],
-                   date=data['date'], scale_factor=data['scale_factor'],
-                   water_depth=data['water_depth'], campaign_id=data['id'], client=client)
+class FloaterConfiguration(Resource):
+    id: Optional[str]
+    name: str
+    description: str
+    campaign_id: str
+    characteristic_length: float
+    draft: float
+    _client: Optional[Client]
 
 
-class CampaignList(ResourceList):
+class FloaterConfigurations(Resources):
+    __root__ = List[FloaterConfiguration]
 
-    def __init__(self, resources: List[Campaign], client=None):
-        self.resources = resources
-        self._client = client
-
-
-class Sensor(BaseResource):
-
-    def __init__(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-                 is_local: bool, area: float = None, campaign_id: str = None,
-                 sensor_id: str = None, client=None):
-        self.id = sensor_id
-        self.name = name
-        self.description = description
-        self.unit = unit
-        self.kind = kind
-        self.area = area
-        self.x = x
-        self.y = y
-        self.z = z
-        self.is_local = is_local
-        self.campaign_id = campaign_id
-        self._client = client
-
-    def __str__(self):
-        return f"<Sensor {self.name}: \n{self.to_pandas()}>"
-
-    def update(self):
-        return self._client.sensor.patch(body=self.dump(), sensor_id=self.id)
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        return cls(name=data['name'], description=data['description'], unit=data['unit'],
-                   kind=data['kind'], area=data['area'], x=data['y'], y=data['y'], z=data['z'],
-                   is_local=data['is_local'],
-                   campaign_id=data['campaign_id'], sensor_id=data['id'], client=client)
+    def append(self, item: FloaterConfiguration):
+        self.__root__.append(item)
 
 
-class SensorList(ResourceList):
-
-    def __init__(self, resources: List[Sensor], client=None):
-        self.resources = resources
-        self._client = client
-
-    def __getitem__(self, key) -> Sensor:
-        if isinstance(key, int):
-            return self.resources[key]
-        if isinstance(key, str):
-            try:
-                for item in self:
-                    if item.name == key:
-                        return item
-            except KeyError:
-                raise Exception(f"Sensor {key} not found under campaign ")
+class Statistics(Resource):
+    min: float
+    max: float
+    std: float
+    mean: float
+    m0: float
+    m1: float
+    m2: float
+    m4: float
+    _client: Optional[Client]
 
 
-class Test(BaseResource):
-    def __init__(self, number: str, description: str, test_date: str, test_type: str, campaign_id: str = None,
-                 test_id: str = None,
-                 client=None):
+class Tag(Resource):
+    id: Optional[str]
+    name: str
+    comment: Optional[str]
+    test_id: Optional[str]
+    sensor_id: Optional[str]
+    timeseries_id: Optional[str]
+    _client: Optional[Client]
 
-        self.number = number
-        self.description = description
-        self.test_date = test_date
-        self.campaign_id = campaign_id
-        self.type = test_type
-        self.id = test_id
-        self._client = client
+    def create(self):
+        """Add it to the database."""
+        tag = self._client.tag.create(**self.dict())
+        self.id = tag.id  # update with id from database
 
-        self.timeseries = TimeseriesList(resources=[], client=client)
+    def delete(self, admin_key: str):
+        """
+        Delete it.
 
-    def __str__(self):
-        return f"<Test: \n{self.to_pandas()}>"
-
-    def get_timeseries(self):
-        return self._client.test.get_timeseries(id=self.id)
-
-    def populate_timeseries(self, child):
-        if isinstance(child, TimeseriesList):
-            for item in child:
-                self.timeseries.append(item)
-        else:
-            self.timeseries.append(child)
-
-    @classmethod
-    def from_dict(cls, data, client: object = None):
-        return cls(number=data['number'], description=data["description"], test_date=data['test_date'],
-                   campaign_id=data['campaign_id'], test_type=data['type'], test_id=data['id'], client=client)
+        Parameters
+        ----------
+        admin_key : str
+            Administrator secret key
+        """
+        self._client.tag.delete(self.id, admin_key=admin_key)
 
 
-class TestList(ResourceList):
+class Tags(Resources):
+    __root__: List[Tag]
 
-    def __init__(self, resources: List[Test], client=None):
-        self.resources = resources
-        self._client = client
+    def append(self, item: Tag):
+        self.__root__.append(item)
 
-    def __getitem__(self, key):
-        if isinstance(key, int):
-            return self.resources[key]
-        if isinstance(key, str):
-            try:
-                for t in self:
-                    if t.description == key:
-                        return t
-            except KeyError:
-                raise Exception(f"Test {key} not found under campaign ")
+
+class DataPoints(Resource):
+    time: List[float]
+    value: List[float]
+    _client: Optional[Client]
+
+    def plot(self, **kwargs):
+        """
+        Plot the dataapoints.
+
+        Parameters
+        ----------
+        kwargs
+            See pandas.DataFrame.plot for options.
+        """
+        self.to_pandas().plot(**kwargs)
+        plt.show()
+
+    def to_pandas(self) -> pd.DataFrame:
+        """
+        Convert the instance into a pandas DataFrame.
+
+        Returns
+        -------
+        pandas.DataFrame
+            The dataframe.
+
+        See Also
+        --------
+        See keyword arguments on pydantic.BaseModel.dict()
+        """
+        return pd.DataFrame(dict(value=self.value), index=self.time)
+
+
+class DataPointsList(Resources):
+    __root__: List[DataPoints]
+
+    def append(self, item: DataPoints):
+        self.__root__.append(item)
+
+    def plot(self, **kwargs):
+        """
+        Plot data points.
+
+        Parameters
+        ----------
+        kwargs
+            See pandas.DataFrame.plot for options
+        """
+        self.to_pandas().plot(**kwargs)
+        plt.show()
+
+    def to_pandas(self):
+        """
+        Convert the data points list into a pandas DataFrame.
+
+        Returns
+        -------
+        pandas.DataFrame
+            The dataframe.
+        """
+        dfs = [dps.to_pandas() for dps in self.__root__]
+        return pd.concat(dfs, axis="columns")
+
+
+class TimeSerie(Resource):
+    id: Optional[str]
+    sensor_id: str
+    test_id: str
+    fs: float
+    datapoints_created_at: str
+    intermittent: Optional[bool] = False
+    default_start_time: Optional[float]
+    default_end_time: Optional[float]
+    read_only: Optional[bool] = False
+    _client: Optional[Client]
+
+    def create(self):
+        """Add it to the database."""
+        ts = self._client.timeseries.create(**self.dict())
+        self.id = ts.id  # update with id from database
+
+    def delete(self, admin_key: str):
+        """
+        Delete it.
+
+        Parameters
+        ----------
+        admin_key : str
+            Administrator secret key
+        """
+        self._client.timeseries.delete(self.id, admin_key=admin_key)
+
+    def add_data(self, time: list, value: list, admin_key: str) -> DataPoints:
+        """
+        Add data points.
+
+        Parameters
+        ----------
+        time : list
+            Time in seconds
+        value : list
+            Data corresponding to time
+        admin_key : str
+            Administrator secret key
+
+        Returns
+        -------
+        DataPoints
+            Data points
+        """
+        dps = self._client.timeseries.add_data_points(self.id, time, value, admin_key)
+        return dps
+
+    def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPoints:
+        """
+        Get data points
+
+        Parameters
+        ----------
+        start : float, optional
+            Fetch data points after this time (s).
+        end : float, optional
+            Fetch data points before this time (s).
+        scaling_length : float, optional
+            Scale the data to this reference length according to Froude law (m).
+
+        Returns
+        -------
+        DataPoints
+            Data points
+        """
+        dps = self._client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length)
+        return dps
+
+    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):
+        """
+        Plot time series
+
+        Parameters
+        ----------
+        start : float, optional
+            Fetch data points after this time (s).
+        end : float, optional
+            Fetch data points before this time (s).
+        scaling_length : float, optional
+            Scale the data to this reference length according to Froude law (m).
+        kwargs
+            See optional arguments for pandas.DataFrame.plot.
+        """
+        dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
+        dps.plot(**kwargs)
+
+
+class TimeSeries(Resources):
+    __root__: List[TimeSerie]
+
+    def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPointsList:
+        """
+        Get data points
+
+        Parameters
+        ----------
+        start : float, optional
+            Fetch data points after this time (s).
+        end : float, optional
+            Fetch data points before this time (s).
+        scaling_length : float, optional
+            Scale the data to this reference length according to Froude law (m).
+
+        Returns
+        -------
+        DataPoints
+            Data points
+        """
+        dps = DataPointsList.parse_obj(
+            [ts.get_data(start=start, end=end, scaling_length=scaling_length) for ts in self.__root__]
+        )
+
+        return dps
+
+    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):
+        """
+        Plot time series
+
+        Parameters
+        ----------
+        start : float, optional
+            Fetch data points after this time (s).
+        end : float, optional
+            Fetch data points before this time (s).
+        scaling_length : float, optional
+            Scale the data to this reference length according to Froude law (m).
+        kwargs
+            See optional arguments for pandas.DataFrame.plot.
+        """
+        dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
+        dps.plot(**kwargs)
+
+    def to_pandas(self) -> pd.DataFrame:
+        """
+        Convert the data points list into a pandas DataFrame.
+
+        Returns
+        -------
+        pandas.DataFrame
+            The dataframe.
+        """
+        dfs = [ts.to_pandas() for ts in self.__root__]
+        return pd.concat(dfs, axis="columns")
+
+
+class Sensor(Resource):
+    id: Optional[str]
+    campaign_id: str
+    name: str
+    description: str
+    unit: str
+    kind: str
+    source: str
+    x: float
+    y: float
+    z: float
+    position_reference: str
+    position_heading_lock: bool
+    position_draft_lock: bool
+    positive_direction_definition: str
+    area: Optional[float]
+    read_only: Optional[bool]
+    _client: Optional[Client]
+
+    def create(self):
+        """Add it to the database."""
+        sensor = self._client.sensor.create(**self.dict())
+        self.id = sensor.id     # update with id from database
+
+    def delete(self, admin_key: str):
+        """
+        Delete it.
+
+        Parameters
+        ----------
+        admin_key : str
+            Administrator secret key
+        """
+        self._client.sensor.delete(self.id, admin_key=admin_key)
+
+    def tags(self) -> Tags:
+        """Retrieve tags on sensor."""
+        return self._client.tag.get_by_sensor_id(self.id)
+
+    def timeseries(self) -> TimeSeries:
+        """Retrieve time series on sensor."""
+        return self._client.timeseries.get_by_sensor_id(self.id)
+
+
+class Sensors(Resources):
+    __root__: List[Sensor]
+
+    def append(self, item: Sensor):
+        self.__root__.append(item)
+
+
+class Test(Resource):
+    id: Optional[str]
+    number: str
+    description: str
+    test_date: str
+    campaign_id: str
+    type: str
+    _client: Optional[Client]
+
+    def delete(self, admin_key: str):
+        """
+        Delete it.
+
+        Parameters
+        ----------
+        admin_key : str
+            Administrator secret key
+        """
+        self._client.test.delete(self.id, admin_key=admin_key)
+
+    def tags(self) -> Tags:
+        """Retrieve tags on time serie."""
+        return self._client.tag.get_by_test_id(self.id)
+
+    def timeseries(self) -> TimeSeries:
+        """Retrieve time series on sensor."""
+        return self._client.timeseries.get_by_test_id(self.id)
 
 
 class FloaterTest(Test):
-    type = "Floater Test"
-
-    def __init__(self, number: str, description: str, test_date: str, campaign_id: str,
-                 category: str, orientation: float, floaterconfig_id: str = None, wave_id: str = None,
-                 wind_id: str = None, floater_id: str = None, client=None):
-        super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         test_type=self.type, test_id=floater_id, client=client)
-
-        self.category = category
-        self.orientation = orientation
-        self.wave_id = wave_id
-        self.wind_id = wind_id
-        self.floaterconfig_id = floaterconfig_id
-        self.id = floater_id
-        self._client = client
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        return cls(number=data['number'], description=data["description"], test_date=data['test_date'],
-                   campaign_id=data['campaign_id'], category=data['category'], orientation=data['orientation'],
-                   wave_id=data['wave_id'], wind_id=data['wind_id'], floaterconfig_id=data['floaterconfig_id'],
-                   floater_id=data['id'], client=client)
-
-
-class FloaterTestList(ResourceList):
-
-    def __init__(self, resources: List[FloaterTest], client=None):
-        self.resources = resources
-        self._client = client
-
-
-class WaveCalibration(Test):
-    type = "Wave Calibration"
-
-    def __init__(self, number: str, description: str, test_date: str, campaign_id: str,
-                 wave_spectrum: str = None, wave_height: float = None, wave_period: float = None,
-                 gamma: float = None, wave_direction: float = None, current_velocity: float = None,
-                 current_direction: float = None, wave_calibration_id: str = None, client=None):
-        super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         test_type=self.type, test_id=wave_calibration_id, client=client)
-
-        self.wave_spectrum = wave_spectrum
-        self.wave_height = wave_height
-        self.wave_period = wave_period
-        self.gamma = gamma
-        self.wave_direction = wave_direction
-        self.current_velocity = current_velocity
-        self.current_direction = current_direction
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        return cls(number=data["number"], description=data["description"], test_date=data['test_date'],
-                   campaign_id=data['campaign_id'], wave_spectrum=data['wave_spectrum'],
-                   wave_height=data['wave_height'],
-                   wave_period=data['wave_period'], gamma=data['gamma'], wave_direction=data['wave_direction'],
-                   current_velocity=data['current_velocity'], current_direction=data['current_direction'],
-                   wave_calibration_id=data['id'], client=client)
-
-
-class WaveCalibrationList(ResourceList):
-
-    def __init__(self, resources: List[WaveCalibration], client=None):
-        self.resources = resources
-        self._client = client
-
-
-class WindCalibration(Test):
-    type = "Wind Calibration"
-
-    def __init__(self, number: str, description: str, test_date: str, campaign_id: str,
-                 wind_spectrum: str = None, wind_velocity: float = None, zref: float = None,
-                 wind_direction: float = None, wind_condition_id: str = None, client=None):
-        super().__init__(number=number, description=description, test_date=test_date, campaign_id=campaign_id,
-                         test_type=self.type, test_id=wind_condition_id, client=client)
-
-        self.wind_spectrum = wind_spectrum
-        self.wind_velocity = wind_velocity
-        self.zref = zref
-        self.wind_direction = wind_direction
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        return cls(number=data['number'], description=data["description"], test_date=data['test_date'],
-                   campaign_id=data['campaign_id'], wind_spectrum=data['wind_spectrum'],
-                   wind_velocity=data['wind_velocity'], zref=data['zref'], wind_direction=data['wind_direction'],
-                   wind_condition_id=data['id'], client=client)
-
-
-class WindCalibrationList(ResourceList):
-
-    def __init__(self, resources: List[WindCalibration], client=None):
-        self.resources = resources
-        self._client = client
-
-
-class Timeseries(BaseResource):
-
-    def __init__(self, sensor_id: str, test_id: str, fs: float, intermittent: bool = False,
-                 ts_id: str = None, client=None):
-
-        self.sensor_id = sensor_id
-        self.test_id = test_id
-        self.fs = fs
-        self.intermittent = intermittent
-        self.id = ts_id
-        self.data_points = DataPointList(resources=[], client=client)
-        self._client = client
-
-    def __str__(self):
-        return f"<Timeseries: \n{self.to_pandas()}>"
-
-    def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
-        ignore = list() if ignore is None else ignore
-        dumped = self.dump()
-
-        df = pd.DataFrame(columns=["value"])
-        for name, value in dumped.items():
-            if name == "sensor_id":
-                df.loc[name] = self._client.sensor.get(value).name
-            elif name == "data_points":
-                df.loc[name] = len(self.data_points)
-            elif name not in ignore:
-                df.loc[name] = [value]
-        return df
-
-    def update(self):
-        self._client.timeseries.patch(body=self.dump(), id=self.id)
-
-    def get_data_points(self):
-        self.data_points = self._client.timeseries.get_data_points(id=self.id)['data']
-        return self.data_points
-
-    def to_arrays(self):
-        if not self.data_points:
-            self.get_data_points()
-        times_in_tuples = []
-        values = []
-        for data_point in self.data_points:
-            times_in_tuples.append(data_point.time)
-            values.append(data_point.value)
-        times_in_array = numpy.array(times_in_tuples)
-        times = []
-        for Time in times_in_array:
-            times.append(float(Time))
-
-        times = numpy.array(times)
-        values = numpy.array(values)
-        return times, values
-
-    def get_froude_scaled_arrays(self):
-        times, values = self.to_arrays()
-
-        # Get the scale factor from the campaign that the timeseries belongs to
-        scale_factor = self._client.campaign.get(self._client.test.get(self.test_id).campaign_id).scale_factor
-
-        # Froude scaling
-        t = times * (scale_factor ** 0.5)
-        sensor = self.get_sensor()
-        if sensor.kind == "length":
-            froude_factor = 1
-        elif sensor.kind == "velocity":
-            froude_factor = 0.5
-        elif sensor.kind == "acceleration":
-            froude_factor = 0
-        elif sensor.kind == "force":
-            froude_factor = 3
-        elif sensor.kind == "pressure":
-            froude_factor = 1
-        elif sensor.kind == "volume":
-            froude_factor = 3
-        elif sensor.kind == "mass":
-            froude_factor = 3
-        elif sensor.kind == "angle":
-            froude_factor = 0
-        else:
-            raise Exception(f"Automatic froude scaling for {sensor.kind} sensors is not supported.")
-
-        v = values * (scale_factor ** froude_factor)
-
-        return t, v
-
-    def post_data_points(self):
-        self._client.timeseries.post_data_points(body=self.data_points.dump(), id=self.id)
-
-    def get_standard_deviation(self):
-        return self._client.timeseries.get_standard_deviation(id=self.id)
-
-    def get_max_value(self):
-        return self._client.timeseries.get_max_value(id=self.id)
-
-    def get_min_value(self):
-        return self._client.timeseries.get_min_value(id=self.id)
-
-    def get_mean(self):
-        return self._client.timeseries.get_mean(id=self.id)
-
-    def get_measured_hs(self):
-        return self._client.timeseries.get_measured_hs(id=self.id)
-
-    def get_measured_tp(self):
-        return self._client.timeseries.get_measured_tp(id=self.id)
-
-    def get_sensor(self) -> Sensor:
-        return self._client.timeseries.get_sensor(id=self.id)
-
-    def get_test(self):
-        return self._client.timeseries.get_test(id=self.id)
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        return cls(sensor_id=data['sensor_id'], test_id=data['test_id'], fs=data['fs'],
-                   intermittent=data['intermittent'], ts_id=data['id'], client=client)
-
-
-class TimeseriesList(ResourceList):
-
-    def __init__(self, resources: List[Timeseries], client=None):
-        self.resources = resources
-        self._client = client
-        # self._sensor_names = []
-
-    def to_pandas(self, ignore: List[str] = None) -> pd.DataFrame:
-        df = pd.DataFrame(self.dump())
-        '''
-        df.rename(columns={'sensor_id': 'sensor', 'data_points': 'length'}, inplace=True)
-        if 'test_id' in df:
-            df.drop(columns={'test_id'}, inplace=True)
-
-        print(df['sensor'].tolist())
-        #names = self._client.sensor.get_multiple_by_name(df['sensor'].tolist())
-        #names = [(self._client.sensor.get(sensor_id)).name for sensor_id in df['sensor'].tolist()]
-        for i in df.index:
-            df.at[i, 'sensor'] = names[i]
-            df.at[i, 'length'] = len(self.resources[i].data_points)
-        '''
-        return df
-
-    def __getitem__(self, key):
-        if isinstance(key, int):
-            return self.resources[key]
-        if isinstance(key, str):
-            key_id = self._client.sensor.get_by_name(key).id
-            try:
-                for item in self:
-                    if item.sensor_id == key_id:
-                        return item
-            except KeyError:
-                raise Exception(f"Timeseries {key} not found under campaign ")
-
-    def __str__(self):
-        return f"<Timeseries: \n{self.to_pandas()}>"
-
-
-class DataPoints(BaseResource):
-    def __init__(self, time: float, value: float, client: Client = None):
-        self.time = time
-        self.value = value
-        self._client = client
-
-    def __str__(self):
-        return f"<DataPoint: \n{self.to_pandas()}>"
-
-    @classmethod
-    def from_dict(cls, data: str, client=None):
-        if data.find("\n") and data.find("\t"):
-            time, value = data.replace("\n", "").split("\t")
-            return cls(time=float(time), value=float(value),
-                       client=client)
-        else:
-            warnings.warn("Imported an empty datapoint.")
-            return cls(time=None, value=float(None),
-                       client=client)
-
-class DataPointsList(ResourceList):
-    def __init__(self, resources: List[DataPoints], client: Client = None):
-        self.resources = resources
-        self._client = client
-
-
-class Tag(BaseResource):
-
-    def __init__(self, name: str, comment: str, test_id: str = None, sensor_id: str = None, timeseries_id: str = None,
-                 tag_id: str = None, client=None):
-        self.name = name
-        self.comment = comment
-        self.test_id = test_id
-        self.sensor_id = sensor_id
-        self.timeseries_id = timeseries_id
-        self.id = tag_id
-        self._client = client
-
-    def __str__(self):
-        return f"<Tag: \n{self.to_pandas()}>"
-
-    def delete(self):
-        self._client.tag.delete(id=self.id)
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        return cls(name=data['name'], comment=data['comment'], test_id=data['test_id'], sensor_id=data['sensor_id'],
-                   timeseries_id=data['timeseries_id'], tag_id=data['id'], client=client)
-
-
-class TagList(ResourceList):
-
-    def __init__(self, resources: List[Tag], client=None):
-        self.resources = resources
-        self._client = client
-
-
-class FloaterConfig(BaseResource):
-
-    def __init__(self, name: str, description: str, characteristic_length: float, draft: float, campaign_id: str,
-                 floater_id: str = None, client=None):
-        self.name = name
-        self.description = description
-        self.characteristic_length = characteristic_length
-        self.draft = draft
-        self.campaign_id = campaign_id
-        self.id = floater_id
-        self._client = client
-
-    def __str__(self):
-        return f"<Concept: \n{self.to_pandas()}>"
-
-    @classmethod
-    def from_dict(cls, data: dict, client=None):
-        return cls(name=data['name'], description=data['description'],
-                   characteristic_length=data['characteristic_length'], draft=data['draft'],
-                   campaign_id=data['campaign_id'], floater_id=data['id'], client=client)
-
-
-class FloaterConfigList(ResourceList):
-
-    def __init__(self, resources: List[FloaterConfig], client=None):
-        self.resources = resources
-        self._client = client
-
-
-class Statistics(BaseResource):
-    def __init__(self, min: float = None, max: float = None, std: float = None, mean: float = None, m0: float = None,
-                 m1: float = None, m2: float = None, m4: float = None, client: Client = None):
-        self.min = min
-        self.max = max
-        self.std = std
-        self.mean = mean
-        self.m0 = m0
-        self.m1 = m1
-        self.m2 = m2
-        self.m4 = m4
-        self._client = client
+    type: Literal["Floater Test"]
+    category: str
+    orientation: float
+    floater_config_id: str
+    wave_id: Optional[str]
+    wind_id: Optional[str]
+    read_only: Optional[bool] = False
+
+    def create(self):
+        """Add it to the database."""
+        sensor = self._client.floater_test.create(**self.dict())
+        self.id = sensor.id  # update with id from database
+
+
+class WaveCalibrationTest(Test):
+    type: Literal["Wave Calibration"]
+    wave_spectrum: Optional[str]
+    wave_height: Optional[float]
+    wave_period: Optional[float]
+    gamma: Optional[float]
+    wave_direction: Optional[float]
+    current_velocity: Optional[float]
+    current_direction: Optional[float]
+    read_only: Optional[bool] = False
+
+    def create(self):
+        """Add it to the database."""
+        sensor = self._client.wave_calibration.create(**self.dict())
+        self.id = sensor.id  # update with id from database
+
+
+class WindCalibrationTest(Test):
+    type: Literal["Wind Calibration"]
+    wind_spectrum: Optional[str]
+    wind_velocity: Optional[float]
+    zref: Optional[float]
+    wind_direction: Optional[float]
+    read_only: Optional[bool] = False
+
+    def create(self):
+        """Add it to the database."""
+        sensor = self._client.wind_calibration.create(**self.dict())
+        self.id = sensor.id  # update with id from database
+
+
+class Tests(Resources):
+    __root__: List[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]]
+
+    def append(self, item: Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]):
+        self.__root__.append(item)
+
+
+class Campaign(Resource):
+    id: Optional[str]
+    name: str
+    description: str
+    location: str
+    date: str
+    scale_factor: float
+    water_depth: float
+    _client: Optional[Client]
+
+    def create(self):
+        """Create this campaign."""
+        campaign = self._client.campaign.create(**self.dict())
+        self.id = campaign.id  # update with id from database
+
+    def delete(self, admin_key: str):
+        """
+        Delete it.
+
+        Parameters
+        ----------
+        admin_key : str
+            Administrator secret key
+        """
+        self._client.campaign.delete(self.id, admin_key=admin_key)
+
+    def sensors(self) -> Sensors:
+        """Fetch sensors."""
+        return self._client.sensor.get_by_campaign_id(self.id)
+
+    def tests(self, test_type: str = None) -> Tests:
+        """Fetch tests."""
+        return self._client.test.get_by_campaign_id(self.id)
+
+    def floater_configurations(self) -> FloaterConfigurations:
+        """Fetch floater configurations."""
+        return self._client.floater_config.get_by_campaign_id(self.id)
+
+
+class Campaigns(Resources):
+    __root__: List[Campaign]

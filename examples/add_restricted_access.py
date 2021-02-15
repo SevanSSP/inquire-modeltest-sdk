@@ -39,7 +39,7 @@ print(resp)
 tic = time.perf_counter()
 
 ts = client.timeseries.get("bc732b7b-f9b0-47cb-a6ce-2dbbd5d2225f")
-ts.get_data_points()
+ts.get_data()
 
 data = ts.data_points
 
