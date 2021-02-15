@@ -1,11 +1,11 @@
 """
 Resource models
 """
-import warnings
 import pandas as pd
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
-from typing import List, Optional, Literal, Union
+from pydantic.typing import Literal
+from typing import List, Optional, Union
 from .client import Client
 
 
