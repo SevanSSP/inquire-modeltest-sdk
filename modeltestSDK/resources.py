@@ -67,7 +67,7 @@ class FloaterConfiguration(Resource):
 
 
 class FloaterConfigurations(Resources):
-    __root__ = List[FloaterConfiguration]
+    __root__: List[FloaterConfiguration]
 
     def append(self, item: FloaterConfiguration):
         self.__root__.append(item)
