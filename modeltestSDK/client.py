@@ -1,4 +1,5 @@
 import os
+import sys
 import requests
 import logging
 from datetime import datetime
@@ -39,6 +40,12 @@ class Client:
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
+
+        # configure logging
+        log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
+        logging.basicConfig(stream=sys.stdout,
+                            level=log_levels.get(self.config.log_level, logging.INFO),
+                            format="%(levelname)s at line %(lineno)d in %(filename)s - %(message)s")
 
     def _request_token(self) -> str:
         """str: Authenticate and return access token."""

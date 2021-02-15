@@ -10,7 +10,8 @@ class Config:
     """
     host: str = os.environ.get("INQUIRE_MODELTEST_API_HOST")
     base_url: str = "api"
-    version: str = 'v1'
+    version: str = "v1"
+    log_level: str = "info"
 
 
 class LocalConfig(Config):
