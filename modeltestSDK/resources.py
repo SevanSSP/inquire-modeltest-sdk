@@ -24,7 +24,11 @@ class Resource(BaseModel):
         --------
         See keyword arguments on pydantic.BaseModel.dict()
         """
-        return pd.DataFrame(self.dict(**kwargs))
+        df = pd.DataFrame(columns=["value"])
+        for name, value in self.dict().items():
+            if name not in ("client", ):
+                df.loc[name] = [value]
+        return df
 
 
 class Resources(BaseModel):
@@ -55,7 +59,7 @@ class Resources(BaseModel):
         --------
         See keyword arguments on pydantic.BaseModel.dict()
         """
-        return pd.DataFrame([_.dict(**kwargs) for _ in self.__root__])
+        return pd.DataFrame([_.dict(exclude={"client"}, **kwargs) for _ in self.__root__])
 
 
 class FloaterConfiguration(Resource):
@@ -312,18 +316,6 @@ class TimeSeries(Resources):
         """
         dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
         dps.plot(**kwargs)
-
-    def to_pandas(self) -> pd.DataFrame:
-        """
-        Convert the data points list into a pandas DataFrame.
-
-        Returns
-        -------
-        pandas.DataFrame
-            The dataframe.
-        """
-        dfs = [ts.to_pandas() for ts in self.__root__]
-        return pd.concat(dfs, axis="columns")
 
 
 class Sensor(Resource):
