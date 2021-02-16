@@ -93,8 +93,6 @@ class Client:
         except requests.exceptions.RequestException as e:
             raise e
         else:
-            logging.info("Acquired valid access token.")
-            
             # update env vars
             data = r.json()
             token = data.get("access_token")
@@ -103,7 +101,7 @@ class Client:
                 raise ValueError(f"Unable to acquire a valid access token 'access_token'= {token} and "
                                  f"token expiry 'expires' = {expires}")
             else:
-                logging.info("Authentication successful. Acquired valid access token.")
+                logging.info("Acquired valid access token.")
                 os.environ["INQUIRE_MODELTEST_API_TOKEN"] = token
                 os.environ["INQUIRE_MODELTEST_API_TOKEN_EXPIRES"] = str(expires)
                 return token
