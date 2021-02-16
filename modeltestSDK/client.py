@@ -172,7 +172,8 @@ class Client:
         }
 
         # remove empty values from parameters
-        parameters = {k: v for k, v in parameters.items() if v is not None}
+        if parameters is not None:
+            parameters = {k: v for k, v in parameters.items() if v is not None}
         
         # do request (also encodes parameters)
         try:
