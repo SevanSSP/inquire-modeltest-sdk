@@ -859,6 +859,30 @@ class TimeseriesAPI(BaseAPI):
         timeseries = self.get(filter_by=[self.client.filter.timeseries.test_id == test_id])
         return timeseries
 
+    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> TimeSerie:
+        """"
+        Get single time serie by sensor id and test id
+
+        Parameters
+        ----------
+        sensor_id : str
+            Sensor identifier
+        test_id : str
+            Test identifier
+
+        Returns
+        -------
+        TimeSerie
+            Time series
+        """
+        timeseries = self.get(
+            filter_by=[
+                self.client.filter.timeseries.sensor_id == sensor_id,
+                self.client.filter.timeseries.test_id == test_id
+            ]
+        )
+        return timeseries[0]
+
     def get_data_points(self, ts_id: str, start: float = None, end: float = None, scaling_length: float = None) \
             -> DataPoints:
         """
