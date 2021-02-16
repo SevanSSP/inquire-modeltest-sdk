@@ -84,7 +84,7 @@ class Client:
         except requests.exceptions.RequestException as e:
             raise e
         else:
-            logging.debug("Acquired valid access token.")
+            logging.info("Acquired valid access token.")
 
             # update env vars
             data = r.json()
@@ -151,7 +151,7 @@ class Client:
 
         # create request headers
         headers = {
-            "Authorization": f"bearer {token}",
+            "Authorization": f"Bearer {token}",
             "Connection": "keep-alive",
             "Host": self.config.host.split("://")[-1],  # remove leading http/https
             "Content-Type": "application/json",

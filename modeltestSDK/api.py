@@ -77,7 +77,7 @@ class CampaignAPI(BaseAPI):
         data = self.client.post(self._resource_path, body=body)
         return Campaign(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> Campaigns:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Campaigns:
         """
         Get multiple campaigns
 
@@ -89,6 +89,10 @@ class CampaignAPI(BaseAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -100,7 +104,7 @@ class CampaignAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
         data = [item.update(dict(client=self.client)) for item in data]     # pass on the configured client
         return Campaigns.parse_obj(data)
 
@@ -171,7 +175,7 @@ class TestAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         data = [item.update(dict(client=self.client)) for item in data]  # pass on the configured client
         return Tests.parse_obj(data)
 
@@ -309,7 +313,7 @@ class FloaterTestAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         data = [item.update(dict(client=self.client)) for item in data]  # pass on the configured client
         return Tests.parse_obj(data)
 
@@ -438,7 +442,7 @@ class WaveCalibrationAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         data = [item.update(dict(client=self.client)) for item in data]  # pass on the configured client
         return Tests.parse_obj(data)
 
@@ -558,7 +562,7 @@ class WindCalibrationAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         data = [item.update(dict(client=self.client)) for item in data]  # pass on the configured client
         return Tests.parse_obj(data)
 
@@ -679,7 +683,7 @@ class SensorAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         data = [item.update(dict(client=self.client)) for item in data]  # pass on the configured client
         return Sensors.parse_obj(data)
 
@@ -807,7 +811,7 @@ class TimeseriesAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         data = [item.update(dict(client=self.client)) for item in data]  # pass on the configured client
         return TimeSeries.parse_obj(data)
 
@@ -999,7 +1003,7 @@ class TagsAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         data = [item.update(dict(client=self.client)) for item in data]  # pass on the configured client
         return Tags.parse_obj(data)
 
@@ -1149,7 +1153,7 @@ class FloaterConfigAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, "", parameters=params)
+        data = self.client.get(self._resource_path, parameters=params)
         data = [item.update(dict(client=self.client)) for item in data]  # pass on the configured client
         return FloaterConfigurations.parse_obj(data)
 
