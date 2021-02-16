@@ -185,7 +185,7 @@ class DataPointsList(Resources):
         return pd.concat(dfs, axis="columns")
 
 
-class TimeSerie(Resource):
+class TimeSeries(Resource):
     id: Optional[str]
     sensor_id: str
     test_id: str
@@ -273,8 +273,8 @@ class TimeSerie(Resource):
         dps.plot(**kwargs)
 
 
-class TimeSeries(Resources):
-    __root__: List[TimeSerie]
+class TimeSeriesList(Resources):
+    __root__: List[TimeSeries]
 
     def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPointsList:
         """
@@ -357,7 +357,7 @@ class Sensor(Resource):
         """Retrieve tags on sensor."""
         return self.client.tag.get_by_sensor_id(self.id)
 
-    def timeseries(self) -> TimeSeries:
+    def timeseries(self) -> TimeSeriesList:
         """Retrieve time series on sensor."""
         return self.client.timeseries.get_by_sensor_id(self.id)
 
@@ -392,7 +392,7 @@ class Test(Resource):
         """Retrieve tags on time serie."""
         return self.client.tag.get_by_test_id(self.id)
 
-    def timeseries(self, sensor_id: str = None) -> TimeSeries:
+    def timeseries(self, sensor_id: str = None) -> TimeSeriesList:
         """
         Retrieve time series on sensor.
 
@@ -403,7 +403,7 @@ class Test(Resource):
 
         Returns
         -------
-        TimeSeries
+        TimeSeriesList
             Time series
         """
         if sensor_id is not None:
