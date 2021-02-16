@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from pydantic import BaseModel
 from pydantic.typing import Literal
 from typing import List, Optional, Union, Any
+from datetime import datetime
 
 
 class Resource(BaseModel):
@@ -372,7 +373,7 @@ class Test(Resource):
     id: Optional[str]
     number: str
     description: str
-    test_date: str
+    test_date: datetime
     campaign_id: str
     type: str
 
@@ -469,7 +470,7 @@ class Campaign(Resource):
     name: str
     description: str
     location: str
-    date: str
+    date: datetime
     scale_factor: float
     water_depth: float
 
