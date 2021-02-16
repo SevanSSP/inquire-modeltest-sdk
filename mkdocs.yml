@@ -1,21 +1,15 @@
 site_name: Python SDK for the Sevan model test API
-theme:
-  name: material
-  palette:
-    scheme: default
-  features:
-    - navigation.instant
-    - navigation.sections
-    - navigation.expand
-  plugins:
-    - search
-  icon:
-    repo: fontawesome/brands/github
 nav:
   - Home: 'index.md'
   - Installation: 'installation.md'
   - Coordinates: 'coordinates.md'
   - Examples: 'examples.md'
+theme:
+  name: material
+  palette:
+    scheme: default
+  icon:
+    repo: fontawesome/brands/github
 markdown_extensions:
   - admonition
   - pymdownx.superfences
