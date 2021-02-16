@@ -45,12 +45,16 @@ class Client:
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
+        
+        # configure logging
+        log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
+        level = log_levels.get(self.config.log_level, logging.INFO)
+        if self.config.log_level == "debug":
+            fmt = "%(levelname)s at line %(lineno)d in %(filename)s - %(message)s"
+        else:
+            fmt = "%(levelname)s - %(message)s"
 
-        logging.basicConfig(
-            stream=sys.stdout,
-            level=log_levels.get(self.config.log_level, logging.INFO),
-            format="%(levelname)s at line %(lineno)d in %(filename)s - %(message)s"
-        )
+        logging.basicConfig(stream=sys.stdout, level=level, format=fmt)
 
     def _request_token(self) -> str:
         """str: Authenticate and return access token."""
@@ -59,7 +63,7 @@ class Client:
         token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
         if current_token is not None and token_expires_on is not None and \
                 datetime.utcnow().timestamp() < float(token_expires_on):
-            logging.debug("Your current access token has not yet expired.")
+            logging.debug("Your current access token is still valid.")
             return current_token
 
         # authenticate and get access token
@@ -97,7 +101,7 @@ class Client:
                 raise ValueError(f"Unable to acquire a valid access token 'access_token'= {token} and "
                                  f"token expiry 'expires' = {expires}")
             else:
-                logging.info("Authentication successful. Acquired valid access token.")
+                logging.info("Acquired valid access token.")
                 os.environ["INQUIRE_MODELTEST_API_TOKEN"] = token
                 os.environ["INQUIRE_MODELTEST_API_TOKEN_EXPIRES"] = str(expires)
                 return token
@@ -162,10 +166,15 @@ class Client:
         headers = {
             "Authorization": f"Bearer {token}",
             "Connection": "keep-alive",
-            # "Host": self.config.host,
+            "Host": self.config.host.split("://")[-1],  # remove leading http/https
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
+
+        # remove empty values from parameters
+        if parameters is not None:
+            parameters = {k: v for k, v in parameters.items() if v is not None}
+        
         # do request (also encodes parameters)
         try:
             r = requests.request(method, url, params=parameters, json=body, headers=headers)
@@ -279,7 +288,7 @@ class Client:
         """
         return self._do_request("PATCH", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
 
-    def delete(self, resource: str = None, endpoint: str = None, parameters: str = None):
+    def delete(self, resource: str = None, endpoint: str = None, parameters: dict = None):
         """
         Perform DELETE request
 

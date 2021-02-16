@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from modeltestSDK.resources import Campaign, Sensor, Timeseries
+from modeltestSDK.resources import Campaign, Sensor, TimeSeries
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +38,7 @@ def new_sensor():
 
 @pytest.fixture(scope="module")
 def new_timeseries():
-    ts = Timeseries(
+    ts = TimeSeries(
         sensor_id="12345678123456781234567812345678",
         test_id="12345678123456781234567812345678",
         fs=2.5,

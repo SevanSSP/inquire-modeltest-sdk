@@ -170,21 +170,6 @@ def format_class_name(s):
     return s[0].lower()
 
 
-def get_parent_dir(directory):
-    return os.path.dirname(directory)
-
-
-def get_datetime_date(date):
-    year = "20" + date[4:6]
-    year = int(year)
-    month = int(date[2:4])
-    day = int(date[0:2])
-    hour = int(date[6:8])
-    minute = int(date[8:10])
-    second = int(date[10:12])
-    return datetime(year, month, day, hour, minute, second).isoformat()
-
-
 class TwoWayDict(dict):
     """
     Special dict where index and value is searchable
@@ -205,13 +190,3 @@ class TwoWayDict(dict):
     def __len__(self):
         """Returns the number of connections"""
         return dict.__len__(self) // 2
-
-
-def from_string_to_time(s: str):
-    time_string = s.split(" ")[1]
-    if len(time_string) == 8:
-        # If timestamp is at whole second, ex. "09:00:00"
-        return datetime.datetime.strptime(time_string, "%H:%M:%S")
-    else:
-        # Timestamp, ex. "09:00:00.592"
-        return datetime.datetime.strptime(time_string, "%H:%M:%S.%f")
