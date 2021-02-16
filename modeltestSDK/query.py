@@ -126,7 +126,7 @@ class Query:
                                                               'wind_velocity',
                                                               'zref',
                                                               'wind_direction',
-                                                              ' read_only',
+                                                              'read_only',
                                                               'id'])
         self.floater_test = class_factory(name="Floatertest", method_spec=method_spec,
                                           attribute_list=['number',

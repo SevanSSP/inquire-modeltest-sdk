@@ -31,7 +31,6 @@ class BaseAPI:
         Notes
         -----
         Deleting items requires administrator privileges.
-
         """
         resp = self.client.delete(self._resource_path, endpoint=item_id, parameters=dict(secret_key=admin_key))
         return resp
@@ -239,7 +238,7 @@ class TestAPI(BaseAPI):
 
 class FloaterTestAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               floater_config_id: str = None, wave_id: str = None, wind_id: str = None,
+               floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
         """
         Create floater test
@@ -412,7 +411,6 @@ class WaveCalibrationAPI(TestAPI):
             current_direction=current_direction,
             read_only=read_only
         )
-
         data = self.client.post(self._resource_path, body=body)
         return WaveCalibrationTest(**data, client=self.client)
 
@@ -531,7 +529,6 @@ class WindCalibrationAPI(TestAPI):
             wind_direction=wind_direction,
             read_only=read_only
         )
-
         data = self.client.post(self._resource_path, body=body)
         return WindCalibrationTest(**data, client=self.client)
 
@@ -1205,3 +1202,4 @@ class FloaterConfigAPI(BaseAPI):
         """
         configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id, ])
         return configs
+

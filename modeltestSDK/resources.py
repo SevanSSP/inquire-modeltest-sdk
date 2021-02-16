@@ -30,7 +30,6 @@ class Resource(BaseModel):
                 df.loc[name] = [value]
         return df
 
-
 class Resources(BaseModel):
     __root__: List[Resource]
 

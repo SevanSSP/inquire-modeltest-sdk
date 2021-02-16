@@ -2,11 +2,15 @@ import os
 import sys
 import requests
 import logging
+import numpy as np
 from datetime import datetime
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
 from .config import Config
+
+
+log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
 
 
 class Client:
@@ -24,6 +28,7 @@ class Client:
 
         INQUIRE_MODELTEST_API_USER - Your username
         INQUIRE_MODELTEST_API_PASSWORD - Your password
+        INQUIRE_MODELTEST_API_HOST - Model test API host
 
     """
     def __init__(self, config=Config):
@@ -40,7 +45,7 @@ class Client:
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
-
+        
         # configure logging
         log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
         level = log_levels.get(self.config.log_level, logging.INFO)
@@ -56,14 +61,14 @@ class Client:
         # check if current access token is still valid
         current_token = os.getenv("INQUIRE_MODELTEST_API_TOKEN")
         token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
-        if current_token is not None and not token_expires_on == "None" :
-            if datetime.utcnow().timestamp() < float(token_expires_on):
-                logging.info("Your current access token is still valid.")
-                return current_token
+        if current_token is not None and token_expires_on is not None and \
+                datetime.utcnow().timestamp() < float(token_expires_on):
+            logging.debug("Your current access token is still valid.")
+            return current_token
 
         # authenticate and get access token
         try:
-            logging.info("Authenticating by user impersonation without any shared secret.")
+            logging.info("Authenticating by user impersonation.")
             user = os.getenv("INQUIRE_MODELTEST_API_USER")
             passwd = os.getenv("INQUIRE_MODELTEST_API_PASSWORD")
             assert user is not None and passwd is not None, "You have to set the following two environment variables " \
@@ -89,14 +94,19 @@ class Client:
             raise e
         else:
             logging.info("Acquired valid access token.")
-
+            
             # update env vars
             data = r.json()
             token = data.get("access_token")
             expires = data.get("expires")
-            os.environ["INQUIRE_MODELTEST_API_TOKEN"] = token
-            os.environ["INQUIRE_MODELTEST_API_TOKEN_EXPIRES"] = str(expires)
-            return token
+            if token is None and expires is None:
+                raise ValueError(f"Unable to acquire a valid access token 'access_token'= {token} and "
+                                 f"token expiry 'expires' = {expires}")
+            else:
+                logging.info("Authentication successful. Acquired valid access token.")
+                os.environ["INQUIRE_MODELTEST_API_TOKEN"] = token
+                os.environ["INQUIRE_MODELTEST_API_TOKEN_EXPIRES"] = str(expires)
+                return token
 
     def _create_url(self, resource: str = None, endpoint: str = None) -> str:
         """
@@ -117,14 +127,15 @@ class Client:
         Notes
         -----
         The full request url is like
-           'https://{host}/{base_url}/{version}/{resource}/{endpoint}'
+           '{host}/{base_url}/{version}/{resource}/{endpoint}'
 
         """
         url = f"{self.config.host}/{self.config.base_url}/{self.config.version}/"
         url += "/".join([p for p in [resource, endpoint] if p is not None])
         return url
 
-    def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
+    def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None,
+                    body: dict = None):
         """
         Carry out request.
 
@@ -164,12 +175,14 @@ class Client:
 
         # remove empty values from parameters
         parameters = {k: v for k, v in parameters.items() if v is not None}
-
+        
         # do request (also encodes parameters)
         try:
-            r = requests.request(method, url, params=parameters, data=body, headers=headers)
+            r = requests.request(method, url, params=parameters, json=body, headers=headers)
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:
+            logging.error("Request body:  " + str(body))
+            logging.error("Request response: " + r.text)
             raise e
         except requests.exceptions.ConnectionError as e:
             raise e
@@ -179,6 +192,35 @@ class Client:
             raise e
         else:
             return r.json()
+
+    def _ensure_serializable(self, body: dict):
+        """
+        change data types not natively supported by json encoder
+
+        Parameters
+        ----------
+        body : dict
+            Request body.
+
+        Returns
+        -------
+        dict
+            Request body with json encoder supported data types
+        """
+
+        serializable_body = dict()
+        for key, value in body.items():
+            if type(value) == np.int64 or type(value) == np.int32:
+                value = int(value)
+            elif type(value) == np.float64 or type(value) == np.float32:
+                value = float(value)
+
+            if (type(value) == float or type(value) == int) and np.isnan(value):
+                value = None
+
+            serializable_body[key] = value
+
+        return serializable_body
 
     def get(self, resource: str = None, endpoint: str = None, parameters: dict = None):
         """
@@ -221,6 +263,8 @@ class Client:
         dict
             Request response
         """
+        body = self._ensure_serializable(body)
+
         return self._do_request("POST", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
 
     def patch(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
