@@ -43,9 +43,13 @@ class Client:
 
         # configure logging
         log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
-        logging.basicConfig(stream=sys.stdout,
-                            level=log_levels.get(self.config.log_level, logging.INFO),
-                            format="%(levelname)s at line %(lineno)d in %(filename)s - %(message)s")
+        level = log_levels.get(self.config.log_level, logging.INFO)
+        if self.config.log_level == "debug":
+            fmt = "%(levelname)s at line %(lineno)d in %(filename)s - %(message)s"
+        else:
+            fmt = "%(levelname)s - %(message)s"
+
+        logging.basicConfig(stream=sys.stdout, level=level, format=fmt)
 
     def _request_token(self) -> str:
         """str: Authenticate and return access token."""
@@ -54,7 +58,7 @@ class Client:
         token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
         if current_token is not None and not token_expires_on == "None" :
             if datetime.utcnow().timestamp() < float(token_expires_on):
-                logging.debug("Your current access token has not yet expired.")
+                logging.info("Your current access token is still valid.")
                 return current_token
 
         # authenticate and get access token
