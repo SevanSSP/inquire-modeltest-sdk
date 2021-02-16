@@ -238,7 +238,7 @@ class TestAPI(BaseAPI):
 
 class FloaterTestAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
+               floater_config_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
         """
         Create floater test
