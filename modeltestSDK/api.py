@@ -5,7 +5,7 @@ import logging
 from typing import Union
 from .utils import format_class_name
 from .resources import (
-    Campaign, Campaigns, Test, Tests, Sensor, Sensors, TimeSerie, TimeSeries, DataPoints, FloaterTest,
+    Campaign, Campaigns, Test, Tests, Sensor, Sensors, TimeSeries, TimeSeriesList, DataPoints, FloaterTest,
     WaveCalibrationTest, WindCalibrationTest, Tag, Tags, FloaterConfiguration, FloaterConfigurations, Statistics
 )
 from .query import create_query_parameters
@@ -740,7 +740,7 @@ class SensorAPI(BaseAPI):
 
 class TimeseriesAPI(BaseAPI):
     def create(self, sensor_id: str, test_id: str, default_start_time: float, default_end_time: float, fs: float,
-               intermittent: bool = False, read_only: bool = False) -> TimeSerie:
+               intermittent: bool = False, read_only: bool = False) -> TimeSeries:
         """
         Create time series
 
@@ -777,9 +777,9 @@ class TimeseriesAPI(BaseAPI):
             read_only=read_only
         )
         data = self.client.post(self._resource_path, body=body)
-        return TimeSerie(**data, client=self.client)
+        return TimeSeries(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> TimeSeries:
+    def get(self, filter_by: list = None, sort_by: list = None) -> TimeSeriesList:
         """
         Get multiple time series
 
@@ -794,7 +794,7 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSeries
+        TimeSeriesList
             Multiple time series
         """
         if filter_by is None:
@@ -803,9 +803,9 @@ class TimeseriesAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return TimeSeries.parse_obj([dict(**item, client=self.client) for item in data])
+        return TimeSeriesList.parse_obj([dict(**item, client=self.client) for item in data])
 
-    def get_by_id(self, timeseries_id: str) -> TimeSerie:
+    def get_by_id(self, timeseries_id: str) -> TimeSeries:
         """
         Get single time series by id
 
@@ -816,13 +816,13 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSerie
+        TimeSeries
             Time series
         """
         data = self.client.get(self._resource_path, timeseries_id)
-        return TimeSerie(**data, client=self.client)
+        return TimeSeries(**data, client=self.client)
 
-    def get_by_sensor_id(self, sensor_id: str) -> TimeSeries:
+    def get_by_sensor_id(self, sensor_id: str) -> TimeSeriesList:
         """"
         Get time series by sensor id
 
@@ -833,13 +833,13 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSeries
+        TimeSeriesList
             Time series
         """
         timeseries = self.get(filter_by=[self.client.filter.timeseries.sensor_id == sensor_id])
         return timeseries
 
-    def get_by_test_id(self, test_id: str) -> TimeSeries:
+    def get_by_test_id(self, test_id: str) -> TimeSeriesList:
         """"
         Get time series by test id
 
@@ -850,13 +850,13 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSeries
+        TimeSeriesList
             Time series
         """
         timeseries = self.get(filter_by=[self.client.filter.timeseries.test_id == test_id])
         return timeseries
 
-    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> TimeSerie:
+    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> TimeSeries:
         """"
         Get single time serie by sensor id and test id
 
@@ -869,7 +869,7 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSerie
+        TimeSeries
             Time series
         """
         timeseries = self.get(
