@@ -35,5 +35,8 @@ venv.bak/
 #Pytest
 .pytest_cache/
 
+#Nox
+.nox
+
 # Jupyter Notebook
 .ipynb_checkpoints/

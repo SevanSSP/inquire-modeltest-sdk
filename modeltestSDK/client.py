@@ -9,7 +9,6 @@ from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI
 from .query import Query
 from .config import Config
 
-
 log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
 
 
@@ -31,6 +30,7 @@ class Client:
         INQUIRE_MODELTEST_API_HOST - Model test API host
 
     """
+
     def __init__(self, config=Config):
         """Initilize objects for interacting with the API"""
         self.config = config
@@ -45,7 +45,7 @@ class Client:
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
-        
+
         # configure logging
         log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
         level = log_levels.get(self.config.log_level, logging.INFO)
@@ -174,7 +174,7 @@ class Client:
         # remove empty values from parameters
         if parameters is not None:
             parameters = {k: v for k, v in parameters.items() if v is not None}
-        
+
         # do request (also encodes parameters)
         try:
             r = requests.request(method, url, params=parameters, json=body, headers=headers)
