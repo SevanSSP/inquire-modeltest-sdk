@@ -189,7 +189,7 @@ class TimeSerie(Resource):
     sensor_id: str
     test_id: str
     fs: float
-    datapoints_created_at: str
+    datapoints_created_at: Optional[str]
     intermittent: Optional[bool] = False
     default_start_time: Optional[float]
     default_end_time: Optional[float]
