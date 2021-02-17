@@ -13,6 +13,7 @@ from .query import create_query_parameters
 
 class BaseAPI:
     """Base API with methods common for all APIs."""
+
     def __init__(self, client):
         self._resource_path: str = format_class_name(self.__class__.__name__)
         self.client = client
@@ -1202,4 +1203,3 @@ class FloaterConfigAPI(BaseAPI):
         """
         configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id, ])
         return configs
-
