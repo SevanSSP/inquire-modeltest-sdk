@@ -44,7 +44,7 @@ Now you are ready to code!
 To run all tests
 
 ```console
-nox
+pytest tests
 ```
 
 ## Versioning
