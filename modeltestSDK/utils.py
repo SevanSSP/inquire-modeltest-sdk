@@ -1,13 +1,11 @@
 """
 Utility functions
 """
-import os
 import numpy as np
 from collections import OrderedDict, defaultdict
 from datetime import datetime, timedelta
 import uuid
 import re
-
 
 # compile regex for camel case to snake case
 first_cap_re = re.compile('(.)([A-Z][a-z]+)')
@@ -80,6 +78,7 @@ def to_snake_case(d):
     str or list or dict
         Data with snake case keys
     """
+
     def snake(s):
         s1 = first_cap_re.sub(r'\1_\2', s)
         return all_cap_re.sub(r'\1_\2', s1).lower()
@@ -113,6 +112,7 @@ def to_camel_case(d):
     str or list or dict
         Data with camel case keys
     """
+
     def camel(s):
         first, *others = s.split('_')
         return ''.join([first.lower(), *map(str.title, others)])
@@ -174,6 +174,7 @@ class TwoWayDict(dict):
     """
     Special dict where index and value is searchable
     """
+
     def __setitem__(self, key, value):
         # Remove any previous connections with these values
         if key in self:
