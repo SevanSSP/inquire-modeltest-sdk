@@ -19,25 +19,5 @@ Where
 - HOST is the API host, e.g "http://127.0.0.1:8000", when hosting locally
 
 
-## Contribute
-These instructions will get you a copy of the project up and running on your local machine for development and testing
-purposes. See deployment for notes on how to deploy the project on a live system.
-
-### Prerequisites
-* Install Python 3, version 3.6.9 or later
-
-### Clone the source code repository
-At the desired location, run:
-
-```git clone https://github.com/SevanSSP/inquire-modeltest-sdk.git```
-
-### Setup Python environment
-Poetry
-
-
-### Run the tests
-To run all tests:
-
-```console
-pytest tests 
-```
+## Prerequisites
+* Python 3, version 3.6.9 or later
