@@ -19,5 +19,7 @@ markdown_extensions:
       linenums: true
       linenums_style: pymdownx.inline
   - pymdownx.inlinehilite
-  - pymdownx.snippets
+  - pymdownx.snippets:
+      base_path: "examples/"
+      check_paths: true
 repo_url: https://github.com/SevanSSP/inquire-modeltest-sdk

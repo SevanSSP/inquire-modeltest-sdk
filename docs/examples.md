@@ -1,5 +1,28 @@
 #Examples
 
+## Basic
+
+Initiate API client and fetch all available campaings.
+
+!!! note
+
+    Line numbers are shown by default and `examples` is configured as base path for the snippets. These
+    settings are controlled in the `mkdocs.yaml`.
+    
+    Snippets shall therefore be put in the `examples` folder on the root and referenced using the filename only.
+    
+    `hl_lines="7-8"` hihglights lines 7 and 8 in the code snippet.
+    
+    
+!!! warning
+
+    An error is raised if the referenced file is not found.    
+
+
+```python hl_lines="7-8"
+--8<--- "basic.py"
+```
+
 ##Create campaign
 
 ``` python linenums="1"
