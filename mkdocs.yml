@@ -8,6 +8,9 @@ theme:
   name: material
   palette:
     scheme: default
+  features:
+    - navigation.instant
+    - toc.integrate
   icon:
     repo: fontawesome/brands/github
 markdown_extensions:
@@ -23,3 +26,4 @@ markdown_extensions:
       base_path: "examples/"
       check_paths: true
 repo_url: https://github.com/SevanSSP/inquire-modeltest-sdk
+copyright: Copyright &copy; 2021 Sevan SSP
