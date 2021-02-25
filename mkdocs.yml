@@ -1,7 +1,6 @@
-site_name: Python SDK for the Sevan model test API
+site_name: Inquire Model Test SDK, by Sevan
 nav:
   - Home: 'index.md'
-  - Installation: 'installation.md'
   - Coordinates: 'coordinates.md'
   - Examples: 'examples.md'
 theme:
@@ -26,4 +25,7 @@ markdown_extensions:
       base_path: "examples/"
       check_paths: true
 repo_url: https://github.com/SevanSSP/inquire-modeltest-sdk
+extra:
+  version:
+    method: mike
 copyright: Copyright &copy; 2021 Sevan SSP
