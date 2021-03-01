@@ -1,43 +1,46 @@
 #Examples
 
+## Basic
+
+Initiate API client and fetch all available campaigns.
+
+
+```python hl_lines="7-8"
+--8<--- "basic.py"
+```
+
+!!! note
+
+    the get_all() method is replaced by get() in later revisions
+
 ##Create campaign
 
-``` python linenums="1"
-from datetime import datetime
-from modeltestSDK import Client
+Add a campaign to the database, using datetime to properly handle the date.
 
-client = Client()
-
-campaign = client.campaign.create(name="Campaign name",
-                                  description="Campaign description",
-                                  date=datetime(year=2000, month=1, day=1).isoformat(),
-                                  location="Test location",
-                                  scale_factor=52,
-                                  water_depth=300,
-                                  read_only=True) 
+```python hl_lines="8-14"
+--8<--- "create.py"
 ```
 
-Import datetime to properly handle the date
-``` python linenums="1" hl_lines="1"
-from datetime import datetime
-from modeltestSDK import Client
+##Get campaign
+This example will filter by campaign name and description and sort ascending by date.
+The filter object enables use of Pythonic syntax 
 
+
+```python hl_lines="8-10"
+--8<--- "filter_and_sort.py"
 ```
 
-Import and initialize the client
-``` python linenums="2" hl_lines="1 3"
-from modeltestSDK import Client
+!!! note
 
-client = Client()
-```
+    Filtering and sort arguments needs to be contained inside a list.
+    Sorting will be done in the order the arguments are given in the list
 
-Add necessary inputs
-``` python linenums="5" hl_lines="1-8"
-campaign = client.campaign.create(name="Campaign name",
-                                  description="Campaign description",
-                                  date=datetime(year=2000, month=1, day=1).isoformat(),
-                                  location="Test location",
-                                  scale_factor=52,
-                                  water_depth=300,
-                                  read_only=True) 
-```
+!!! note
+
+    the get_all() method is replaced by get() in later revisions
+
+
+
+ 
+
+
