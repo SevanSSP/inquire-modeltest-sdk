@@ -56,6 +56,9 @@ class Client:
 
         logging.basicConfig(stream=sys.stdout, level=level, format=fmt)
 
+    def __str__(self):
+        return f"<Client host:'{self.config.host}'>"
+
     def _request_token(self) -> str:
         """str: Authenticate and return access token."""
         # check if current access token is still valid
