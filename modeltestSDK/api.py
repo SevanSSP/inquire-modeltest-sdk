@@ -882,7 +882,7 @@ class TimeseriesAPI(BaseAPI):
         return timeseries[0]
 
     def get_data_points(self, ts_id: str, start: float = None, end: float = None, scaling_length: float = None,
-                        all: bool = False) -> DataPoints:
+                        all_data: bool = False) -> DataPoints:
         """
         Fetch data points for time series by id.
 
@@ -897,7 +897,7 @@ class TimeseriesAPI(BaseAPI):
         scaling_length : float, optional
             Scale data points to the the specified scaling length according to Froude law from the original
             reference length.
-        all : bool, optional
+        all_data : bool, optional
             Fetch all data points including the transients which are masked by default.
 
         Returns
@@ -905,7 +905,7 @@ class TimeseriesAPI(BaseAPI):
         DataPoints
             Data points
         """
-        parameters = dict(start_time=start, end_time=end, scaling_length=scaling_length, all_data=all)
+        parameters = dict(start_time=start, end_time=end, scaling_length=scaling_length, all_data=all_data)
         data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data", parameters=parameters)
         return DataPoints(**data.get("data"), _client=self.client)
 
