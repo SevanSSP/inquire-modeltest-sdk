@@ -507,7 +507,7 @@ class WindCalibrationAPI(TestAPI):
         wind_velocity : float
             Wind velocity (m/s)
         zref : float
-            Vertical reference heigh (m)
+            Vertical reference height (m)
         wind_direction : float
             Wave direction (degrees)
         read_only : bool, optional
@@ -859,7 +859,7 @@ class TimeseriesAPI(BaseAPI):
 
     def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> TimeSeries:
         """"
-        Get single time serie by sensor id and test id
+        Get single time series by sensor id and test id
 
         Parameters
         ----------
@@ -882,7 +882,7 @@ class TimeseriesAPI(BaseAPI):
         return timeseries[0]
 
     def get_data_points(self, ts_id: str, start: float = None, end: float = None, scaling_length: float = None,
-                        all_data: bool = False, cache = True) -> DataPoints:
+                        all_data: bool = False, cache: bool = True) -> DataPoints:
         """
         Fetch data points for time series by id.
 
@@ -899,6 +899,8 @@ class TimeseriesAPI(BaseAPI):
             reference length.
         all_data : bool, optional
             Fetch all data points including the transients which are masked by default.
+        cache : bool, optional
+            Cache data points for 30 days
 
         Returns
         -------

@@ -182,7 +182,7 @@ class Client:
         # do request (also encodes parameters)
         try:
             if cache:
-                with requests_cache.enabled(cache_name='mtdb', backend='sqlite', use_cache_dir=True,
+                with requests_cache.enabled('mtdb', cache_name='mtdb', backend='sqlite', use_cache_dir=True,
                                             expire_after=timedelta(days=30)):
                     r = requests.request(method, url, params=parameters, json=body, headers=headers)
                 r.raise_for_status()
@@ -202,7 +202,8 @@ class Client:
         else:
             return r.json()
 
-    def _ensure_serializable(self, body: dict):
+    @staticmethod
+    def _ensure_serializable(body: dict):
         """
         change data types not natively supported by json encoder
 
@@ -231,7 +232,7 @@ class Client:
 
         return serializable_body
 
-    def get(self, resource: str = None, endpoint: str = None, parameters: dict = None, cache = False):
+    def get(self, resource: str = None, endpoint: str = None, parameters: dict = None, cache: bool = False):
         """
         Perform GET request
 
@@ -243,6 +244,8 @@ class Client:
            API resource endpoint e.g. 'list' or 'search'
         parameters : dict, optional
             URL parameters
+        cache : bool, optional
+            Enable caching of request response
 
         Returns
         -------
