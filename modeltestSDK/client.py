@@ -182,7 +182,7 @@ class Client:
         # do request (also encodes parameters)
         try:
             if cache:
-                with requests_cache.enabled('mtdb', cache_name='mtdb', backend='sqlite', use_cache_dir=True,
+                with requests_cache.enabled(cache_name='mtdb', backend='sqlite', use_cache_dir=True,
                                             expire_after=timedelta(days=30)):
                     r = requests.request(method, url, params=parameters, json=body, headers=headers)
                 r.raise_for_status()
