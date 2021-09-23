@@ -1,9 +1,10 @@
 import os
 import sys
 import requests
+import requests_cache
 import logging
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
@@ -136,7 +137,7 @@ class Client:
         return url
 
     def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None,
-                    body: dict = None):
+                    body: dict = None, cache=False):
         """
         Carry out request.
 
@@ -180,8 +181,14 @@ class Client:
 
         # do request (also encodes parameters)
         try:
-            r = requests.request(method, url, params=parameters, json=body, headers=headers)
-            r.raise_for_status()
+            if cache:
+                with requests_cache.enabled(cache_name='mtdb', backend='sqlite', use_cache_dir=True,
+                                            expire_after=timedelta(days=30)):
+                    r = requests.request(method, url, params=parameters, json=body, headers=headers)
+                r.raise_for_status()
+            else:
+                r = requests.request(method, url, params=parameters, json=body, headers=headers)
+                r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             logging.error("Request body:  " + str(body))
             logging.error("Request response: " + r.text)
@@ -224,7 +231,7 @@ class Client:
 
         return serializable_body
 
-    def get(self, resource: str = None, endpoint: str = None, parameters: dict = None):
+    def get(self, resource: str = None, endpoint: str = None, parameters: dict = None, cache = False):
         """
         Perform GET request
 
@@ -243,7 +250,7 @@ class Client:
             Request response
 
         """
-        return self._do_request("GET", resource=resource, endpoint=endpoint, parameters=parameters)
+        return self._do_request("GET", resource=resource, endpoint=endpoint, parameters=parameters, cache=cache)
 
     def post(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
         """

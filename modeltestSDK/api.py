@@ -882,7 +882,7 @@ class TimeseriesAPI(BaseAPI):
         return timeseries[0]
 
     def get_data_points(self, ts_id: str, start: float = None, end: float = None, scaling_length: float = None,
-                        all_data: bool = False) -> DataPoints:
+                        all_data: bool = False, cache = True) -> DataPoints:
         """
         Fetch data points for time series by id.
 
@@ -906,7 +906,8 @@ class TimeseriesAPI(BaseAPI):
             Data points
         """
         parameters = dict(start_time=start, end_time=end, scaling_length=scaling_length, all_data=all_data)
-        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data", parameters=parameters)
+        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data", parameters=parameters,
+                               cache=cache)
         return DataPoints(**data.get("data"), _client=self.client)
 
     def add_data_points(self, ts_id: str, time: list, values: list, admin_key: str) -> DataPoints:
