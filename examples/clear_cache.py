@@ -1,3 +1,7 @@
+"""
+Clearing cache example
+"""
+
 from modeltestSDK import Client
 client = Client()
 
