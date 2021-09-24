@@ -4,7 +4,7 @@ import requests
 import requests_cache
 import logging
 import numpy as np
-from datetime import datetime, timedelta
+from datetime import datetime
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
@@ -182,8 +182,7 @@ class Client:
         # do request (also encodes parameters)
         try:
             if cache:
-                with requests_cache.enabled(cache_name='mtdb', backend='sqlite', use_cache_dir=True,
-                                            expire_after=timedelta(days=30)):
+                with requests_cache.enabled(**Config.cache_settings):
                     r = requests.request(method, url, params=parameters, json=body, headers=headers)
                 r.raise_for_status()
             else:
@@ -326,6 +325,5 @@ class Client:
         """
         Removes cached datapoints (from mtdb.sqlite at local cache folder)
         """
-        with requests_cache.enabled(cache_name='mtdb', backend='sqlite', use_cache_dir=True,
-                                    expire_after=timedelta(days=30)):
+        with requests_cache.enabled(**Config.cache_settings):
             requests_cache.clear()

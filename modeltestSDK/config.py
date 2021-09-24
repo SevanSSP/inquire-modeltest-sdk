@@ -2,7 +2,7 @@
 Configurations
 """
 import os
-
+from datetime import timedelta
 
 class Config:
     """
@@ -12,6 +12,10 @@ class Config:
     base_url: str = "api"
     version: str = "v1"
     log_level: str = "info"
+    cache_settings = {'cache_name': 'mtdb',
+                      'backend': 'sqlite',
+                      'use_cache_dir': True,
+                      'expire_after': timedelta(days=7)}
 
 
 class LocalConfig(Config):
