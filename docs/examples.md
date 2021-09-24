@@ -11,7 +11,7 @@ Initiate API client and fetch all available campaigns.
 
 !!! note
 
-    the get_all() method is replaced by get() in later revisions
+    the get_all() method was previously used to return several results
 
 ##Create campaign
 
@@ -37,7 +37,7 @@ The filter object enables use of Pythonic syntax
 
 !!! note
 
-    the get_all() method is replaced by get() in later revisions
+    the get_all() method was previously used to return several results
 
 
 

@@ -1,6 +1,7 @@
 import os
 import sys
 import requests
+import requests_cache
 import logging
 import numpy as np
 from datetime import datetime
@@ -136,7 +137,7 @@ class Client:
         return url
 
     def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None,
-                    body: dict = None):
+                    body: dict = None, cache=False):
         """
         Carry out request.
 
@@ -180,8 +181,13 @@ class Client:
 
         # do request (also encodes parameters)
         try:
-            r = requests.request(method, url, params=parameters, json=body, headers=headers)
-            r.raise_for_status()
+            if cache:
+                with requests_cache.enabled(**Config.cache_settings):
+                    r = requests.request(method, url, params=parameters, json=body, headers=headers)
+                r.raise_for_status()
+            else:
+                r = requests.request(method, url, params=parameters, json=body, headers=headers)
+                r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             logging.error("Request body:  " + str(body))
             logging.error("Request response: " + r.text)
@@ -195,7 +201,8 @@ class Client:
         else:
             return r.json()
 
-    def _ensure_serializable(self, body: dict):
+    @staticmethod
+    def _ensure_serializable(body: dict):
         """
         change data types not natively supported by json encoder
 
@@ -224,7 +231,7 @@ class Client:
 
         return serializable_body
 
-    def get(self, resource: str = None, endpoint: str = None, parameters: dict = None):
+    def get(self, resource: str = None, endpoint: str = None, parameters: dict = None, cache: bool = False):
         """
         Perform GET request
 
@@ -236,6 +243,8 @@ class Client:
            API resource endpoint e.g. 'list' or 'search'
         parameters : dict, optional
             URL parameters
+        cache : bool, optional
+            Enable caching of request response
 
         Returns
         -------
@@ -243,7 +252,7 @@ class Client:
             Request response
 
         """
-        return self._do_request("GET", resource=resource, endpoint=endpoint, parameters=parameters)
+        return self._do_request("GET", resource=resource, endpoint=endpoint, parameters=parameters, cache=cache)
 
     def post(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
         """
@@ -310,3 +319,11 @@ class Client:
             Request response
         """
         return self._do_request("DELETE", resource=resource, endpoint=endpoint, parameters=parameters)
+
+    @staticmethod
+    def clear_cache():
+        """
+        Removes cached datapoints (from mtdb.sqlite at local cache folder)
+        """
+        with requests_cache.enabled(**Config.cache_settings):
+            requests_cache.clear()

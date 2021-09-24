@@ -3,6 +3,7 @@ nav:
   - Home: 'index.md'
   - Coordinates: 'coordinates.md'
   - Examples: 'examples.md'
+  - Caching: 'caching.md'
 theme:
   name: material
   palette:
