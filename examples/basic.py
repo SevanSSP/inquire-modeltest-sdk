@@ -5,4 +5,4 @@ from modeltestSDK import Client
 
 
 client = Client()
-campaigns = client.campaign.get_all()
+campaigns = client.campaign.get()
