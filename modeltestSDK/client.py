@@ -320,3 +320,12 @@ class Client:
             Request response
         """
         return self._do_request("DELETE", resource=resource, endpoint=endpoint, parameters=parameters)
+
+    @staticmethod
+    def clear_cache():
+        """
+        Removes cached datapoints (from mtdb.sqlite at local cache folder)
+        """
+        with requests_cache.enabled(cache_name='mtdb', backend='sqlite', use_cache_dir=True,
+                                    expire_after=timedelta(days=30)):
+            requests_cache.clear()
