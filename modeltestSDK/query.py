@@ -22,6 +22,9 @@ class FilterAttribute:
     def __ge__(self, other):
         return dict(name=self.name, op='gte', val=other)
 
+    def contains(self, item):
+        return dict(name=self.name, op='co', val=item)
+
 
 class SortAttribute:
     def __init__(self, name):
@@ -154,7 +157,7 @@ class Query:
                                                             'description',
                                                             'characteristic_length',
                                                             'campaign_id',
-                                                            ' draft',
+                                                            'draft',
                                                             'read_only',
                                                             'id'])
 
