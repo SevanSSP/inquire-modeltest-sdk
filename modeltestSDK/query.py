@@ -1,6 +1,8 @@
 """
 Classes and functions enabling advanced API queries
 """
+from typing_extensions import Literal
+query_extension_types = Literal["sort", "filter"]
 
 
 class FilterAttribute:
@@ -47,15 +49,15 @@ class SortAttribute:
         return self.descending
 
 
-def class_factory(name: str, method_spec: str, attribute_list: list):
+def class_factory(name: str, method_spec: query_extension_types, attribute_list: list):
     def init():
         pass
 
     attr_dict = {'__init__': init}
-    if method_spec == 'sort' or method_spec == 'both':
+    if method_spec == 'sort':
         for attr in attribute_list:
             attr_dict[attr] = SortAttribute(attr)
-    if method_spec == 'filter' or method_spec == 'both':
+    if method_spec == 'filter':
         for attr in attribute_list:
             attr_dict[attr] = FilterAttribute(attr)
 
@@ -63,7 +65,7 @@ def class_factory(name: str, method_spec: str, attribute_list: list):
 
 
 class Query:
-    def __init__(self, method_spec: str = 'both'):
+    def __init__(self, method_spec: query_extension_types):
         self.campaign = class_factory(name='Campaign', method_spec=method_spec,
                                       attribute_list=['name',
                                                       'description',
@@ -186,11 +188,6 @@ def create_query_parameters(filter_expressions: list, sorting_expressions: list)
             query_filter['val'] = str(query_filter['val'])
         filter_s = filter_s + query_filter['name'] + '[' + query_filter['op'] + ']' + '=' + query_filter['val']
 
-    if sorting_expressions == [] or filter_expressions == []:
-        sort_filter = ''
-    else:
-        sort_filter = ''
-
     sort_str = ''
     for sort_parameter in sorting_expressions:
         if not sort_str == '':
@@ -199,7 +196,7 @@ def create_query_parameters(filter_expressions: list, sorting_expressions: list)
 
     parameters = dict()
     if filter_s != "":
-        parameters["filter_by"] = filter_s + sort_filter
+        parameters["filter_by"] = filter_s
 
     if sort_str != "":
         parameters["sort_by"] = sort_str
