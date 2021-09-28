@@ -26,7 +26,7 @@ This example will filter by campaign name and description and sort ascending by 
 The filter object enables use of Pythonic syntax 
 
 
-```python hl_lines="8-10"
+```python hl_lines="7-10"
 --8<--- "filter_and_sort.py"
 ```
 
