@@ -312,7 +312,7 @@ class FloaterTestAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Tests.parse_obj([dict(**item, _client=self.client) for item in data])
+        return Tests.parse_obj([FloaterTest(**item, _client=self.client) for item in data])
 
     def get_by_id(self, test_id: str) -> FloaterTest:
         """
@@ -439,7 +439,7 @@ class WaveCalibrationAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Tests.parse_obj([dict(**item, _client=self.client) for item in data])
+        return Tests.parse_obj([WaveCalibrationTest(**item, _client=self.client) for item in data])
 
     def get_by_id(self, test_id: str) -> WaveCalibrationTest:
         """
@@ -557,7 +557,7 @@ class WindCalibrationAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Tests.parse_obj([dict(**item, _client=self.client) for item in data])
+        return Tests.parse_obj([WindCalibrationTest(**item, _client=self.client) for item in data])
 
     def get_by_id(self, test_id: str) -> WindCalibrationTest:
         """
