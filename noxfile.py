@@ -38,7 +38,7 @@ def tests(session):
 
     # unit tests
     testfiles = ["tests/"]
-    session.run("coverage", "run", "-m", "pytest", *testfiles)
+    session.run("coverage", "run", "-m", "pytest", *testfiles, "--source==modeltestSDK")
     session.notify("cover")
 
 
