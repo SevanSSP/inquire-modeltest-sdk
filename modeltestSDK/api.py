@@ -665,7 +665,6 @@ class SensorAPI(BaseAPI):
             campaign_id=campaign_id,
             read_only=read_only
         )
-        print(body)
         data = self.client.post(self._resource_path, body=body)
         return Sensor(**data, _client=self.client)
 
