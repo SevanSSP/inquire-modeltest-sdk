@@ -604,8 +604,9 @@ class WindCalibrationAPI(TestAPI):
 
 
 class SensorAPI(BaseAPI):
-    def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-               is_local: bool, campaign_id: str, area: float = None,
+    def create(self, name: str, description: str, unit: str, kind: str, source: str, x: float, y: float, z: float,
+               position_reference: str, position_heading_lock: bool, position_draft_lock: bool,
+               positive_direction_definition: str, campaign_id: str, area: float = None,
                read_only: bool = False) -> Sensor:
         """
         Parameters
@@ -617,15 +618,24 @@ class SensorAPI(BaseAPI):
         unit : str
             Unit of measure
         kind : str
-            Kind of sensor
+            Kind of sensor: "length", "velocity", "acceleration", "force", "pressure", "volume", "mass", "moment",
+            "angle", "angular velocity", "angular acceleration", "slamming force", "slamming pressure", "control signal"
+        source : str
+            Data source. 'Direct measurement', 'Basin derived', 'Sevan derived' or 'external derived'
         x : float
             Position x-coordinate
         y : float
             Position y-coordinate
         z : float
             Position z-coordinate
-        is_local : bool
-            Is the sensor placed in local coordinate system
+        position_reference : str
+            position reference, "local" or "global"
+        position_heading_lock : bool
+            Is the position locked to floater heading
+        position_draft_lock: bool
+            Is the position locked to floater draft
+        positive_direction_definition : str
+            Definition of positive directio
         campaign_id : str
             Identifier of parent campaign
         area : float, optional
@@ -641,15 +651,21 @@ class SensorAPI(BaseAPI):
         body = dict(
             name=name,
             description=description,
-            unit=unit, kind=kind,
+            unit=unit,
+            kind=kind,
+            source=source,
             area=area,
             x=x,
             y=y,
             z=z,
-            is_local=is_local,
+            position_reference=position_reference,
+            position_heading_lock=position_heading_lock,
+            position_draft_lock=position_draft_lock,
+            positive_direction_definition=positive_direction_definition,
             campaign_id=campaign_id,
             read_only=read_only
         )
+        print(body)
         data = self.client.post(self._resource_path, body=body)
         return Sensor(**data, _client=self.client)
 
@@ -912,7 +928,7 @@ class TimeseriesAPI(BaseAPI):
                                cache=cache)
         return DataPoints(**data.get("data"), _client=self.client)
 
-    def add_data_points(self, ts_id: str, time: list, values: list, admin_key: str) -> DataPoints:
+    def add_data_points(self, ts_id: str, time: list, values: list) -> DataPoints:
         """
         Add data points to timeseries
 
@@ -924,8 +940,6 @@ class TimeseriesAPI(BaseAPI):
             Time (s)
         values : list
             Values corresponding to time
-        admin_key : str
-            Administrator secret key
 
         Returns
         -------
@@ -933,8 +947,7 @@ class TimeseriesAPI(BaseAPI):
             Data points
         """
         body = dict(data=dict(time=time, value=values))
-        data = self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=body,
-                                parameters=dict(secret_key=admin_key))
+        data = self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=body)
         return DataPoints(**data, _client=self.client)
 
     def get_statistics(self, ts_id: str, scaling_length: float = None) -> Statistics:
