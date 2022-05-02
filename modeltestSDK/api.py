@@ -255,7 +255,7 @@ class FloaterTestAPI(TestAPI):
         campaign_id : str
             Identifier of parent campaign
         category : str
-            The kind of test
+            The kind of test, "current force", "wind force", "decay", "regular wave", "irregular wave" or "pull out"
         orientation : float
             Orientation (degrees)
         floater_config_id : id
@@ -359,7 +359,7 @@ class FloaterTestAPI(TestAPI):
 
 class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
-               wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
+               wave_spectrum: Union[str, None], wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
                read_only: bool = False) -> WaveCalibrationTest:
         """
@@ -375,8 +375,8 @@ class WaveCalibrationAPI(TestAPI):
             Date of testing
         campaign_id : str
             Identifier of parent campaign
-        wave_spectrum : str
-            Wave spectrum type
+        wave_spectrum : Union[str, None]
+            Wave spectrum type, "jonswap", "torsethaugen", "broad band", "regular", None
         wave_height : float
             Wave height (m)
         wave_period : float
@@ -604,8 +604,9 @@ class WindCalibrationAPI(TestAPI):
 
 
 class SensorAPI(BaseAPI):
-    def create(self, name: str, description: str, unit: str, kind: str, x: float, y: float, z: float,
-               is_local: bool, campaign_id: str, area: float = None,
+    def create(self, name: str, description: str, unit: str, kind: str, source: str, x: float, y: float, z: float,
+               position_reference: str, position_heading_lock: bool, position_draft_lock: bool,
+               positive_direction_definition: str, campaign_id: str, area: float = None,
                read_only: bool = False) -> Sensor:
         """
         Parameters
@@ -617,15 +618,24 @@ class SensorAPI(BaseAPI):
         unit : str
             Unit of measure
         kind : str
-            Kind of sensor
+            Kind of sensor: "length", "velocity", "acceleration", "force", "pressure", "volume", "mass", "moment",
+            "angle", "angular velocity", "angular acceleration", "slamming force", "slamming pressure", "control signal"
+        source : str
+            Data source. 'Direct measurement', 'Basin derived', 'Sevan derived' or 'external derived'
         x : float
             Position x-coordinate
         y : float
             Position y-coordinate
         z : float
             Position z-coordinate
-        is_local : bool
-            Is the sensor placed in local coordinate system
+        position_reference : str
+            position reference, "local" or "global"
+        position_heading_lock : bool
+            Is the position locked to floater heading
+        position_draft_lock: bool
+            Is the position locked to floater draft
+        positive_direction_definition : str
+            Definition of positive directio
         campaign_id : str
             Identifier of parent campaign
         area : float, optional
@@ -641,12 +651,17 @@ class SensorAPI(BaseAPI):
         body = dict(
             name=name,
             description=description,
-            unit=unit, kind=kind,
+            unit=unit,
+            kind=kind,
+            source=source,
             area=area,
             x=x,
             y=y,
             z=z,
-            is_local=is_local,
+            position_reference=position_reference,
+            position_heading_lock=position_heading_lock,
+            position_draft_lock=position_draft_lock,
+            positive_direction_definition=positive_direction_definition,
             campaign_id=campaign_id,
             read_only=read_only
         )
@@ -912,7 +927,7 @@ class TimeseriesAPI(BaseAPI):
                                cache=cache)
         return DataPoints(**data.get("data"), _client=self.client)
 
-    def add_data_points(self, ts_id: str, time: list, values: list, admin_key: str) -> DataPoints:
+    def add_data_points(self, ts_id: str, time: list, values: list) -> DataPoints:
         """
         Add data points to timeseries
 
@@ -924,8 +939,6 @@ class TimeseriesAPI(BaseAPI):
             Time (s)
         values : list
             Values corresponding to time
-        admin_key : str
-            Administrator secret key
 
         Returns
         -------
@@ -933,9 +946,8 @@ class TimeseriesAPI(BaseAPI):
             Data points
         """
         body = dict(data=dict(time=time, value=values))
-        data = self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=body,
-                                parameters=dict(secret_key=admin_key))
-        return DataPoints(**data, _client=self.client)
+        data = self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=body)
+        return DataPoints(**data.get("data"), _client=self.client)
 
     def get_statistics(self, ts_id: str, scaling_length: float = None) -> Statistics:
         """
@@ -968,7 +980,13 @@ class TagsAPI(BaseAPI):
         Parameters
         ----------
         name : str
-            Tag name, see API documentation for valid tag names.
+            Tag name, allowable types:
+            for sensor tag: "comment", "surge", "sway", "heave", "roll", "pitch", "yaw", "quality: bad",
+                            "quality: questionable", "coord. system: Sevan - Global",
+                            "coord. system: Sevan - Local - globally oriented", "coord. system: Sevan - Local",
+                            "reference signal"
+            for test tag: "comment", "failed" and "repeated"
+            for timeseries tag: "comment", "quality: bad" and "quality: questionable"
         comment : str, optional
             Add a comment.
         test_id : str, optional
