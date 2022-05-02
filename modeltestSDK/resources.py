@@ -213,7 +213,7 @@ class TimeSeries(Resource):
         """
         self._client.timeseries.delete(self.id, admin_key=admin_key)
 
-    def add_data(self, time: list, value: list) -> DataPoints:
+    def add_data(self, time: list, values: list) -> DataPoints:
         """
         Add data points.
 
@@ -221,7 +221,7 @@ class TimeSeries(Resource):
         ----------
         time : list
             Time in seconds
-        value : list
+        values : list
             Data corresponding to time
 
 
@@ -230,7 +230,7 @@ class TimeSeries(Resource):
         DataPoints
             Data points
         """
-        dps = self._client.timeseries.add_data_points(self.id, time, value)
+        dps = self._client.timeseries.add_data_points(self.id, time, values)
         return dps
 
     def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPoints:

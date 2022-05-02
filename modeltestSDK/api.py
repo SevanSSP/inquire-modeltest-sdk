@@ -255,7 +255,7 @@ class FloaterTestAPI(TestAPI):
         campaign_id : str
             Identifier of parent campaign
         category : str
-            The kind of test
+            The kind of test, "current force", "wind force", "decay", "regular wave", "irregular wave" or "pull out"
         orientation : float
             Orientation (degrees)
         floater_config_id : id
@@ -359,7 +359,7 @@ class FloaterTestAPI(TestAPI):
 
 class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
-               wave_spectrum: str, wave_height: float, wave_period: float, gamma: float,
+               wave_spectrum: Union[str, None], wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
                read_only: bool = False) -> WaveCalibrationTest:
         """
@@ -375,8 +375,8 @@ class WaveCalibrationAPI(TestAPI):
             Date of testing
         campaign_id : str
             Identifier of parent campaign
-        wave_spectrum : str
-            Wave spectrum type
+        wave_spectrum : Union[str, None]
+            Wave spectrum type, "jonswap", "torsethaugen", "broad band", "regular", None
         wave_height : float
             Wave height (m)
         wave_period : float
@@ -947,7 +947,7 @@ class TimeseriesAPI(BaseAPI):
         """
         body = dict(data=dict(time=time, value=values))
         data = self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=body)
-        return DataPoints(**data, _client=self.client)
+        return DataPoints(**data.get("data"), _client=self.client)
 
     def get_statistics(self, ts_id: str, scaling_length: float = None) -> Statistics:
         """
@@ -980,7 +980,13 @@ class TagsAPI(BaseAPI):
         Parameters
         ----------
         name : str
-            Tag name, see API documentation for valid tag names.
+            Tag name, allowable types:
+            for sensor tag: "comment", "surge", "sway", "heave", "roll", "pitch", "yaw", "quality: bad",
+                            "quality: questionable", "coord. system: Sevan - Global",
+                            "coord. system: Sevan - Local - globally oriented", "coord. system: Sevan - Local",
+                            "reference signal"
+            for test tag: "comment", "failed" and "repeated"
+            for timeseries tag: "comment", "quality: bad" and "quality: questionable"
         comment : str, optional
             Add a comment.
         test_id : str, optional
