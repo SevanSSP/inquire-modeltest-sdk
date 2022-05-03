@@ -2,7 +2,7 @@ COPY poetry.lock ./
 COPY pyproject.toml ./
 RUN pip install poetry
 RUN poetry config virtualenvs.create false
-RUN poetry install
+RUN poetry install --no-dev
 COPY modeltestSDK ./modeltestSDK
 COPY tests ./tests
 
