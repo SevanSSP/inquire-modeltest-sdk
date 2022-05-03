@@ -30,6 +30,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Login to Docker Registry
+        run: docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin <<< "$DOCKER_PASSWORD"
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+
       - name: Run tests
         run: |
           if [ -f docker-compose.test.yml ]; then
