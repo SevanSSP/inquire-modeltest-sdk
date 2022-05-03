@@ -13,7 +13,7 @@ services:
     networks:
       - frontend
     ports:
-      - "8080"
+      - "8000"
   api:
     image: ghcr.io/sevanssp/inquire_modeltest:latest
     command: gunicorn -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --access-logfile - --error-logfile - app.main:app
