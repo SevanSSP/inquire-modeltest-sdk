@@ -1,6 +1,6 @@
 import pytest
 from modeltestSDK import Client
-
+import requests
 
 @pytest.fixture(scope="module")
 def client():

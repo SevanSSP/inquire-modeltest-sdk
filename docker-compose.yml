@@ -1,0 +1,27 @@
+version: "3"
+services:
+  api:
+    image: ghcr.io/sevanssp/inquire_modeltest:latest
+    environment:
+      - INQUIRE_MODELTEST_DATABASE_URI=postgresql+psycopg2://postgres:postgres@db:5432/test
+      - ADMINISTRATOR_KEY=administrator
+      - SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+    depends_on:
+      - db
+    ports:
+      - "8001:8001"
+    restart: always
+  db:
+    image: postgres:10
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=test
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "5433"
+    volumes:
+      - ./docker_scripts:/docker-entrypoint-initdb.d
+      - app-db-data:/var/lib/postgresql/data/pgdata
+volumes:
+  app-db-data:
