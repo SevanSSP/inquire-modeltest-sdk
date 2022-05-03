@@ -30,12 +30,12 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Login to Docker Registry
-        run: docker login "$DOCKER_REGISTRY" -u "$DOCKER_USERNAME" --password-stdin <<< "$DOCKER_PASSWORD"
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-          DOCKER_REGISTRY: ${{ secrets.DOCKER_REGISTRY }}
+      - name: Log in to registry
+        uses: docker/login-action@v1
+        with:
+          registry: https://ghcr.io/
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PAT }}
 
       - name: Run tests
         run: |
