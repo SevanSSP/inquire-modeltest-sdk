@@ -4,16 +4,16 @@ services:
     build:
       context: .
       dockerfile: tests.Dockerfile
-    command: pytest tests/
     depends_on:
       - db
       - api
+    command: pytest tests/
     links:
       - "api"
+    ports:
+      - "5000:8080"
     networks:
       - frontend
-    ports:
-      - "8000"
   api:
     image: ghcr.io/sevanssp/inquire_modeltest:latest
     command: gunicorn -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8080 --access-logfile - --error-logfile - app.main:app
@@ -27,7 +27,9 @@ services:
       - frontend
       - backend
     ports:
-      - "8000:8080"
+      - "5000:8080"
+    expose:
+      - 5000
   db:
     image: postgres:10
     networks:
