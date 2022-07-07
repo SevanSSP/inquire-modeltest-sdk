@@ -10,7 +10,7 @@ from datetime import datetime
 
 
 class Resource(BaseModel):
-    _client: Optional[Any]
+    client: Optional[Any]
 
     def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
@@ -34,7 +34,6 @@ class Resource(BaseModel):
 
 class Resources(BaseModel):
     __root__: List[Resource]
-    _client: Optional[Any]
 
     def __iter__(self):
         return iter(self.__root__)
@@ -47,6 +46,12 @@ class Resources(BaseModel):
 
     def append(self, item: Resource):
         self.__root__.append(item)
+
+    def get_by_id(self, id):
+        for i in self:
+            if i.id == id:
+                return i
+        return 'ID not in list'
 
     def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
@@ -101,7 +106,7 @@ class Tag(Resource):
 
     def create(self):
         """Add it to the database."""
-        tag = self._client.tag.create(**self.dict())
+        tag = self.client.tag.create(**self.dict())
         self.id = tag.id  # update with id from database
 
     def delete(self, admin_key: str):
@@ -113,7 +118,7 @@ class Tag(Resource):
         admin_key : str
             Administrator secret key
         """
-        self._client.tag.delete(self.id, admin_key=admin_key)
+        self.client.tag.delete(self.id, admin_key=admin_key)
 
 
 class Tags(Resources):
@@ -199,7 +204,7 @@ class TimeSeries(Resource):
 
     def create(self):
         """Add it to the database."""
-        ts = self._client.timeseries.create(**self.dict())
+        ts = self.client.timeseries.create(**self.dict())
         self.id = ts.id  # update with id from database
 
     def delete(self, admin_key: str):
@@ -211,7 +216,7 @@ class TimeSeries(Resource):
         admin_key : str
             Administrator secret key
         """
-        self._client.timeseries.delete(self.id, admin_key=admin_key)
+        self.client.timeseries.delete(self.id, admin_key=admin_key)
 
     def add_data(self, time: list, values: list) -> DataPoints:
         """
@@ -230,7 +235,7 @@ class TimeSeries(Resource):
         DataPoints
             Data points
         """
-        dps = self._client.timeseries.add_data_points(self.id, time, values)
+        dps = self.client.timeseries.add_data_points(self.id, time, values)
         return dps
 
     def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPoints:
@@ -251,7 +256,7 @@ class TimeSeries(Resource):
         DataPoints
             Data points
         """
-        dps = self._client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length)
+        dps = self.client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length)
         return dps
 
     def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):
@@ -339,7 +344,7 @@ class Sensor(Resource):
 
     def create(self):
         """Add it to the database."""
-        sensor = self._client.sensor.create(**self.dict())
+        sensor = self.client.sensor.create(**self.dict())
         self.id = sensor.id     # update with id from database
 
     def delete(self, admin_key: str):
@@ -351,15 +356,15 @@ class Sensor(Resource):
         admin_key : str
             Administrator secret key
         """
-        self._client.sensor.delete(self.id, admin_key=admin_key)
+        self.client.sensor.delete(self.id, admin_key=admin_key)
 
     def tags(self) -> Tags:
         """Retrieve tags on sensor."""
-        return self._client.tag.get_by_sensor_id(self.id)
+        return self.client.tag.get_by_sensor_id(self.id)
 
     def timeseries(self) -> TimeSeriesList:
         """Retrieve time series on sensor."""
-        return self._client.timeseries.get_by_sensor_id(self.id)
+        return self.client.timeseries.get_by_sensor_id(self.id)
 
 
 class Sensors(Resources):
@@ -367,6 +372,14 @@ class Sensors(Resources):
 
     def append(self, item: Sensor):
         self.__root__.append(item)
+
+    def print_full(self):
+        for i in self:
+            print(f'{i.to_pandas()}\n')
+
+    def print_small(self):
+        for i in self:
+            print(f"{i.to_pandas().loc[['name', 'id', 'campaign_id', 'description']]}\n")
 
 
 class Test(Resource):
@@ -386,11 +399,11 @@ class Test(Resource):
         admin_key : str
             Administrator secret key
         """
-        self._client.test.delete(self.id, admin_key=admin_key)
+        self.client.test.delete(self.id, admin_key=admin_key)
 
     def tags(self) -> Tags:
         """Retrieve tags on time serie."""
-        return self._client.tag.get_by_test_id(self.id)
+        return self.client.tag.get_by_test_id(self.id)
 
     def timeseries(self, sensor_id: str = None) -> TimeSeriesList:
         """
@@ -407,9 +420,9 @@ class Test(Resource):
             Time series
         """
         if sensor_id is not None:
-            return self._client.timeseries.get_by_sensor_id_and_test_id(sensor_id=sensor_id, test_id=self.id)
+            return self.client.timeseries.get_by_sensor_id_and_test_id(sensor_id=sensor_id, test_id=self.id)
         else:
-            return self._client.timeseries.get_by_test_id(test_id=self.id)
+            return self.client.timeseries.get_by_test_id(test_id=self.id)
 
 
 class FloaterTest(Test):
@@ -423,7 +436,7 @@ class FloaterTest(Test):
 
     def create(self):
         """Add it to the database."""
-        sensor = self._client.floater_test.create(**self.dict())
+        sensor = self.client.floater_test.create(**self.dict())
         self.id = sensor.id  # update with id from database
 
 
@@ -440,7 +453,7 @@ class WaveCalibrationTest(Test):
 
     def create(self):
         """Add it to the database."""
-        sensor = self._client.wave_calibration.create(**self.dict())
+        sensor = self.client.wave_calibration.create(**self.dict())
         self.id = sensor.id  # update with id from database
 
 
@@ -454,7 +467,7 @@ class WindCalibrationTest(Test):
 
     def create(self):
         """Add it to the database."""
-        sensor = self._client.wind_calibration.create(**self.dict())
+        sensor = self.client.wind_calibration.create(**self.dict())
         self.id = sensor.id  # update with id from database
 
 
@@ -463,6 +476,14 @@ class Tests(Resources):
 
     def append(self, item: Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]):
         self.__root__.append(item)
+
+    def print_full(self):
+        for i in self:
+            print(f'{i.to_pandas()}\n')
+
+    def print_small(self):
+        for i in self:
+            print(f"{i.to_pandas().loc[['id', 'campaign_id', 'description', 'type']]}\n")
 
 
 class Campaign(Resource):
@@ -476,7 +497,7 @@ class Campaign(Resource):
 
     def create(self):
         """Create this campaign."""
-        campaign = self._client.campaign.create(**self.dict())
+        campaign = self.client.campaign.create(**self.dict())
         self.id = campaign.id  # update with id from database
 
     def delete(self, admin_key: str):
@@ -488,19 +509,19 @@ class Campaign(Resource):
         admin_key : str
             Administrator secret key
         """
-        self._client.campaign.delete(self.id, admin_key=admin_key)
+        self.client.campaign.delete(self.id, admin_key=admin_key)
 
     def sensors(self) -> Sensors:
         """Fetch sensors."""
-        return self._client.sensor.get_by_campaign_id(self.id)
+        return self.client.sensor.get_by_campaign_id(self.id)
 
     def tests(self, test_type: str = None) -> Tests:
         """Fetch tests."""
-        return self._client.test.get_by_campaign_id(self.id)
+        return self.client.test.get_by_campaign_id(self.id)
 
     def floater_configurations(self) -> FloaterConfigurations:
         """Fetch floater configurations."""
-        return self._client.floater_config.get_by_campaign_id(self.id)
+        return self.client.floater_config.get_by_campaign_id(self.id)
 
 
 class Campaigns(Resources):
