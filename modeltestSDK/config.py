@@ -16,6 +16,8 @@ class Config:
                       'backend': 'sqlite',
                       'use_cache_dir': True,
                       'expire_after': timedelta(days=7)}
+    requests_max_retries = 5
+    requests_backoff_factor = 1.0
 
 
 class LocalConfig(Config):
