@@ -25,3 +25,4 @@ class LocalConfig(Config):
     Local context configuration
     """
     host: str = os.environ.get("INQUIRE_MODELTEST_API_HOST", "http://localhost:8080/")
+
