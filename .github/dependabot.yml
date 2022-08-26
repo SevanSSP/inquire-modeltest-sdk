@@ -8,6 +8,7 @@ registries:
 updates:
   - package-ecosystem: "pip"
     directory: "/"
+    insecure-external-code-execution: allow
     registries:
       - sevan-packagr
     schedule:
