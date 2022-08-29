@@ -1,0 +1,15 @@
+version: 2
+registries:
+  sevan-packagr:
+    type: python-index
+    url: https://api.packagr.app/EYvhW6SyL
+    username: ${{secrets.PACKAGR_USERNAME}}
+    password: ${{secrets.PACKAGR_PASSWORD}}
+updates:
+  - package-ecosystem: "pip"
+    directory: "/"
+    insecure-external-code-execution: allow
+    registries:
+      - sevan-packagr
+    schedule:
+      interval: "weekly"

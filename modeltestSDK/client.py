@@ -9,8 +9,12 @@ from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
 from .config import Config
+from requests.adapters import HTTPAdapter, Retry
 
 log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
+retries = Retry(total=Config.requests_max_retries,
+                backoff_factor=Config.requests_backoff_factor,
+                status_forcelist=[500, 502, 503, 504])
 
 
 class Client:
@@ -80,7 +84,10 @@ class Client:
                                                             "\n\t'INQUIRE_MODELTEST_API_USER'" \
                                                             "\n\t'INQUIRE_MODELTEST_API_PASSWORD'."
 
-            r = requests.post(
+            s = requests.session()
+            s.mount('http://', HTTPAdapter(max_retries=retries))
+
+            r = s.post(
                 self._create_url(resource="auth", endpoint="token"),
                 data=dict(
                     username=user,
@@ -180,13 +187,17 @@ class Client:
             parameters = {k: v for k, v in parameters.items() if v is not None}
 
         # do request (also encodes parameters)
+
+        s = requests.session()
+        s.mount('http://', HTTPAdapter(max_retries=retries))
+
         try:
             if cache:
                 with requests_cache.enabled(**Config.cache_settings):
-                    r = requests.request(method, url, params=parameters, json=body, headers=headers)
+                    r = s.request(method, url, params=parameters, json=body, headers=headers)
                 r.raise_for_status()
             else:
-                r = requests.request(method, url, params=parameters, json=body, headers=headers)
+                r = s.request(method, url, params=parameters, json=body, headers=headers)
                 r.raise_for_status()
         except requests.exceptions.HTTPError as e:
             logging.error("Request body:  " + str(body))
