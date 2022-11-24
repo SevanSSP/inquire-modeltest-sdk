@@ -13,3 +13,4 @@ updates:
       - sevan-packagr
     schedule:
       interval: "weekly"
+    open-pull-requests-limit: 10
