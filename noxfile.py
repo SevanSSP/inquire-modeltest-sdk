@@ -1,4 +1,6 @@
 import nox
+import tempfile
+import os
 
 # override default sessions
 nox.options.sessions = ["lint", "tests"]
@@ -31,14 +33,26 @@ def lint(session):
 def tests(session):
     """Run test suite."""
     # install dependencies
-    session.run("poetry", "install", external=True)
+    req_path = os.path.join(tempfile.gettempdir(),'requirements.txt')
+    session.install("poetry")
+
+    session.run(
+        "poetry",
+        "export",
+        "--dev",
+        "--format=requirements.txt",
+        f"--output={req_path}",
+        external=True,
+    )
+    session.install("-r", req_path)
+
+
     session.install("pytest")
+    session.install("requests")
     session.install("coverage")
-    # session.install("-r", "requirements.txt")
 
     # unit tests
-    testfiles = ["tests/"]
-    session.run("coverage", "run", "--source", "modeltestSDK", "-m", "pytest", *testfiles)
+    session.run("coverage", "run", "--source", "modeltestSDK", "-m", "pytest")
     session.notify("cover")
 
 
