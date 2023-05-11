@@ -23,4 +23,4 @@ jobs:
         run: pip install nox poetry
 
       - name: Run tests with Nox
-        run: nox -s lint tests
+        run: nox -s lint tests --verbose
