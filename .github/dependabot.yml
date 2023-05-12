@@ -16,6 +16,7 @@ updates:
     insecure-external-code-execution: allow
     registries:
       - sevan-packagr
+      - docker-registry
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
