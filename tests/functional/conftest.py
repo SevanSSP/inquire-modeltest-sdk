@@ -24,10 +24,10 @@ def client(http_service, admin_key):
     # check if user exists
     resp = requests.get(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}')
     if resp.status_code != 404:
-        resp = requests.delete(f'{api_url}/api/v1/auth/users?username=tester494234&administrator_key={admin_key}')
+        resp = requests.delete(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}')
         assert resp.status_code == 200
 
-    resp = requests.post(f'{api_url}/api/v1/auth/users?administrator_key=administrator', json=user_dict)
+    resp = requests.post(f'{api_url}/api/v1/auth/users?administrator_key={admin_key}', json=user_dict)
     assert resp.status_code == 200
     return client
 
