@@ -17,7 +17,7 @@ def docker_compose_file(pytestconfig):
     return os.path.join("tests", "functional", "docker-compose.test.yml")
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def http_service(api, request):
     """Ensure that API service is up and responsive."""
     if api == 'build':
@@ -36,7 +36,7 @@ def http_service(api, request):
     return api_url
 
 
-@pytest.fixture(scope="function")
+@pytest.fixture(scope="session")
 def admin_key(api):
     """collect admin key from environmental variable if testing against localhost, otherwise returns 'administrator'"""
     if api == 'build':
