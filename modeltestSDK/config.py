@@ -4,6 +4,7 @@ Configurations
 import os
 from datetime import timedelta
 
+
 class Config:
     """
     Client configuration
@@ -18,10 +19,3 @@ class Config:
                       'expire_after': timedelta(days=7)}
     requests_max_retries = 5
     requests_backoff_factor = 1.0
-
-
-class LocalConfig(Config):
-    """
-    Local context configuration
-    """
-    host: str = os.environ.get("INQUIRE_MODELTEST_API_HOST", "http://localhost:8080/")
