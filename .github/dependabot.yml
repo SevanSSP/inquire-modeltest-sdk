@@ -1,5 +1,10 @@
 version: 2
 registries:
+  docker-registry:
+    type: docker-registry
+    url: ghcr.io
+    username: ${{ github.actor }}
+    password: ${{ secrets.GHCR_PAT }}
   sevan-packagr:
     type: python-index
     url: https://api.packagr.app/EYvhW6SyL
