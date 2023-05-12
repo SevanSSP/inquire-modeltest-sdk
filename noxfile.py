@@ -22,6 +22,7 @@ def lint(session):
         "flake8",
         "modeltestSDK/",
         "--count",
+        "--per-file-ignores=__init__.py:F401",
         "--exit-zero",
         "--max-complexity=10",
         "--max-line-length=127",
@@ -33,42 +34,19 @@ def lint(session):
 def tests(session):
     """Run test suite."""
     # install dependencies
-    req_path = os.path.join(tempfile.gettempdir(),'requirements.txt')
+    req_path = os.path.join(tempfile.gettempdir(), 'requirements.txt')
     session.install("poetry")
 
     session.run(
         "poetry",
         "export",
-        "--dev",
+        "--with=dev",
         "--format=requirements.txt",
         f"--output={req_path}",
         external=True,
     )
     session.install("-r", req_path)
 
-
-    session.install("pytest")
-    session.install("requests")
-    session.install("coverage")
-
-    # unit tests
-    session.run("coverage", "run", "--source", "modeltestSDK", "-m", "pytest")
-    session.notify("cover")
-
-
-@nox.session
-def cover(session):
-    """Analyse and report test coverage."""
-    session.install("coverage")
-    # TODO: Add "--fail-under=99" once test coverage is improved
-    session.run("coverage", "report", "--show-missing")
-    session.run("coverage", "erase")
-
-
-@nox.session
-def blacken(session):
-    """Run black code formatter."""
-    session.install("black", "isort")
-    files = ["modeltestSDK", "tests", "noxfile.py"]
-    session.run("black", *files, "--diff", "--color")
-    session.run("isort", *files, "--diff")
+    # run tests
+    # Todo: add "--cov-fail-under=95"
+    session.run("pytest", "-s", "tests", "--cov=modeltestSDK", "--cov-report=term-missing")
