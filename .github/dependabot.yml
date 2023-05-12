@@ -12,8 +12,7 @@ updates:
     registries:
       - sevan-packagr
     schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
+      interval: "weekly" 
     secrets:
       - type: "docker-registry"
         docker-registry:
