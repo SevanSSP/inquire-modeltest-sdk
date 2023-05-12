@@ -39,7 +39,7 @@ def http_service(api, request):
 @pytest.fixture(scope="function")
 def admin_key(api):
     """collect admin key from environmental variable if testing against localhost, otherwise returns 'administrator'"""
-    if admin_key == 'build':
+    if api == 'build':
         return 'administrator'
     else:
         return os.environ.get("ADMINISTRATOR_KEY")
