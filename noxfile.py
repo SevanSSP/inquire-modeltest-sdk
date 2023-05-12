@@ -49,4 +49,28 @@ def tests(session):
 
     # run tests
     # Todo: add "--cov-fail-under=95"
-    session.run("pytest", "-s", "tests", "--cov=modeltestSDK", "--cov-report=term-missing")
+    session.run("pytest", "-s", "tests", "--api=http://127.0.0.1:8000",
+                "--cov=modeltestSDK", "--cov-report=term-missing")
+
+
+@nox.session
+def tests_github(session):
+    """Run test suite."""
+    # install dependencies
+    req_path = os.path.join(tempfile.gettempdir(), 'requirements.txt')
+    session.install("poetry")
+
+    session.run(
+        "poetry",
+        "export",
+        "--with=dev",
+        "--format=requirements.txt",
+        f"--output={req_path}",
+        external=True,
+    )
+    session.install("-r", req_path)
+
+    # run tests
+    # Todo: add "--cov-fail-under=95"
+    session.run("pytest", "-s", "tests", "--api=build",
+                "--cov=modeltestSDK", "--cov-report=term-missing")
