@@ -1,10 +1,5 @@
 version: 2
 registries:
-  docker-registry:
-    type: docker-registry
-    url: ghcr.io
-    username: ${{ github.actor }}
-    password: ${{ secrets.GHCR_PAT }}
   sevan-packagr:
     type: python-index
     url: https://api.packagr.app/EYvhW6SyL
@@ -16,7 +11,12 @@ updates:
     insecure-external-code-execution: allow
     registries:
       - sevan-packagr
-      - docker-registry
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
+    secrets:
+      - type: "docker-registry"
+        docker-registry:
+          server: "ghcr.io"
+          username: "${{ github.repository_owner }}"
+          password: "${{ secrets.GHCR_PAT }}"
