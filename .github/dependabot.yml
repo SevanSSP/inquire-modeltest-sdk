@@ -11,11 +11,5 @@ updates:
     insecure-external-code-execution: allow
     registries:
       - sevan-packagr
-    schedule:
-      interval: "weekly" 
-    secrets:
-      - type: "docker-registry"
-        docker-registry:
-          server: "ghcr.io"
-          username: "${{ github.repository_owner }}"
-          password: "${{ secrets.GHCR_PAT }}"
+      interval: "weekly"
+    open-pull-requests-limit: 10
