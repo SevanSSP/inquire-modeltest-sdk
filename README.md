@@ -53,7 +53,7 @@ or
 nox
 ```
 
-Local testing requires that the model test API is running at http://127.0.0.1:8000 (local host)
+Local functional testing requires that the model test API is running at http://127.0.0.1:8000 (local host)
 
 
 ## Versioning
