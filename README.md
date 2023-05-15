@@ -20,7 +20,7 @@ These instructions will get you a copy of the project up and running on your loc
 purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
-Install Python version 3.9.1 or later from either https://www.python.org or https://www.anaconda.com.
+Install Python version 3.8.0 or later from either https://www.python.org or https://www.anaconda.com.
 
 We use Poetry for dependency management and packaging. Install it as shown [here](https://python-poetry.org/docs/#installation).
 
