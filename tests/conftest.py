@@ -30,6 +30,7 @@ def http_service(api, request):
         port = docker_services.port_for("api", 8000)
         api_url = f"http://{docker_ip}:{port}"
         time.sleep(10)
+        print(docker_services)
     else:
         api_url = api
 
