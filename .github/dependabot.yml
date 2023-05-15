@@ -11,5 +11,6 @@ updates:
     insecure-external-code-execution: allow
     registries:
       - sevan-packagr
+    schedule:
       interval: "weekly"
     open-pull-requests-limit: 10

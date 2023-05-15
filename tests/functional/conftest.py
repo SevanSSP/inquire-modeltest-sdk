@@ -5,6 +5,7 @@ from modeltestSDK.config import Config
 from modeltestSDK.client import Client
 import os
 
+
 @pytest.fixture(scope="module")
 def client(http_service, admin_key):
     """The Api is now verified good to go and tests can interact with it"""
@@ -30,4 +31,3 @@ def client(http_service, admin_key):
     resp = requests.post(f'{api_url}/api/v1/auth/users?administrator_key={admin_key}', json=user_dict)
     assert resp.status_code == 200
     return client
-
