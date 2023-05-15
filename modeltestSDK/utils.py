@@ -80,7 +80,7 @@ def to_snake_case(d):
     """
 
     def snake(s):
-        s1 = first_cap_re.sub(r'\1_\2', s)
+        s1 = first_cap_re.sub(r'\1_\2', s).replace('__', '_')
         return all_cap_re.sub(r'\1_\2', s1).lower()
 
     if isinstance(d, str):
@@ -95,6 +95,8 @@ def to_snake_case(d):
 
             if isinstance(v, (list, dict)):
                 v = to_snake_case(v)
+            elif isinstance(v, str):
+                v = snake(v)
 
             dd[k] = v
         return dd
@@ -129,6 +131,8 @@ def to_camel_case(d):
 
             if isinstance(v, (list, dict)):
                 v = to_camel_case(v)
+            elif isinstance(v, str):
+                v = camel(v)
 
             dd[k] = v
         return dd
