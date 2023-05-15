@@ -26,4 +26,4 @@ markdown_extensions:
       base_path: "examples/"
       check_paths: true
 repo_url: https://github.com/SevanSSP/inquire-modeltest-sdk
-copyright: Copyright &copy; 2021 Sevan SSP
+copyright: Copyright &copy; 2023 Sevan SSP
