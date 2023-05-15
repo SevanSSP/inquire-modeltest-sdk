@@ -30,4 +30,7 @@ def client(http_service, admin_key):
 
     resp = requests.post(f'{api_url}/api/v1/auth/users?administrator_key={admin_key}', json=user_dict)
     assert resp.status_code == 200
-    return client
+
+    yield client
+
+    requests.delete(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}')

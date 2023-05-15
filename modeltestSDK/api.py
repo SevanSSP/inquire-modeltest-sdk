@@ -58,7 +58,7 @@ class CampaignAPI(BaseAPI):
         water_depth : float
             Water depth (m)
         read_only : bool, optional
-            Make the this campaign read only.
+            Make the campaign read only.
 
         Returns
         -------
