@@ -33,4 +33,17 @@ def client(http_service, admin_key):
 
     yield client
 
-    requests.delete(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}')
+    # user info
+    user = requests.get(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}')
+    resp = requests.delete(f'{api_url}/api/v1/auth/users?username={user.json()["username"]}&administrator_key={admin_key}')
+    assert resp.status_code == 200
+
+    # delete groups
+    for group in user.json()["groups"][0]:
+        resp = requests.delete(
+            f'{api_url}/api/v1/auth/group?administrator_key={admin_key}&'
+            f'group_description={group["description"]}&'
+            f'group_id={group["id"]}')
+        assert resp.status_code == 200
+
+
