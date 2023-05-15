@@ -1,6 +1,10 @@
-name: Build and test package
+name: Pytest with minimum 95% coverage
 
-on: [push]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   build:
