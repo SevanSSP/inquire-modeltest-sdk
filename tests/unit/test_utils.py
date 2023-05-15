@@ -2,34 +2,39 @@ from modeltestSDK.utils import make_serializable, to_snake_case, to_camel_case, 
 import numpy as np
 import pytest
 from datetime import datetime, timedelta
+from uuid import UUID
 
 
 def test_make_serializable():
     assert make_serializable([
         [1, 2, 3],
+        UUID('4175bd27-62e5-46ad-bbce-2f37c131bdb6'),
         np.array([1, 2, 3]),
-        datetime(2020, 1, 1),
+        datetime(2020, 1, 1, 12, 32, 12, 32),
         timedelta(days=1),
         {'a': 1, 'b': 2, 'c': 3},
         {'dct': {'a': 1, 'b': 2, 'c': 3}}
     ]) == [
                [1, 2, 3],
+               '4175bd27-62e5-46ad-bbce-2f37c131bdb6',
                [1, 2, 3],
-               '2020-01-01T00:00:00',
+               '2020-01-01T12:32:12.000032',
                86400.,
                {'a': 1, 'b': 2, 'c': 3},
                {'dct': {'a': 1, 'b': 2, 'c': 3}}
            ]
 
-    with pytest.raises(NotImplementedError) as e:
-        make_serializable(np.array([[1, 2, 3], [3, 2, 1]]))
+    assert make_serializable({'test': 'ok'}) == {'test': 'ok'}
 
-        assert e.value.args[0] == "Unable to JSON serialize multidimensional ndarrays."
+    with pytest.raises(NotImplementedError) as e:
+        make_serializable({'error': np.array([[1, 2, 3], [3, 2, 1]])})
+
+    assert e.value.args[0] == "Unable to JSON serialize multidimensional ndarrays. Key = 'error'."
 
     with pytest.raises(NotImplementedError) as e:
         make_serializable(pytest)
 
-        assert e.value.args[0] == f"Unable to convert object of type '{type(pytest)}' to JSON serializable"
+    assert e.value.args[0] == f"Unable to convert object of type '{type(pytest)}' to JSON serializable."
 
 
 def test_to_snake_case():
