@@ -49,7 +49,7 @@ def tests(session):
 
     # run tests
     session.run("pytest", "-s", "tests", "--api=http://127.0.0.1:8000",
-                "--cov=modeltestSDK", "--cov-report=term-missing", "--cov-fail-under=40")
+                "--cov=modeltestSDK", "--cov-report=term-missing", "--cov-fail-under=95")
 
 
 @nox.session
@@ -71,4 +71,4 @@ def tests_github(session):
 
     # run tests
     session.run("pytest", "-s", "tests", "--api=build",
-                "--cov=modeltestSDK", "--cov-report=term-missing", "--cov-fail-under=40")
+                "--cov=modeltestSDK", "--cov-report=term-missing", "--cov-fail-under=95")
