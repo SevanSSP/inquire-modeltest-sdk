@@ -20,3 +20,10 @@ def test_campaign_api(client):
 
     assert len(campaigns) == 1
     assert campaigns[0] == client.campaign.get_by_name(name) == client.campaign.get_by_id(campaigns[0].id)
+
+
+def test_campaign_resources(client, new_campaigns):
+    campaigns_from_db = client.campaign.get(limit=10000, skip=0)
+
+    for campaign in campaigns_from_db:
+        assert campaign in new_campaigns
