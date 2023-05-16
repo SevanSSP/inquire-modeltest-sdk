@@ -43,3 +43,12 @@ def admin_key(api):
         return 'administrator'
     else:
         return os.environ.get("ADMINISTRATOR_KEY")
+
+
+@pytest.fixture(scope="session")
+def secret_key(api):
+    """collect secret key from environmental variable if testing against localhost, otherwise returns 'not_so_secret'"""
+    if api == 'build':
+        return 'not_so_secret'
+    else:
+        return os.environ.get("SECRET_KEY")

@@ -19,7 +19,7 @@ class BaseAPI:
         self._resource_path: str = format_class_name(self.__class__.__name__)
         self.client = client
 
-    def delete(self, item_id: str, admin_key: str):
+    def delete(self, item_id: str, secret_key: str):
         """
         Delete item by id
 
@@ -27,14 +27,14 @@ class BaseAPI:
         ----------
         item_id : str
             Item identifier
-        admin_key : str
-            Administrator key
+        secret_key : str
+            Secret key to allow deletion of read only items
 
         Notes
         -----
         Deleting items requires administrator privileges.
         """
-        resp = self.client.delete(self._resource_path, endpoint=item_id, parameters=dict(secret_key=admin_key))
+        resp = self.client.delete(self._resource_path, endpoint=item_id, parameters=dict(secret_key=secret_key))
         return resp
 
 
@@ -59,7 +59,7 @@ class CampaignAPI(BaseAPI):
         water_depth : float
             Water depth (m)
         read_only : bool, optional
-            Make the this campaign read only.
+            Make the campaign read only.
 
         Returns
         -------

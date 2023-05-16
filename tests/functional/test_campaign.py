@@ -1,24 +1,29 @@
 from datetime import datetime
 from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool
 
-def test_campaign(client, create_random_campaign):
-    """The Api is now verified good to go and tests can interact with it"""
-    assert client.campaign.get_by_name(create_random_campaign.name) == create_random_campaign
-    assert client.campaign.get_by_id(create_random_campaign.id) == create_random_campaign
 
-def test_same_named_campaign(client, admin_key):
+def test_campaign_api(client):
     """The Api is now verified good to go and tests can interact with it"""
-    name = 'samename'
+    name = random_lower_string()
     description = random_lower_string()
     date = str(datetime.now())
     location = random_lower_string()
     scale_factor = random_float()
     water_depth = random_float()
-    campaign = client.campaign.create(name, description, location, date, scale_factor, water_depth)
-    campaign2 = client.campaign.create(name, description, location, date, scale_factor, water_depth)
+    client.campaign.create(name, description, location, date, scale_factor, water_depth)
+    assert client.campaign.get_by_name(name)
 
-    assert client.campaign.get_by_name(name).name == name
+    campaigns = client.campaign.get(filter_by=[
+        client.filter.campaign.name == name,
+        client.filter.campaign.description == description],
+        sort_by=[client.sort.campaign.date.asc])
 
-    client.campaign.delete(campaign.id, admin_key=admin_key)
-    client.campaign.delete(campaign2.id, admin_key=admin_key)
-    assert client.campaign.get_by_name(name) is None
+    assert len(campaigns) == 1
+    assert campaigns[0] == client.campaign.get_by_name(name) == client.campaign.get_by_id(campaigns[0].id)
+
+
+def test_campaign_resources(client, new_campaigns):
+    campaigns_from_db = client.campaign.get(limit=10000, skip=0)
+
+    for campaign in campaigns_from_db:
+        assert campaign in new_campaigns

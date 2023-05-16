@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
 from pydantic.typing import Literal
-from typing import List, Optional, Union, Any, TypeVar
+from typing import List, Optional, Union, Any
 from datetime import datetime
 
 
@@ -104,16 +104,16 @@ class Tag(Resource):
         tag = self.client.tag.create(**self.dict())
         self.id = tag.id  # update with id from database
 
-    def delete(self, admin_key: str):
+    def delete(self, secret_key: str):
         """
         Delete it.
 
         Parameters
         ----------
-        admin_key : str
-            Administrator secret key
+        secret_key : str
+            Secret key to allow deletion of read only items
         """
-        self.client.tag.delete(self.id, admin_key=admin_key)
+        self.client.tag.delete(self.id, secret_key=secret_key)
 
 
 class Tags(Resources[Tag]):
@@ -200,16 +200,16 @@ class TimeSeries(Resource):
         ts = self.client.timeseries.create(**self.dict())
         self.id = ts.id  # update with id from database
 
-    def delete(self, admin_key: str):
+    def delete(self, secret_key: str):
         """
         Delete it.
 
         Parameters
         ----------
-        admin_key : str
-            Administrator secret key
+        secret_key : str
+            Secret key to allow deletion of read only items
         """
-        self.client.timeseries.delete(self.id, admin_key=admin_key)
+        self.client.timeseries.delete(self.id, secret_key=secret_key)
 
     def add_data(self, time: list, values: list) -> DataPoints:
         """
@@ -338,16 +338,16 @@ class Sensor(Resource):
         sensor = self.client.sensor.create(**self.dict())
         self.id = sensor.id     # update with id from database
 
-    def delete(self, admin_key: str):
+    def delete(self, secret_key: str):
         """
         Delete it.
 
         Parameters
         ----------
-        admin_key : str
-            Administrator secret key
+        secret_key : str
+            Secret key to allow deletion of read only items
         """
-        self.client.sensor.delete(self.id, admin_key=admin_key)
+        self.client.sensor.delete(self.id, secret_key=secret_key)
 
     def tags(self) -> Tags:
         """Retrieve tags on sensor."""
@@ -379,16 +379,16 @@ class Test(Resource):
     __test__ = False
 
 
-    def delete(self, admin_key: str):
+    def delete(self, secret_key: str):
         """
         Delete it.
 
         Parameters
         ----------
-        admin_key : str
-            Administrator secret key
+        secret_key : str
+            Secret key to allow deletion of read only items
         """
-        self.client.test.delete(self.id, admin_key=admin_key)
+        self.client.test.delete(self.id, secret_key=secret_key)
 
     def tags(self) -> Tags:
         """Retrieve tags on time serie."""
@@ -486,16 +486,16 @@ class Campaign(Resource):
         campaign = self.client.campaign.create(**self.dict())
         self.id = campaign.id  # update with id from database
 
-    def delete(self, admin_key: str):
+    def delete(self, secret_key: str):
         """
         Delete it.
 
         Parameters
         ----------
-        admin_key : str
-            Administrator secret key
+        secret_key : str
+            Secret key to allow deletion of read only items
         """
-        self.client.campaign.delete(self.id, admin_key=admin_key)
+        self.client.campaign.delete(self.id, secret_key=secret_key)
 
     def sensors(self) -> Sensors:
         """Fetch sensors."""

@@ -1,4 +1,4 @@
-name: deploy documentation
+name: Build documentation
 on:
   push:
     branches:
