@@ -16,7 +16,7 @@ services:
     environment:
       - INQUIRE_MODELTEST_DATABASE_URI=postgresql+psycopg2://postgres:postgres@db:5432/test_modeltest_db
       - ADMINISTRATOR_KEY=administrator
-      - SECRET_KEY=09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7
+      - SECRET_KEY=not_so_secret
     depends_on:
       - db
     restart: always
