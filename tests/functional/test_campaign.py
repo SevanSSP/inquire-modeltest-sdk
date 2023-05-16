@@ -2,7 +2,7 @@ from datetime import datetime
 from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool
 
 
-def test_campaign_api(client):
+def test_campaign_api(client, secret_key):
     """The Api is now verified good to go and tests can interact with it"""
     name = random_lower_string()
     description = random_lower_string()
@@ -10,7 +10,7 @@ def test_campaign_api(client):
     location = random_lower_string()
     scale_factor = random_float()
     water_depth = random_float()
-    client.campaign.create(name, description, location, date, scale_factor, water_depth)
+    camp = client.campaign.create(name, description, location, date, scale_factor, water_depth)
     assert client.campaign.get_by_name(name)
 
     campaigns = client.campaign.get(filter_by=[
@@ -20,7 +20,7 @@ def test_campaign_api(client):
 
     assert len(campaigns) == 1
     assert campaigns[0] == client.campaign.get_by_name(name) == client.campaign.get_by_id(campaigns[0].id)
-
+    client.campaign.delete(camp.id, secret_key=secret_key)
 
 def test_campaign_resources(client, new_campaigns):
     campaigns_from_db = client.campaign.get(limit=10000, skip=0)
