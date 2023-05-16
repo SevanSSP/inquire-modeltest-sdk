@@ -5,7 +5,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
 from pydantic.typing import Literal
-from typing import List, Optional, Union, Any
+from typing import List, Optional, Union, Any, TypeVar
 from datetime import datetime
 
 
@@ -32,26 +32,25 @@ class Resource(BaseModel):
         return df
 
 
-class Resources(BaseModel):
-    __root__: List[Resource]
+class Resources(List[Resource]):
+    def __init__(self, items: List[Resource]) -> None:
+        self._check_types(items)
+        super().__init__(items)
+    def _check_types(self, items: List[Resource]) -> None:
+        for item in items:
+            if not isinstance(item, self.__orig_bases__[0].__args__[0]):
+                raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
-    def __iter__(self):
-        return iter(self.__root__)
-
-    def __getitem__(self, item: int):
-        return self.__root__[item]
-
-    def __len__(self):
-        return len(self.__root__)
-
-    def append(self, item: Resource):
-        self.__root__.append(item)
+    def append(self, item: Resource) -> None:
+        if not isinstance(item, self.__orig_bases__[0].__args__[0]):
+            raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
+        super().append(item)
 
     def get_by_id(self, id):
         for i in self:
             if i.id == id:
                 return i
-        return 'ID not in list'
+        raise KeyError(f"ID: {id} not found in  {self.__class__.__name__}")
 
     def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
@@ -66,7 +65,7 @@ class Resources(BaseModel):
         --------
         See keyword arguments on pydantic.BaseModel.dict()
         """
-        return pd.DataFrame([_.dict(exclude={"client"}, **kwargs) for _ in self.__root__])
+        return pd.DataFrame([_.dict(exclude={"client"}, **kwargs) for _ in self])
 
 
 class FloaterConfiguration(Resource):
@@ -78,12 +77,8 @@ class FloaterConfiguration(Resource):
     draft: float
 
 
-class FloaterConfigurations(Resources):
-    __root__: List[FloaterConfiguration]
-
-    def append(self, item: FloaterConfiguration):
-        self.__root__.append(item)
-
+class FloaterConfigurations(Resources[FloaterConfiguration]):
+    pass
 
 class Statistics(Resource):
     min: float
@@ -121,16 +116,17 @@ class Tag(Resource):
         self.client.tag.delete(self.id, admin_key=admin_key)
 
 
-class Tags(Resources):
-    __root__: List[Tag]
-
-    def append(self, item: Tag):
-        self.__root__.append(item)
+class Tags(Resources[Tag]):
+    pass
 
 
 class DataPoints(Resource):
     time: List[float]
     value: List[float]
+    timeseries_id: str
+
+    def __len__(self):
+        return len(self.time)
 
     def plot(self, **kwargs):
         """
@@ -160,11 +156,7 @@ class DataPoints(Resource):
         return pd.DataFrame(dict(value=self.value), index=self.time)
 
 
-class DataPointsList(Resources):
-    __root__: List[DataPoints]
-
-    def append(self, item: DataPoints):
-        self.__root__.append(item)
+class DataPointsList(Resources[DataPoints]):
 
     def plot(self, **kwargs):
         """
@@ -187,9 +179,10 @@ class DataPointsList(Resources):
         pandas.DataFrame
             The dataframe.
         """
-        dfs = [dps.to_pandas() for dps in self.__root__]
-        return pd.concat(dfs, axis="columns")
-
+        dfs = [dps.to_pandas() for dps in self]
+        conc = pd.concat(dfs, axis="columns")
+        conc.columns = [i.timeseries_id for i in self]
+        return conc
 
 class TimeSeries(Resource):
     id: Optional[str]
@@ -278,9 +271,7 @@ class TimeSeries(Resource):
         dps.plot(**kwargs)
 
 
-class TimeSeriesList(Resources):
-    __root__: List[TimeSeries]
-
+class TimeSeriesList(Resources[TimeSeries]):
     def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPointsList:
         """
         Get data points
@@ -300,7 +291,7 @@ class TimeSeriesList(Resources):
             Data points
         """
         dps = DataPointsList.parse_obj(
-            [ts.get_data(start=start, end=end, scaling_length=scaling_length) for ts in self.__root__]
+            [ts.get_data(start=start, end=end, scaling_length=scaling_length) for ts in self]
         )
 
         return dps
@@ -367,12 +358,7 @@ class Sensor(Resource):
         return self.client.timeseries.get_by_sensor_id(self.id)
 
 
-class Sensors(Resources):
-    __root__: List[Sensor]
-
-    def append(self, item: Sensor):
-        self.__root__.append(item)
-
+class Sensors(Resources[Sensor]):
     def print_full(self):
         for i in self:
             print(f'{i.to_pandas()}\n')
@@ -389,6 +375,9 @@ class Test(Resource):
     test_date: datetime
     campaign_id: str
     type: str
+
+    __test__ = False
+
 
     def delete(self, admin_key: str):
         """
@@ -471,11 +460,8 @@ class WindCalibrationTest(Test):
         self.id = sensor.id  # update with id from database
 
 
-class Tests(Resources):
-    __root__: List[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]]
-
-    def append(self, item: Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]):
-        self.__root__.append(item)
+class Tests(Resources[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]]):
+    __test__ = False
 
     def print_full(self):
         for i in self:
@@ -524,5 +510,5 @@ class Campaign(Resource):
         return self.client.floater_config.get_by_campaign_id(self.id)
 
 
-class Campaigns(Resources):
-    __root__: List[Campaign]
+class Campaigns(Resources[Campaign]):
+    pass

@@ -89,10 +89,12 @@ class Client:
 
             r = s.post(
                 self._create_url(resource="auth", endpoint="token"),
-                data=dict(
-                    username=user,
-                    password=passwd
-                )
+                data=dict(grant_type=None,
+                          username=user,
+                          password=passwd,
+                          scope=None,
+                          client_id=None,
+                          client_secret=None)
             )
             r.raise_for_status()
         except requests.exceptions.HTTPError as e:

@@ -9,6 +9,7 @@ from .resources import (
     WaveCalibrationTest, WindCalibrationTest, Tag, Tags, FloaterConfiguration, FloaterConfigurations, Statistics
 )
 from .query import create_query_parameters
+from pydantic import parse_obj_as
 
 
 class BaseAPI:
@@ -105,7 +106,9 @@ class CampaignAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
-        return Campaigns.parse_obj([dict(**item, client=self.client) for item in data])
+
+        return parse_obj_as(Campaigns, [parse_obj_as(Campaign, dict(**_, client=self.client)) for _ in data])
+
 
     def get_by_id(self, campaign_id: str) -> Campaign:
         """
@@ -175,7 +178,7 @@ class TestAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Tests.parse_obj([dict(**item, client=self.client) for item in data])
+        return parse_obj_as(Tests, [parse_obj_as(Test, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> Test:
         """
@@ -312,7 +315,7 @@ class FloaterTestAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Tests.parse_obj([FloaterTest(**item, client=self.client) for item in data])
+        return parse_obj_as(Tests, [parse_obj_as(FloaterTest, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> FloaterTest:
         """
@@ -439,7 +442,7 @@ class WaveCalibrationAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Tests.parse_obj([WaveCalibrationTest(**item, client=self.client) for item in data])
+        return parse_obj_as(Tests, [parse_obj_as(WaveCalibrationTest, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> WaveCalibrationTest:
         """
@@ -557,7 +560,8 @@ class WindCalibrationAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Tests.parse_obj([WindCalibrationTest(**item, client=self.client) for item in data])
+        return parse_obj_as(Tests, [parse_obj_as(WindCalibrationTest, dict(**_, client=self.client)) for _ in data])
+
 
     def get_by_id(self, test_id: str) -> WindCalibrationTest:
         """
@@ -692,7 +696,8 @@ class SensorAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Sensors.parse_obj([dict(**item, client=self.client) for item in data])
+        return parse_obj_as(Sensors, [parse_obj_as(Sensor, dict(**_, client=self.client)) for _ in data])
+
 
     def get_by_id(self, sensor_id: str) -> Sensor:
         """
@@ -819,7 +824,7 @@ class TimeseriesAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return TimeSeriesList.parse_obj([dict(**item, client=self.client) for item in data])
+        return parse_obj_as(TimeSeriesList, [parse_obj_as(TimeSeries, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, timeseries_id: str) -> TimeSeries:
         """
@@ -1042,7 +1047,7 @@ class TagsAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return Tags.parse_obj([dict(**item, client=self.client) for item in data])
+        return parse_obj_as(Tags, [parse_obj_as(Tag, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, tag_id: str) -> Tag:
         """
@@ -1191,7 +1196,7 @@ class FloaterConfigAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return FloaterConfigurations.parse_obj([dict(**item, client=self.client) for item in data])
+        return parse_obj_as(FloaterConfigurations, [parse_obj_as(FloaterConfiguration, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, config_id: str) -> FloaterConfiguration:
         """
