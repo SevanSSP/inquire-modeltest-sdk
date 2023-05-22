@@ -3,6 +3,7 @@ import requests
 from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool
 from modeltestSDK.config import Config
 from modeltestSDK.client import Client
+from modeltestSDK.resources import Campaigns
 from datetime import datetime
 import os
 import random
@@ -52,7 +53,7 @@ def client(http_service, admin_key):
 
 @pytest.fixture(scope='module')
 def new_campaigns(client, secret_key):
-    campaigns = []
+    campaigns = Campaigns()
     for _ in range(random.randint(5, 15)):
         campaigns.append(client.campaign.create(
             name=random_lower_string(),
