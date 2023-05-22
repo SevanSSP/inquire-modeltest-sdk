@@ -33,10 +33,10 @@ class Resource(BaseModel):
 
 
 class Resources(List[Resource]):
-    def __init__(self, items: List[Resource]) -> None:
-        self._check_types(items)
-        super().__init__(items)
-
+    def __init__(self, items: List[Resource] = None) -> None:
+        if items:
+            self._check_types(items)
+            super().__init__(items)
     def _check_types(self, items: List[Resource]) -> None:
         for item in items:
             if not isinstance(item, self.__orig_bases__[0].__args__[0]):
