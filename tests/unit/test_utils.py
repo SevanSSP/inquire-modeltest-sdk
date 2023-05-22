@@ -57,6 +57,7 @@ def test_to_camel_case():
 
 def test_from_datetime_string():
     assert from_datetime_string('2020-01-01T00:00:00') == datetime(2020, 1, 1, 0, 0, 0)
+    assert from_datetime_string("2020-05-01T00:00:00Z").isoformat() == '2020-05-01T00:00:00+00:00'
 
 
 def test_format_class_name():
