@@ -482,6 +482,7 @@ class Campaign(Resource):
     date: datetime
     scale_factor: float
     water_depth: float
+    read_only: Optional[bool] = False
 
     def create(self):
         """Create this campaign."""

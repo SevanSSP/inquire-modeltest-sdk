@@ -31,8 +31,14 @@ def test_campaign_api(client, secret_key):
     client.campaign.delete(camp_with_same_name.id, secret_key=secret_key)
 
 
-def test_campaign_resources(client, new_campaigns):
+def test_campaign_resources(client, new_campaigns, new_sensors):
     campaigns_from_db = client.campaign.get(limit=10000, skip=0)
 
-    for campaign in campaigns_from_db:
-        assert campaign in new_campaigns
+    for campaign in new_campaigns:
+        assert campaign in campaigns_from_db
+
+        sensors_from_db = client.sensor.get(filter_by=[client.filter.sensor.campaign_id == campaign.id],
+                                            limit=10000, skip=0)
+
+        for sensor in campaign.sensors():
+            assert sensor in sensors_from_db
