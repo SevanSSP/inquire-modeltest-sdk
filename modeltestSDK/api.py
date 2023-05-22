@@ -127,7 +127,7 @@ class CampaignAPI(BaseAPI):
         return Campaign(**data, client=self.client)
 
     def get_by_name(self, name: str) -> Union[Campaign, None]:
-        """"
+        """
         Get single campaign by name
 
         Parameters

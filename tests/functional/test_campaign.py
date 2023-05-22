@@ -20,7 +20,15 @@ def test_campaign_api(client, secret_key):
 
     assert len(campaigns) == 1
     assert campaigns[0] == client.campaign.get_by_name(name) == client.campaign.get_by_id(campaigns[0].id)
+    assert client.campaign.get_by_name('not existing name') is None
+
+    camp_with_same_name = client.campaign.create(name, 'description', 'location', date, scale_factor, water_depth)
+    assert camp_with_same_name.id != camp.id
+    assert client.campaign.get_by_name(name) == client.campaign.get_by_id(camp.id)
+    assert client.campaign.get_by_name(name) != client.campaign.get_by_id(camp_with_same_name.id)
+
     client.campaign.delete(camp.id, secret_key=secret_key)
+    client.campaign.delete(camp_with_same_name.id, secret_key=secret_key)
 
 
 def test_campaign_resources(client, new_campaigns):
