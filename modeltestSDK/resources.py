@@ -27,7 +27,7 @@ class Resource(BaseModel):
         """
         df = pd.DataFrame(columns=["value"])
         for name, value in self.dict().items():
-            if name not in ("client", ):
+            if name not in ("client",):
                 df.loc[name] = [value]
         return df
 
@@ -36,6 +36,7 @@ class Resources(List[Resource]):
     def __init__(self, items: List[Resource]) -> None:
         self._check_types(items)
         super().__init__(items)
+
     def _check_types(self, items: List[Resource]) -> None:
         for item in items:
             if not isinstance(item, self.__orig_bases__[0].__args__[0]):
@@ -79,6 +80,7 @@ class FloaterConfiguration(Resource):
 
 class FloaterConfigurations(Resources[FloaterConfiguration]):
     pass
+
 
 class Statistics(Resource):
     min: float
@@ -183,6 +185,7 @@ class DataPointsList(Resources[DataPoints]):
         conc = pd.concat(dfs, axis="columns")
         conc.columns = [i.timeseries_id for i in self]
         return conc
+
 
 class TimeSeries(Resource):
     id: Optional[str]
@@ -336,7 +339,7 @@ class Sensor(Resource):
     def create(self):
         """Add it to the database."""
         sensor = self.client.sensor.create(**self.dict())
-        self.id = sensor.id     # update with id from database
+        self.id = sensor.id  # update with id from database
 
     def delete(self, secret_key: str):
         """
@@ -377,7 +380,6 @@ class Test(Resource):
     type: str
 
     __test__ = False
-
 
     def delete(self, secret_key: str):
         """

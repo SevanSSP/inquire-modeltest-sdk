@@ -22,6 +22,7 @@ def test_campaign_api(client, secret_key):
     assert campaigns[0] == client.campaign.get_by_name(name) == client.campaign.get_by_id(campaigns[0].id)
     client.campaign.delete(camp.id, secret_key=secret_key)
 
+
 def test_campaign_resources(client, new_campaigns):
     campaigns_from_db = client.campaign.get(limit=10000, skip=0)
 

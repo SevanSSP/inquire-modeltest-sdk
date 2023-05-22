@@ -109,7 +109,6 @@ class CampaignAPI(BaseAPI):
 
         return parse_obj_as(Campaigns, [parse_obj_as(Campaign, dict(**_, client=self.client)) for _ in data])
 
-
     def get_by_id(self, campaign_id: str) -> Campaign:
         """
         Get single campaign by id
@@ -562,7 +561,6 @@ class WindCalibrationAPI(TestAPI):
         data = self.client.get(self._resource_path, parameters=params)
         return parse_obj_as(Tests, [parse_obj_as(WindCalibrationTest, dict(**_, client=self.client)) for _ in data])
 
-
     def get_by_id(self, test_id: str) -> WindCalibrationTest:
         """
         Get single wind calibration test by id
@@ -697,7 +695,6 @@ class SensorAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
         return parse_obj_as(Sensors, [parse_obj_as(Sensor, dict(**_, client=self.client)) for _ in data])
-
 
     def get_by_id(self, sensor_id: str) -> Sensor:
         """
@@ -1196,7 +1193,8 @@ class FloaterConfigAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(FloaterConfigurations, [parse_obj_as(FloaterConfiguration, dict(**_, client=self.client)) for _ in data])
+        return parse_obj_as(FloaterConfigurations,
+                            [parse_obj_as(FloaterConfiguration, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, config_id: str) -> FloaterConfiguration:
         """
