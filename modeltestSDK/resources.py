@@ -127,22 +127,6 @@ class Tag(Resource):
     sensor_id: Optional[str]
     timeseries_id: Optional[str]
 
-    def create(self):
-        """Add it to the database."""
-        tag = self.client.tag.create(**self.dict())
-        self.id = tag.id  # update with id from database
-
-    def delete(self, secret_key: str):
-        """
-        Delete it.
-
-        Parameters
-        ----------
-        secret_key : str
-            Secret key to allow deletion of read only items
-        """
-        self.client.tag.delete(self.id, secret_key=secret_key)
-
 
 class Tags(Resources[Tag]):
     pass
@@ -223,22 +207,6 @@ class TimeSeries(Resource):
     default_start_time: Optional[float]
     default_end_time: Optional[float]
     read_only: Optional[bool] = False
-
-    def create(self):
-        """Add it to the database."""
-        ts = self.client.timeseries.create(**self.dict())
-        self.id = ts.id  # update with id from database
-
-    def delete(self, secret_key: str):
-        """
-        Delete it.
-
-        Parameters
-        ----------
-        secret_key : str
-            Secret key to allow deletion of read only items
-        """
-        self.client.timeseries.delete(self.id, secret_key=secret_key)
 
     def add_data(self, time: list, values: list) -> DataPoints:
         """
@@ -362,22 +330,6 @@ class Sensor(Resource):
     area: Optional[float]
     read_only: Optional[bool]
 
-    def create(self):
-        """Add it to the database."""
-        sensor = self.client.sensor.create(**self.dict())
-        self.id = sensor.id  # update with id from database
-
-    def delete(self, secret_key: str):
-        """
-        Delete it.
-
-        Parameters
-        ----------
-        secret_key : str
-            Secret key to allow deletion of read only items
-        """
-        self.client.sensor.delete(self.id, secret_key=secret_key)
-
     def tags(self) -> Tags:
         """Retrieve tags on sensor."""
         return self.client.tag.get_by_sensor_id(self.id)
@@ -451,11 +403,6 @@ class FloaterTest(Test):
     wind_id: Optional[str]
     read_only: Optional[bool] = False
 
-    def create(self):
-        """Add it to the database."""
-        sensor = self.client.floater_test.create(**self.dict())
-        self.id = sensor.id  # update with id from database
-
 
 class WaveCalibrationTest(Test):
     type: Literal["Wave Calibration"]
@@ -468,11 +415,6 @@ class WaveCalibrationTest(Test):
     current_direction: Optional[float]
     read_only: Optional[bool] = False
 
-    def create(self):
-        """Add it to the database."""
-        sensor = self.client.wave_calibration.create(**self.dict())
-        self.id = sensor.id  # update with id from database
-
 
 class WindCalibrationTest(Test):
     type: Literal["Wind Calibration"]
@@ -481,11 +423,6 @@ class WindCalibrationTest(Test):
     zref: Optional[float]
     wind_direction: Optional[float]
     read_only: Optional[bool] = False
-
-    def create(self):
-        """Add it to the database."""
-        sensor = self.client.wind_calibration.create(**self.dict())
-        self.id = sensor.id  # update with id from database
 
 
 class Tests(Resources[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]]):
