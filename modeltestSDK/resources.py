@@ -22,8 +22,12 @@ class Resource(BaseModel):
         else:
             return None
 
-    def create(self):
-        resource = self._api_object().create(**make_serializable(self.dict(exclude={"client",  'id'})))
+    def create(self, admin_key=None):
+        if admin_key is None:
+            resource = self._api_object().create(**make_serializable(self.dict(exclude={"client",  'id'})))
+        else:
+            resource = self._api_object().create(**make_serializable(self.dict(exclude={"client", 'id'})),
+                                                 admin_key=admin_key)
         self.id = resource.id
 
     def update(self, secret_key: str = None):

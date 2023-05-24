@@ -57,7 +57,7 @@ class BaseAPI:
 
 class CampaignAPI(BaseAPI):
     def create(self, name: str, description: str, location: str, date: str, scale_factor: float, water_depth: float,
-               read_only: bool = False) -> Campaign:
+               admin_key: str, read_only: bool = False, ) -> Campaign:
         """
         Create a campaign
 
@@ -75,8 +75,12 @@ class CampaignAPI(BaseAPI):
             Model scale
         water_depth : float
             Water depth (m)
+        admin_key : str
+            admin key required to create a Campaign in MTDB
         read_only : bool, optional
             Make the campaign read only.
+
+
 
         Returns
         -------
@@ -92,7 +96,7 @@ class CampaignAPI(BaseAPI):
             water_depth=water_depth,
             read_only=read_only
         )
-        data = self.client.post(self._resource_path, body=body)
+        data = self.client.post(self._resource_path, parameters=dict(administrator_key=admin_key), body=body)
         return Campaign(**data, client=self.client)
 
     def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Campaigns:
