@@ -7,10 +7,31 @@ from pydantic import BaseModel
 from pydantic.typing import Literal
 from typing import List, Optional, Union, Any
 from datetime import datetime
+from .utils import make_serializable
 
 
 class Resource(BaseModel):
     client: Optional[Any]
+    id: Optional[str]
+
+    def _api_object(self):
+        if hasattr(self.client, self.__class__.__name__.lower()):
+            return getattr(self.client, self.__class__.__name__.lower())
+        elif hasattr(self.client, self.__class__.__name__[:-5].lower()):
+            return getattr(self.client, self.__class__.__name__[:-5].lower())
+        else:
+            return None
+
+    def create(self):
+        resource = self._api_object().create(**make_serializable(self.dict(exclude={"client",  'id'})))
+        self.id = resource.id
+
+    def update(self, secret_key: str = None):
+        self._api_object().update(item_id=self.id, secret_key=secret_key,
+                                  **make_serializable(self.dict(exclude={"client",  'id'})))
+
+    def delete(self, secret_key: str = None):
+        self._api_object().delete(item_id=self.id, secret_key=secret_key)
 
     def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
@@ -37,6 +58,7 @@ class Resources(List[Resource]):
         if items:
             self._check_types(items)
             super().__init__(items)
+
     def _check_types(self, items: List[Resource]) -> None:
         for item in items:
             if not isinstance(item, self.__orig_bases__[0].__args__[0]):
@@ -475,7 +497,6 @@ class Tests(Resources[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrat
 
 
 class Campaign(Resource):
-    id: Optional[str]
     name: str
     description: str
     location: str
@@ -483,22 +504,6 @@ class Campaign(Resource):
     scale_factor: float
     water_depth: float
     read_only: Optional[bool] = False
-
-    def create(self):
-        """Create this campaign."""
-        campaign = self.client.campaign.create(**self.dict())
-        self.id = campaign.id  # update with id from database
-
-    def delete(self, secret_key: str):
-        """
-        Delete it.
-
-        Parameters
-        ----------
-        secret_key : str
-            Secret key to allow deletion of read only items
-        """
-        self.client.campaign.delete(self.id, secret_key=secret_key)
 
     def sensors(self) -> Sensors:
         """Fetch sensors."""
