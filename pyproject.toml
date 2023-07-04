@@ -20,7 +20,7 @@ pydantic = "^1.10.7"
 requests-cache = "^1.0.1"
 
 [tool.poetry.dev-dependencies]
-pytest = "^7.3.0"
+pytest = "^7.4.0"
 nox = "^2023.4.22"
 scipy="^1.10.1"
 jupyter="^1"
