@@ -70,10 +70,14 @@ class Resources(List[Resource]):
             if not isinstance(item, self.__orig_bases__[0].__args__[0]):
                 raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
-    def append(self, item: Resource) -> None:
+    def append(self, item: Resource, admin_key: str = None) -> None:
         if not isinstance(item, self.__orig_bases__[0].__args__[0]):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
-        super().append(item)
+        if item.id:
+            super().append(item)
+        else:
+            item.create(admin_key=admin_key)
+            super().append(item)
 
     def get_by_id(self, id):
         for i in self:

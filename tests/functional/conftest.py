@@ -34,6 +34,19 @@ def client(http_service, admin_key):
     resp = requests.post(f'{api_url}/api/v1/auth/users?administrator_key={admin_key}', json=user_dict)
     assert resp.status_code == 200
 
+    #create group user to admin group
+    resp = requests.get(f'{api_url}/api/v1/auth/group?group_description=admin')
+    if resp.status_code != 404:
+        resp = requests.delete(f'{api_url}/api/v1/auth/group?administrator_key={admin_key}&group_description=admin')
+        assert resp.status_code == 200
+
+    group_dict = dict(description='admin')
+    resp = requests.post(f"{api_url}/api/v1/auth/group?administrator_key={admin_key}", json=group_dict)
+    assert resp.status_code == 200
+    resp = requests.patch(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}&group_description=admin&remove=false')
+    assert resp.status_code == 200
+
+
     yield client
 
     # user info
@@ -51,7 +64,7 @@ def client(http_service, admin_key):
 
 
 @pytest.fixture(scope='module')
-def new_campaigns(client, secret_key):
+def new_campaigns(client, secret_key, admin_key):
     campaigns = Campaigns()
     for _ in range(random.randint(5, 15)):
         campaigns.append(Campaign(
@@ -62,7 +75,8 @@ def new_campaigns(client, secret_key):
             location=random_lower_string(),
             scale_factor=random_float(),
             water_depth=random_float(),
-            read_only=random_bool())
+            read_only=random_bool()),
+            admin_key
         )
 
     yield campaigns
@@ -74,15 +88,16 @@ def new_campaigns(client, secret_key):
 
 @pytest.fixture(scope='module')
 def new_sensors(client, new_campaigns, secret_key):
-    sensors = Sensors
-
+    sensors = Sensors()
+    i = 0
     for campaign in new_campaigns:
+        i+=1
         sensors.append(Sensor(
             client=client,
             campaign_id=campaign.id,
             name=random_lower_string(),
             description=random_lower_string(),
-            unit=random_lower_string(),
+            unit=random_lower_short_string(),
             kind=random.choice([
                 "length",
                 "velocity",
@@ -117,8 +132,8 @@ def new_sensors(client, new_campaigns, secret_key):
             read_only=random_bool()
         ))
 
-        yield sensors
+    yield sensors
 
-        # clean up
-        for sensor in sensors:
-            sensor.delete(secret_key=secret_key)
+    # clean up
+    for sensor in sensors:
+        sensor.delete(secret_key=secret_key)
