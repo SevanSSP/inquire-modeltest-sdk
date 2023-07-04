@@ -128,7 +128,7 @@ class CampaignAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return parse_obj_as(Campaigns, [parse_obj_as(Campaign, dict(**_, client=self.client)) for _ in data])
+        return Campaigns([parse_obj_as(Campaign, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, campaign_id: str) -> Campaign:
         """
@@ -198,26 +198,36 @@ class TestAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(Tests, [parse_obj_as(Test, dict(**_, client=self.client)) for _ in data])
+        data_out = []
+        for i in data:
+            if i['type'] == 'Wave Calibration':
+                data_out.append(self.client.wave_calibration.get_by_id(i['id']))
+            elif i['type'] == 'Floater Test':
+                data_out.append(self.client.floater_test.get_by_id(i['id']))
+            elif i['type'] == 'Wind Calibration':
+                data_out.append(self.client.wind_calibration.get_by_id(i['id']))
+            else:
+                data_out.append(parse_obj_as(Test, dict(**i, client=self.client)))
+#
+        return Tests(data_out)
 
-    def get_by_id(self, test_id: str) -> Test:
+    def get_by_id(self, test_id: str) -> Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
         """
-        Get single campaign by id
+        Get single test by id
 
         Parameters
         ----------
         test_id : str
-            Campaign identifier
+            test identifier
 
         Returns
         -------
-        Test
+        Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
             Test data
         """
-        data = self.client.get(self._resource_path, test_id)
-        return Test(**data, client=self.client)
+        return self.get(filter_by=[self.client.filter.test.id == test_id])[0]
 
-    def get_by_number(self, test_number: str) -> Union[Test, None]:
+    def get_by_number(self, test_number: str) -> Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
         """"
         Get single test by number
 
@@ -228,7 +238,7 @@ class TestAPI(BaseAPI):
 
         Returns
         -------
-        Test
+        Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]
             Test data
         """
         tests = self.get(filter_by=[self.client.filter.test.number == test_number])
@@ -242,7 +252,7 @@ class TestAPI(BaseAPI):
         else:
             return tests[0]
 
-    def get_by_campaign_id(self, campaign_id: str) -> Tests:
+    def get_by_campaign_id(self, campaign_id: str, test_type: str = None) -> Tests:
         """"
         Get tests by parent campaign
 
@@ -253,10 +263,13 @@ class TestAPI(BaseAPI):
 
         Returns
         -------
-        Sensors
-            Multiple sensors
+        Tests
+            Multiple tests
         """
-        tests = self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id])
+        if test_type:
+            tests = self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id, self.client.filter.test.type == test_type])
+        else:
+            tests = self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id])
         return tests
 
 
@@ -335,7 +348,7 @@ class FloaterTestAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(Tests, [parse_obj_as(FloaterTest, dict(**_, client=self.client)) for _ in data])
+        return Tests([parse_obj_as(FloaterTest, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> FloaterTest:
         """
@@ -462,7 +475,7 @@ class WaveCalibrationAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(Tests, [parse_obj_as(WaveCalibrationTest, dict(**_, client=self.client)) for _ in data])
+        return Tests([parse_obj_as(WaveCalibrationTest, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> WaveCalibrationTest:
         """
@@ -580,7 +593,7 @@ class WindCalibrationAPI(TestAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(Tests, [parse_obj_as(WindCalibrationTest, dict(**_, client=self.client)) for _ in data])
+        return Tests([parse_obj_as(WindCalibrationTest, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> WindCalibrationTest:
         """
@@ -715,7 +728,7 @@ class SensorAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(Sensors, [parse_obj_as(Sensor, dict(**_, client=self.client)) for _ in data])
+        return Sensors([parse_obj_as(Sensor, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, sensor_id: str) -> Sensor:
         """
@@ -755,9 +768,9 @@ class SensorAPI(BaseAPI):
             return None
         elif len(sensors) > 1:
             logging.warning(f"Found multiple sensors with name='{name}'. Returning the first match.")
-            return sensors[0]
+            return Sensor(sensors[0])
         else:
-            return sensors[0]
+            return Sensor(sensors[0])
 
     def get_by_campaign_id(self, campaign_id: str) -> Sensors:
         """"
@@ -773,8 +786,8 @@ class SensorAPI(BaseAPI):
         Sensors
             Multiple sensors
         """
-        sensors = self.get(filter_by=[self.client.filter.sensor.campaign_id == campaign_id])
-        return sensors
+        return self.get(filter_by=[self.client.filter.sensor.campaign_id == campaign_id])
+
 
 
 class TimeseriesAPI(BaseAPI):
@@ -842,7 +855,7 @@ class TimeseriesAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(TimeSeriesList, [parse_obj_as(TimeSeries, dict(**_, client=self.client)) for _ in data])
+        return TimeSeriesList([parse_obj_as(TimeSeries, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, timeseries_id: str) -> TimeSeries:
         """
@@ -892,8 +905,7 @@ class TimeseriesAPI(BaseAPI):
         TimeSeriesList
             Time series
         """
-        timeseries = self.get(filter_by=[self.client.filter.timeseries.test_id == test_id])
-        return timeseries
+        return self.get(filter_by=[self.client.filter.timeseries.test_id == test_id])
 
     def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> TimeSeries:
         """"
@@ -911,13 +923,13 @@ class TimeseriesAPI(BaseAPI):
         TimeSeries
             Time series
         """
-        timeseries = self.get(
+        ts = self.get(
             filter_by=[
                 self.client.filter.timeseries.sensor_id == sensor_id,
                 self.client.filter.timeseries.test_id == test_id
             ]
         )
-        return timeseries[0]
+        return ts[0]
 
     def get_data_points(self, ts_id: str, start: float = None, end: float = None, scaling_length: float = None,
                         all_data: bool = False, cache: bool = True) -> DataPoints:
@@ -948,6 +960,7 @@ class TimeseriesAPI(BaseAPI):
         parameters = dict(start_time=start, end_time=end, scaling_length=scaling_length, all_data=all_data)
         data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/data", parameters=parameters,
                                cache=cache)
+        data['data']['timeseries_id'] = ts_id
         return DataPoints(**data.get("data"), client=self.client)
 
     def add_data_points(self, ts_id: str, time: list, values: list) -> DataPoints:
@@ -1214,8 +1227,7 @@ class FloaterConfigAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(FloaterConfigurations,
-                            [parse_obj_as(FloaterConfiguration, dict(**_, client=self.client)) for _ in data])
+        return FloaterConfigurations([parse_obj_as(FloaterConfiguration, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, config_id: str) -> FloaterConfiguration:
         """
@@ -1248,5 +1260,5 @@ class FloaterConfigAPI(BaseAPI):
         FloaterConfigurations
             Floater configurations
         """
-        configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id, ])
+        configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id])
         return configs

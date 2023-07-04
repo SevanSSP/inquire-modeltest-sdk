@@ -2,13 +2,15 @@
 Resource models
 """
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
 from pydantic.typing import Literal
 from typing import List, Optional, Union, Any
 from datetime import datetime
 from .utils import make_serializable
-
+from qats import TimeSeries as QatsTimeSeries
+from qats import TsDB as QatsTsDB
 
 class Resource(BaseModel):
     client: Optional[Any]
@@ -167,6 +169,12 @@ class DataPoints(Resource):
         """
         return pd.DataFrame(dict(value=self.value), index=self.time)
 
+    def to_qats_ts(self) -> QatsTimeSeries:
+        ts = self.client.timeseries.get_by_id(self.timeseries_id)
+        sensor = self.client.sensor.get_by_id(ts.sensor_id)
+        test_name = self.client.test.get_by_id(ts.test_id).description
+        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(self.value), t=np.array(self.time), kind=sensor.kind, unit = sensor.unit)
+
 
 class DataPointsList(Resources[DataPoints]):
 
@@ -228,7 +236,10 @@ class TimeSeries(Resource):
         dps = self.client.timeseries.add_data_points(self.id, time, values)
         return dps
 
-    def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPoints:
+    def sensor(self):
+        return self.client.sensor.get_by_id()
+
+    def get_data(self, start: float = None, end: float = None, scaling_length: float = None, all_data: bool = False) -> DataPoints:
         """
         Get data points
 
@@ -246,7 +257,7 @@ class TimeSeries(Resource):
         DataPoints
             Data points
         """
-        dps = self.client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length)
+        dps = self.client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length, all_data=all_data)
         return dps
 
     def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):
@@ -266,6 +277,30 @@ class TimeSeries(Resource):
         """
         dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
         dps.plot(**kwargs)
+
+    def get_qats_ts(self, start: float = None, end: float = None, scaling_length: float = None, all_data: bool = False) -> QatsTimeSeries:
+        """
+        Get Qats timeseries
+
+        Parameters
+        ----------
+        start : float, optional
+            Fetch data points after this time (s).
+        end : float, optional
+            Fetch data points before this time (s).
+        scaling_length : float, optional
+            Scale the data to this reference length according to Froude law (m).
+        all_data: bool = False
+            Flag to fetch all available data or use default start-end values
+        Returns
+        -------
+        QatsTimeSeries
+            Qats TimeSeries object
+        """
+        dp = self.get_data(start=start, end=end, scaling_length=scaling_length, all_data=all_data)
+        sensor = self.client.sensor.get_by_id(self.sensor_id)
+        test_name = self.client.test.get_by_id(self.test_id).description
+        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time), kind=sensor.kind, unit = sensor.unit)
 
 
 class TimeSeriesList(Resources[TimeSeries]):
@@ -287,11 +322,33 @@ class TimeSeriesList(Resources[TimeSeries]):
         DataPoints
             Data points
         """
-        dps = DataPointsList.parse_obj(
-            [ts.get_data(start=start, end=end, scaling_length=scaling_length) for ts in self]
-        )
-
+        dps = DataPointsList([ts.get_data(start=start, end=end, scaling_length=scaling_length) for ts in self])
         return dps
+
+    def get_qats_tsdb(self, start: float = None, end: float = None, scaling_length: float = None, all_data: bool = False) -> QatsTsDB:
+        """
+        Get Qats timeseries database
+
+        Parameters
+        ----------
+        start : float, optional
+            Fetch data points after this time (s).
+        end : float, optional
+            Fetch data points before this time (s).
+        scaling_length : float, optional
+            Scale the data to this reference length according to Froude law (m).
+        all_data: bool = False
+            Flag to fetch all available data or use default start-end values
+        Returns
+        -------
+        QatsTsDB
+            Qats TsDB object
+        """
+        db = QatsTsDB()
+        for i in self:
+            db.add(i.get_qats_ts())
+        return db
+
 
     def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):
         """
@@ -348,6 +405,11 @@ class Sensors(Resources[Sensor]):
         for i in self:
             print(f"{i.to_pandas().loc[['name', 'id', 'campaign_id', 'description']]}\n")
 
+    def print_list(self):
+        print(f'id\tkind\tunit\tdescription')
+        for i in self:
+            print(f'{i.id}\t{i.kind}\t{i.unit}\t{i.description}')
+
 
 class Test(Resource):
     id: Optional[str]
@@ -374,7 +436,7 @@ class Test(Resource):
         """Retrieve tags on time serie."""
         return self.client.tag.get_by_test_id(self.id)
 
-    def timeseries(self, sensor_id: str = None) -> TimeSeriesList:
+    def timeseries(self, sensor_id: str = None) -> Union[TimeSeriesList, TimeSeries]:
         """
         Retrieve time series on sensor.
 
@@ -436,6 +498,10 @@ class Tests(Resources[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrat
         for i in self:
             print(f"{i.to_pandas().loc[['id', 'campaign_id', 'description', 'type']]}\n")
 
+    def print_list(self):
+        print(f'id\tnumber\ttype\tdescription')
+        for i in self:
+            print(f'{i.id}\t{i.number}\t{i.type}\t{i.description}')
 
 class Campaign(Resource):
     name: str
@@ -452,11 +518,15 @@ class Campaign(Resource):
 
     def tests(self, test_type: str = None) -> Tests:
         """Fetch tests."""
-        return self.client.test.get_by_campaign_id(self.id)
+        return self.client.test.get_by_campaign_id(self.id, test_type=test_type)
 
     def floater_configurations(self) -> FloaterConfigurations:
         """Fetch floater configurations."""
         return self.client.floater_config.get_by_campaign_id(self.id)
+
+    def floater_tests(self) -> Tests:
+        """Fetch floater tests."""
+        return self.client.test.get_by_campaign_id(self.id, test_type='Floater Test')
 
 
 class Campaigns(Resources[Campaign]):
