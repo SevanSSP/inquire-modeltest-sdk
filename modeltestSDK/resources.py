@@ -21,20 +21,31 @@ class Resource(BaseModel):
             return getattr(self.client, self.__class__.__name__.lower())
         elif hasattr(self.client, self.__class__.__name__[:-5].lower()):
             return getattr(self.client, self.__class__.__name__[:-5].lower())
+        elif hasattr(self.client, self.__class__.__name__[:-7].lower()):
+            return getattr(self.client, self.__class__.__name__[:-7].lower())
+        elif hasattr(self.client, self.__class__.__name__[:-4].lower()):
+            return getattr(self.client, self.__class__.__name__[:-4].lower())
         else:
             return None
 
     def create(self, admin_key=None):
-        if admin_key is None:
-            resource = self._api_object().create(**make_serializable(self.dict(exclude={"client",  'id'})))
-        else:
-            resource = self._api_object().create(**make_serializable(self.dict(exclude={"client", 'id'})),
+        try:
+            if admin_key is None:
+                resource = self._api_object().create(**make_serializable(self.dict(exclude={"client",  'id', 'datapoints_created_at'})))
+            else:
+                resource = self._api_object().create(**make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at'})),
                                                  admin_key=admin_key)
-        self.id = resource.id
+            self.id = resource.id
+        except AttributeError as e:
+            if self.client is None:
+                raise AttributeError('No client provided, unable to create object')
+            else:
+                raise e
+
 
     def update(self, secret_key: str = None):
-        self._api_object().update(item_id=self.id, secret_key=secret_key,
-                                  **make_serializable(self.dict(exclude={"client",  'id'})))
+        self._api_object().update(item_id=self.id, body=make_serializable(self.dict(exclude={"client",  'id'})),
+                                  secret_key=secret_key)
 
     def delete(self, secret_key: str = None):
         self._api_object().delete(item_id=self.id, secret_key=secret_key)
@@ -461,7 +472,7 @@ class Test(Resource):
 
 
 class FloaterTest(Test):
-    type: Literal["Floater Test"]
+    type: Literal["Floater Test"] = 'Floater Test'
     category: str
     orientation: float
     floaterconfig_id: str
@@ -469,9 +480,8 @@ class FloaterTest(Test):
     wind_id: Optional[str]
     read_only: Optional[bool] = False
 
-
 class WaveCalibrationTest(Test):
-    type: Literal["Wave Calibration"]
+    type: Literal["Wave Calibration"] = "Wave Calibration"
     wave_spectrum: Optional[str]
     wave_height: Optional[float]
     wave_period: Optional[float]
@@ -483,7 +493,7 @@ class WaveCalibrationTest(Test):
 
 
 class WindCalibrationTest(Test):
-    type: Literal["Wind Calibration"]
+    type: Literal["Wind Calibration"] = "Wind Calibration"
     wind_spectrum: Optional[str]
     wind_velocity: Optional[float]
     zref: Optional[float]
@@ -526,7 +536,7 @@ class Campaign(Resource):
 
     def floater_configurations(self) -> FloaterConfigurations:
         """Fetch floater configurations."""
-        return self.client.floater_config.get_by_campaign_id(self.id)
+        return self.client.floaterconfig.get_by_campaign_id(self.id)
 
     def floater_tests(self) -> Tests:
         """Fetch floater tests."""

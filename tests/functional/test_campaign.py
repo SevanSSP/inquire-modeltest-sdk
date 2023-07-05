@@ -31,7 +31,7 @@ def test_campaign_api(client, secret_key, admin_key):
     client.campaign.delete(camp_with_same_name.id, secret_key=secret_key)
 
 
-def test_campaign_resources(client, new_campaigns, new_sensors):
+def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_floaterconfig):
     campaigns_from_db = client.campaign.get()
 
     for campaign in new_campaigns:
@@ -41,3 +41,19 @@ def test_campaign_resources(client, new_campaigns, new_sensors):
 
         for sensor in campaign.sensors():
             assert sensor in sensors_from_db
+
+        fc_from_db = client.floaterconfig.get(filter_by=[client.filter.floaterconfig.campaign_id == campaign.id])
+
+        for fc in campaign.floater_configurations():
+            assert fc in fc_from_db
+
+        tests_from_db = client.test.get(filter_by=[client.filter.test.campaign_id == campaign.id])
+        for test in campaign.tests():
+            assert test in tests_from_db
+
+def test_update_campaign(client, new_campaigns, secret_key):
+    for campaign in new_campaigns:
+        campaign.name = campaign.name + 'new'
+        campaign.update(secret_key=secret_key)
+
+        assert client.campaign.get_by_name(campaign.name) == campaign

@@ -201,14 +201,11 @@ class TestAPI(BaseAPI):
         data_out = []
         for i in data:
             if i['type'] == 'Wave Calibration':
-                data_out.append(self.client.wave_calibration.get_by_id(i['id']))
-            elif i['type'] == 'Floater Test':
-                data_out.append(self.client.floater_test.get_by_id(i['id']))
+                data_out.append(self.client.wavecalibration.get_by_id(i['id']))
             elif i['type'] == 'Wind Calibration':
-                data_out.append(self.client.wind_calibration.get_by_id(i['id']))
+                data_out.append(self.client.windcalibration.get_by_id(i['id']))
             else:
-                data_out.append(parse_obj_as(Test, dict(**i, client=self.client)))
-#
+                data_out.append(self.client.floatertest.get_by_id(i['id']))
         return Tests(data_out)
 
     def get_by_id(self, test_id: str) -> Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
@@ -274,8 +271,8 @@ class TestAPI(BaseAPI):
 
 
 class FloaterTestAPI(TestAPI):
-    def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               floater_config_id: str = None, wave_id: str = None, wind_id: str = None,
+    def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,  type: str = 'Floater Test',
+               floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
         """
         Create floater test
@@ -311,14 +308,14 @@ class FloaterTestAPI(TestAPI):
         body = dict(
             number=number,
             description=description,
-            type="Floater Test",
+            type=type,
             test_date=test_date,
             campaign_id=campaign_id,
             category=category,
             orientation=orientation,
             wave_id=wave_id,
             wind_id=wind_id,
-            floaterconfig_id=floater_config_id,
+            floaterconfig_id=floaterconfig_id,
             read_only=read_only
         )
         data = self.client.post(self._resource_path, body=body)
@@ -381,7 +378,7 @@ class FloaterTestAPI(TestAPI):
         Test
             Test data
         """
-        tests = self.get(filter_by=[self.client.filter.floater_test.number == test_number])
+        tests = self.get(filter_by=[self.client.filter.floatertest.number == test_number])
 
         if len(tests) == 0:
             logging.info(f"Did not find a floater test with name='{test_number}'.")
@@ -396,7 +393,7 @@ class FloaterTestAPI(TestAPI):
 class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: Union[str, None], wave_height: float, wave_period: float, gamma: float,
-               wave_direction: float, current_velocity: float, current_direction: float,
+               wave_direction: float, current_velocity: float, current_direction: float, type: str = "Wave Calibration",
                read_only: bool = False) -> WaveCalibrationTest:
         """
         Create wave calibration test
@@ -436,7 +433,7 @@ class WaveCalibrationAPI(TestAPI):
         body = dict(
             number=number,
             description=description,
-            type="Wave Calibration",
+            type=type,
             test_date=test_date,
             campaign_id=campaign_id,
             wave_spectrum=wave_spectrum,
@@ -508,7 +505,7 @@ class WaveCalibrationAPI(TestAPI):
         Test
             Test data
         """
-        tests = self.get(filter_by=[self.client.filter.wave_calibration.number == test_number])
+        tests = self.get(filter_by=[self.client.filter.wavecalibration.number == test_number])
 
         if len(tests) == 0:
             logging.info(f"Did not find a wave calibration test with name='{test_number}'.")
@@ -523,7 +520,7 @@ class WaveCalibrationAPI(TestAPI):
 
 class WindCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
-               wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
+               wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float, type: str = "Wind Calibration",
                read_only: bool = False) -> WindCalibrationTest:
         """
         Create wind calibration test
@@ -558,7 +555,7 @@ class WindCalibrationAPI(TestAPI):
             number=number,
             description=description,
             test_date=test_date,
-            type="Wind Calibration",
+            type=type,
             campaign_id=campaign_id,
             wind_spectrum=wind_spectrum,
             wind_velocity=wind_velocity,
@@ -626,7 +623,7 @@ class WindCalibrationAPI(TestAPI):
         Test
             Test data
         """
-        tests = self.get(filter_by=[self.client.filter.wind_calibration.number == test_number])
+        tests = self.get(filter_by=[self.client.filter.windcalibration.number == test_number])
 
         if len(tests) == 0:
             logging.info(f"Did not find a wind calibration test with name='{test_number}'.")
@@ -768,9 +765,9 @@ class SensorAPI(BaseAPI):
             return None
         elif len(sensors) > 1:
             logging.warning(f"Found multiple sensors with name='{name}'. Returning the first match.")
-            return Sensor(sensors[0])
+            return sensors[0]
         else:
-            return Sensor(sensors[0])
+            return sensors[0]
 
     def get_by_campaign_id(self, campaign_id: str) -> Sensors:
         """"

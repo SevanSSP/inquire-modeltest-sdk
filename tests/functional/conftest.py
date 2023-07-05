@@ -1,9 +1,12 @@
 import pytest
 import requests
-from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool
+from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool, \
+    random_int
 from modeltestSDK.config import Config
 from modeltestSDK.client import Client
-from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors)
+from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibrationTest,
+                                    WaveCalibrationTest, FloaterConfiguration, FloaterConfigurations, TimeSeries,
+                                    TimeSeriesList)
 from datetime import datetime
 import os
 import random
@@ -34,7 +37,7 @@ def client(http_service, admin_key):
     resp = requests.post(f'{api_url}/api/v1/auth/users?administrator_key={admin_key}', json=user_dict)
     assert resp.status_code == 200
 
-    #create group user to admin group
+    # create group user to admin group
     resp = requests.get(f'{api_url}/api/v1/auth/group?group_description=admin')
     if resp.status_code != 404:
         resp = requests.delete(f'{api_url}/api/v1/auth/group?administrator_key={admin_key}&group_description=admin')
@@ -43,9 +46,9 @@ def client(http_service, admin_key):
     group_dict = dict(description='admin')
     resp = requests.post(f"{api_url}/api/v1/auth/group?administrator_key={admin_key}", json=group_dict)
     assert resp.status_code == 200
-    resp = requests.patch(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}&group_description=admin&remove=false')
+    resp = requests.patch(
+        f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}&group_description=admin&remove=false')
     assert resp.status_code == 200
-
 
     yield client
 
@@ -75,7 +78,7 @@ def new_campaigns(client, secret_key, admin_key):
             location=random_lower_string(),
             scale_factor=random_float(),
             water_depth=random_float(),
-            read_only=random_bool()),
+            read_only=False),
             admin_key
         )
 
@@ -89,9 +92,7 @@ def new_campaigns(client, secret_key, admin_key):
 @pytest.fixture(scope='module')
 def new_sensors(client, new_campaigns, secret_key):
     sensors = Sensors()
-    i = 0
     for campaign in new_campaigns:
-        i+=1
         sensors.append(Sensor(
             client=client,
             campaign_id=campaign.id,
@@ -129,7 +130,7 @@ def new_sensors(client, new_campaigns, secret_key):
             position_heading_lock=random_bool(),
             positive_direction_definition=random_lower_string(),
             area=random_float(),
-            read_only=random_bool()
+            read_only=False
         ))
 
     yield sensors
@@ -137,3 +138,113 @@ def new_sensors(client, new_campaigns, secret_key):
     # clean up
     for sensor in sensors:
         sensor.delete(secret_key=secret_key)
+
+
+@pytest.fixture(scope='module')
+def new_floaterconfig(client, new_campaigns, secret_key):
+    floaterconfigs = FloaterConfigurations()
+
+    for campaign in new_campaigns:
+        floaterconfigs.append(FloaterConfiguration(
+            client=client,
+            name=random_lower_string(),
+            description=random_lower_string(),
+            campaign_id=campaign.id,
+            characteristic_length=random_float(),
+            draft=random_lower_int()
+        ))
+    yield floaterconfigs
+
+    # clean up
+    for floaterconfig in floaterconfigs:
+        floaterconfig.delete(secret_key=secret_key)
+
+
+@pytest.fixture(scope='module')
+def new_tests(client, secret_key, new_floaterconfig, new_campaigns):
+    tests = Tests()
+    for fc in new_floaterconfig:
+        tests.append(FloaterTest(
+            client=client,
+            floaterconfig_id=fc.id,
+            category=random.choice(["current force",
+                                    "wind force",
+                                    "decay",
+                                    "regular wave",
+                                    "irregular wave",
+                                    "pull out",
+                                    "vim",
+                                    "freak wave"
+                                    ]),
+            orientation=random_lower_int(),
+            number=random_int(),
+            description=random_lower_string(),
+            test_date=datetime.now(),
+            campaign_id=fc.campaign_id)
+        )
+
+    for camp in new_campaigns:
+        tests.append(WaveCalibrationTest(
+            client=client,
+            wave_spectrum=random.choice(["jonswap",
+                                         "torsethaugen",
+                                         "broad band",
+                                         "chirp wave",
+                                         "regular",
+                                         None]),
+            wave_height=random_float(),
+            wave_period=random_float(),
+            gamma=random_float(),
+            wave_direction=random_float(),
+            current_velocity=random_float(),
+            current_direction=random_float(),
+            campaign_id=camp.id,
+            number=random_int(),
+            description=random_lower_string(),
+            test_date=datetime.now(),
+        )
+        )
+
+    for camp in new_campaigns:
+        tests.append(WindCalibrationTest(
+            client=client,
+            wind_spectrum=random_lower_short_string(),
+            wind_velocity=random_float(),
+            zref=random_float(),
+            wind_direction=random_float(),
+            campaign_id=camp.id,
+            number=random_int(),
+            description=random_lower_string(),
+            test_date=datetime.now(),
+        )
+        )
+
+    yield tests
+
+    # clean up
+    for test in tests:
+        test.delete(secret_key=secret_key)
+
+
+@pytest.fixture(scope='module')
+def new_timeseries(client, secret_key, new_campaigns, new_sensors, new_tests):
+    ts_list = TimeSeriesList()
+    for camp in new_campaigns:
+        sensors = camp.sensors()
+        tests = camp.tests()
+        for sensor in sensors:
+            for test in tests:
+                ts_list.append(TimeSeries(
+                    client=client,
+                    sensor_id=sensor.id,
+                    test_id=test.id,
+                    fs=random_float(),
+                    default_start_time=100,
+                    default_end_time=900
+                ))
+
+    yield ts_list
+
+    # clean up
+    for ts in ts_list:
+        ts.delete(secret_key=secret_key)
