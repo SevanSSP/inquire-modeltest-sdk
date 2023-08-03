@@ -247,3 +247,31 @@ def new_timeseries(client, secret_key, new_campaigns, new_sensors, new_tests):
     # clean up
     for ts in ts_list:
         ts.delete(secret_key=secret_key)
+
+
+
+@pytest.fixture(scope='module')
+def new_datapoints(client, secret_key, new_timeseries):
+    time = [random_float() for i in range(0, 400)]
+    time.sort()
+    timeseries_id: str
+
+    for ts in new_timeseries:
+        sensors = camp.sensors()
+        tests = camp.tests()
+        for sensor in sensors:
+            for test in tests:
+                ts_list.append(TimeSeries(
+                    client=client,
+                    sensor_id=sensor.id,
+                    test_id=test.id,
+                    fs=random_float(),
+                    default_start_time=100,
+                    default_end_time=900
+                ))
+
+    yield ts_list
+
+    # clean up
+    for ts in ts_list:
+        ts.delete(secret_key=secret_key)
