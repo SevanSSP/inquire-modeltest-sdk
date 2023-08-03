@@ -75,9 +75,6 @@ def new_campaigns(client, secret_key, admin_key):
             admin_key
         )
 
-    for campaign in campaigns:
-        campaign.create(admin_key=admin_key)
-
     yield campaigns
 
     # clean up
@@ -128,9 +125,6 @@ def new_sensors(client, new_campaigns, secret_key):
             area=random_float(),
             read_only=random_bool()
         ))
-
-    for sensor in sensors:
-        sensor.create()
 
     yield sensors
 
