@@ -80,13 +80,17 @@ class Resources(List[Resource]):
             super().__init__(items)
 
     def _check_types(self, items: List[Resource]) -> None:
-        expected_types = self.__orig_bases__[0].__args__[0].__args__ if self.__orig_bases__[0].__args__[0].__name__ == 'Union' else [self.__orig_bases__[0].__args__[0]]
+        expected_types = self.__orig_bases__[0].__args__[0].__args__ \
+            if isinstance(self.__orig_bases__[0].__args__[0], typing._UnionGenericAlias) \
+            else [self.__orig_bases__[0].__args__[0]]
         for item in items:
             if not any(type(item).__name__ == t.__name__ for t in expected_types):
                 raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
     def append(self, item: Resource, admin_key: str = None) -> None:
-        expected_types = self.__orig_bases__[0].__args__[0].__args__ if self.__orig_bases__[0].__args__[0].__name__ == 'Union' else [self.__orig_bases__[0].__args__[0]]
+        expected_types = self.__orig_bases__[0].__args__[0].__args__ \
+            if self.__orig_bases__[0].__args__[0].__name__ == 'Union' \
+            else [self.__orig_bases__[0].__args__[0]]
         if not any(type(item).__name__ == t.__name__ for t in expected_types):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
         if item.id or item.__class__.__name__ == 'DataPoints':
