@@ -97,13 +97,13 @@ class Client:
                           client_secret=None)
             )
             r.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError as e:     # pragma: no cover
             raise e
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError as e:     # pragma: no cover
             raise e
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout as e:     # pragma: no cover
             raise e
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as e:     # pragma: no cover
             raise e
         else:
             # update env vars
@@ -201,15 +201,15 @@ class Client:
             else:
                 r = s.request(method, url, params=parameters, json=body, headers=headers)
                 r.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError as e:     # pragma: no cover
             logging.error("Request body:  " + str(body))
             logging.error("Request response: " + r.text)
             raise e
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError as e:     # pragma: no cover
             raise e
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout as e:     # pragma: no cover
             raise e
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as e:     # pragma: no cover
             raise e
         else:
             return r.json()

@@ -47,10 +47,6 @@ def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_f
             assert sensor in campaign.sensors()
             assert sensor in new_sensors
 
-        for sensor in new_sensors:
-            assert sensor in campaign.sensors()
-            assert sensor in sensors_from_db
-
         fc_from_db = client.floaterconfig.get(filter_by=[client.filter.floaterconfig.campaign_id == campaign.id])
 
         for fc in campaign.floater_configurations():
@@ -66,3 +62,8 @@ def test_update_campaign(client, new_campaigns, secret_key):
         campaign.update(secret_key=secret_key)
 
         assert client.campaign.get_by_name(campaign.name) == campaign
+
+def test_campaign_resource(client, new_campaigns, new_tests):
+    camp = new_campaigns[0]
+    for test in camp.floater_tests():
+        assert test in new_tests

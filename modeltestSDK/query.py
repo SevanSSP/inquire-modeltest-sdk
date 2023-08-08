@@ -3,7 +3,7 @@ Classes and functions enabling advanced API queries
 """
 try:
     from typing_extensions import Literal  # Python 3.7
-except ImportError:
+except ImportError:     # pragma: no cover
     from typing import Literal  # Python 3.8/3.9
 query_extension_types = Literal["sort", "filter"]
 

@@ -27,6 +27,7 @@ def client(http_service, admin_key):
     os.environ['INQUIRE_MODELTEST_API_PASSWORD'] = 'password'
 
     client = Client(config)
+    assert client.__str__()
 
     # check if user exists
     resp = requests.get(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}')

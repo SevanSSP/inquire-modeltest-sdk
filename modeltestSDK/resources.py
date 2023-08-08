@@ -11,6 +11,7 @@ from datetime import datetime
 from .utils import make_serializable
 from qats import TimeSeries as QatsTimeSeries
 from qats import TsDB as QatsTsDB
+import typing
 
 
 class Resource(BaseModel):
@@ -79,12 +80,14 @@ class Resources(List[Resource]):
             super().__init__(items)
 
     def _check_types(self, items: List[Resource]) -> None:
+        expected_type = typing.get_args(self.__orig_bases__[0])[0]
         for item in items:
-            if not isinstance(item, self.__orig_bases__[0].__args__[0]):
+            if not isinstance(item, expected_type):
                 raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
     def append(self, item: Resource, admin_key: str = None) -> None:
-        if not isinstance(item, self.__orig_bases__[0].__args__[0]):
+        expected_type = typing.get_args(self.__orig_bases__[0])[0]
+        if not isinstance(item, expected_type):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
         if item.id or item.__class__.__name__ == 'DataPoints':
             super().append(item)
@@ -513,15 +516,15 @@ class WindCalibrationTest(Test):
 class Tests(Resources[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]]):
     __test__ = False
 
-    def print_full(self):
+    def print_full(self):    # pragma: no cover
         for i in self:
             print(f'{i.to_pandas()}\n')
 
-    def print_small(self):
+    def print_small(self):    # pragma: no cover
         for i in self:
             print(f"{i.to_pandas().loc[['id', 'campaign_id', 'description', 'type']]}\n")
 
-    def print_list(self):
+    def print_list(self):    # pragma: no cover
         print(f'id\tnumber\ttype\tdescription')
         for i in self:
             print(f'{i.id}\t{i.number}\t{i.type}\t{i.description}')
