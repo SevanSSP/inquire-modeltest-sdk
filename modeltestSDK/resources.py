@@ -44,7 +44,7 @@ class Resource(BaseModel):
             if self.client is None:
                 raise AttributeError('No client provided, unable to create object')
             else:
-                raise e
+                raise e # pragma: no cover
 
     def update(self, secret_key: str = None):
         self._api_object().update(item_id=self.id, body=make_serializable(self.dict(exclude={"client", 'id'})),

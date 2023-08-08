@@ -338,5 +338,5 @@ class Client:
         """
         Removes cached datapoints (from mtdb.sqlite at local cache folder)
         """
-        with requests_cache.enabled(**Config.cache_settings):
+        with requests_cache.enabled(**Config.cache_settings): # pragma: no cover
             requests_cache.clear()
