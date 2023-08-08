@@ -53,7 +53,7 @@ class SortAttribute:
 
 
 def class_factory(name: str, method_spec: query_extension_types, attribute_list: list):
-    def init():
+    def init():  # pragma: no cover
         pass
 
     attr_dict = {'__init__': init}
