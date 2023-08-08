@@ -89,7 +89,7 @@ class Resources(List[Resource]):
 
     def append(self, item: Resource, admin_key: str = None) -> None:
         expected_types = self.__orig_bases__[0].__args__[0].__args__ \
-            if self.__orig_bases__[0].__args__[0].__name__ == 'Union' \
+            if isinstance(self.__orig_bases__[0].__args__[0], typing._UnionGenericAlias) \
             else [self.__orig_bases__[0].__args__[0]]
         if not any(type(item).__name__ == t.__name__ for t in expected_types):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
