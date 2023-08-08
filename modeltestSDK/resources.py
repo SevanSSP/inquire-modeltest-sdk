@@ -72,6 +72,7 @@ class Resource(BaseModel):
                 df.loc[name] = [value]
         return df
 
+T = typing.TypeVar("T", bound=Resource)
 
 class Resources(List[Resource]):
     def __init__(self, items: List[Resource] = None) -> None:
@@ -79,13 +80,13 @@ class Resources(List[Resource]):
             self._check_types(items)
             super().__init__(items)
 
-    def _check_types(self, items: List[Resource]) -> None:
+    def _check_types(self, items: List[T]) -> None:
         expected_type = self.__orig_bases__[0].__args__[0]
         for item in items:
             if not issubclass(type(item), expected_type):
                 raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
-    def append(self, item: Resource, admin_key: str = None) -> None:
+    def append(self, item: T, admin_key: str = None) -> None:
         expected_type = self.__orig_bases__[0].__args__[0]
         if not issubclass(type(item), expected_type):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
