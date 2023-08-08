@@ -12,6 +12,7 @@ from .utils import make_serializable
 from qats import TimeSeries as QatsTimeSeries
 from qats import TsDB as QatsTsDB
 
+
 class Resource(BaseModel):
     client: Optional[Any]
     id: Optional[str]
@@ -31,10 +32,12 @@ class Resource(BaseModel):
     def create(self, admin_key=None):
         try:
             if admin_key is None:
-                resource = self._api_object().create(**make_serializable(self.dict(exclude={"client",  'id', 'datapoints_created_at'})))
+                resource = self._api_object().create(
+                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at'})))
             else:
-                resource = self._api_object().create(**make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at'})),
-                                                 admin_key=admin_key)
+                resource = self._api_object().create(
+                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at'})),
+                    admin_key=admin_key)
             self.id = resource.id
         except AttributeError as e:
             if self.client is None:
@@ -42,9 +45,8 @@ class Resource(BaseModel):
             else:
                 raise e
 
-
     def update(self, secret_key: str = None):
-        self._api_object().update(item_id=self.id, body=make_serializable(self.dict(exclude={"client",  'id'})),
+        self._api_object().update(item_id=self.id, body=make_serializable(self.dict(exclude={"client", 'id'})),
                                   secret_key=secret_key)
 
     def delete(self, secret_key: str = None):
@@ -188,7 +190,8 @@ class DataPoints(Resource):
         ts = self.client.timeseries.get_by_id(self.timeseries_id)
         sensor = self.client.sensor.get_by_id(ts.sensor_id)
         test_name = self.client.test.get_by_id(ts.test_id).description
-        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(self.value), t=np.array(self.time), kind=sensor.kind, unit = sensor.unit)
+        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(self.value), t=np.array(self.time),
+                              kind=sensor.kind, unit=sensor.unit)
 
 
 class DataPointsList(Resources[DataPoints]):
@@ -254,7 +257,8 @@ class TimeSeries(Resource):
     def sensor(self):
         return self.client.sensor.get_by_id(self.sensor_id)
 
-    def get_data(self, start: float = None, end: float = None, scaling_length: float = None, all_data: bool = False) -> DataPoints:
+    def get_data(self, start: float = None, end: float = None, scaling_length: float = None,
+                 all_data: bool = False) -> DataPoints:
         """
         Get data points
 
@@ -272,7 +276,8 @@ class TimeSeries(Resource):
         DataPoints
             Data points
         """
-        dps = self.client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length, all_data=all_data)
+        dps = self.client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length,
+                                                     all_data=all_data)
         return dps
 
     def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):  # pragma: no cover
@@ -293,7 +298,8 @@ class TimeSeries(Resource):
         dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
         dps.plot(**kwargs)
 
-    def get_qats_ts(self, start: float = None, end: float = None, scaling_length: float = None, all_data: bool = False) -> QatsTimeSeries:
+    def get_qats_ts(self, start: float = None, end: float = None, scaling_length: float = None,
+                    all_data: bool = False) -> QatsTimeSeries:
         """
         Get Qats timeseries
 
@@ -315,7 +321,8 @@ class TimeSeries(Resource):
         dp = self.get_data(start=start, end=end, scaling_length=scaling_length, all_data=all_data)
         sensor = self.client.sensor.get_by_id(self.sensor_id)
         test_name = self.client.test.get_by_id(self.test_id).description
-        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time), kind=sensor.kind, unit = sensor.unit)
+        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
+                              kind=sensor.kind, unit=sensor.unit)
 
 
 class TimeSeriesList(Resources[TimeSeries]):
@@ -340,7 +347,8 @@ class TimeSeriesList(Resources[TimeSeries]):
         dps = DataPointsList([ts.get_data(start=start, end=end, scaling_length=scaling_length) for ts in self])
         return dps
 
-    def get_qats_tsdb(self, start: float = None, end: float = None, scaling_length: float = None, all_data: bool = False) -> QatsTsDB:
+    def get_qats_tsdb(self, start: float = None, end: float = None, scaling_length: float = None,
+                      all_data: bool = False) -> QatsTsDB:
         """
         Get Qats timeseries database
 
@@ -480,6 +488,7 @@ class FloaterTest(Test):
     wind_id: Optional[str]
     read_only: Optional[bool] = False
 
+
 class WaveCalibrationTest(Test):
     type: Literal["Wave Calibration"] = "Wave Calibration"
     wave_spectrum: Optional[str]
@@ -516,6 +525,7 @@ class Tests(Resources[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrat
         print(f'id\tnumber\ttype\tdescription')
         for i in self:
             print(f'{i.id}\t{i.number}\t{i.type}\t{i.description}')
+
 
 class Campaign(Resource):
     name: str

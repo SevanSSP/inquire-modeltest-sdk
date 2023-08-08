@@ -41,6 +41,15 @@ def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_f
 
         for sensor in campaign.sensors():
             assert sensor in sensors_from_db
+            assert sensor in new_sensors
+
+        for sensor in sensors_from_db:
+            assert sensor in campaign.sensors()
+            assert sensor in new_sensors
+
+        for sensor in new_sensors:
+            assert sensor in campaign.sensors()
+            assert sensor in sensors_from_db
 
         fc_from_db = client.floaterconfig.get(filter_by=[client.filter.floaterconfig.campaign_id == campaign.id])
 

@@ -58,13 +58,6 @@ def client(http_service, admin_key):
         f'{api_url}/api/v1/auth/users?username={user.json()["username"]}&administrator_key={admin_key}')
     assert resp.status_code == 200
 
-    # delete groups
-    for group in user.json()["groups"][0]:
-        requests.delete(
-            f'{api_url}/api/v1/auth/group?administrator_key={admin_key}&'
-            f'group_description={group["description"]}&'
-            f'group_id={group["id"]}')
-
 
 @pytest.fixture(scope='module')
 def new_campaigns(client, secret_key, admin_key):
@@ -78,7 +71,7 @@ def new_campaigns(client, secret_key, admin_key):
             location=random_lower_string(),
             scale_factor=random_float(),
             water_depth=random_float(),
-            read_only=False),
+            read_only=random_bool()),
             admin_key
         )
 
@@ -130,7 +123,7 @@ def new_sensors(client, new_campaigns, secret_key):
             position_heading_lock=random_bool(),
             positive_direction_definition=random_lower_string(),
             area=random_float(),
-            read_only=False
+            read_only=random_bool()
         ))
 
     yield sensors
