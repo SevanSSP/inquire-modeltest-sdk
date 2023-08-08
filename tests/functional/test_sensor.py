@@ -66,3 +66,7 @@ def test_sensor_api(client, secret_key, admin_key, new_campaigns):
     client.sensor.delete(sensor.id, secret_key=secret_key)
     client.sensor.delete(sensor_with_same_name.id, secret_key=secret_key)
 
+
+def test_sensor_resource(client, secret_key, admin_key, new_sensors, new_timeseries):
+    sensor = new_sensors[0]
+    sensor.timeseries()

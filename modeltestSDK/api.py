@@ -980,7 +980,7 @@ class TimeseriesAPI(BaseAPI):
         """
         body = dict(data=dict(time=time, value=values))
         data = self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=body)
-        return DataPoints(**data.get("data"), client=self.client)
+        return DataPoints(**data.get("data"), timeseries_id=ts_id, client=self.client)
 
     def get_statistics(self, ts_id: str, scaling_length: float = None) -> Statistics:
         """

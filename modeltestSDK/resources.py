@@ -84,7 +84,7 @@ class Resources(List[Resource]):
     def append(self, item: Resource, admin_key: str = None) -> None:
         if not isinstance(item, self.__orig_bases__[0].__args__[0]):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
-        if item.id:
+        if item.id or item.__class__.__name__ == 'DataPoints':
             super().append(item)
         else:
             item.create(admin_key=admin_key)
@@ -157,7 +157,7 @@ class DataPoints(Resource):
     def __len__(self):
         return len(self.time)
 
-    def plot(self, **kwargs):
+    def plot(self, **kwargs): # pragma: no cover
         """
         Plot the dataapoints.
 
@@ -193,7 +193,7 @@ class DataPoints(Resource):
 
 class DataPointsList(Resources[DataPoints]):
 
-    def plot(self, **kwargs):
+    def plot(self, **kwargs): # pragma: no cover
         """
         Plot data points.
 
@@ -252,7 +252,7 @@ class TimeSeries(Resource):
         return dps
 
     def sensor(self):
-        return self.client.sensor.get_by_id()
+        return self.client.sensor.get_by_id(self.sensor_id)
 
     def get_data(self, start: float = None, end: float = None, scaling_length: float = None, all_data: bool = False) -> DataPoints:
         """
@@ -275,7 +275,7 @@ class TimeSeries(Resource):
         dps = self.client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length, all_data=all_data)
         return dps
 
-    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):
+    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):  # pragma: no cover
         """
         Plot time series
 
@@ -365,7 +365,7 @@ class TimeSeriesList(Resources[TimeSeries]):
         return db
 
 
-    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):
+    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):   # pragma: no cover
         """
         Plot time series
 
@@ -412,15 +412,15 @@ class Sensor(Resource):
 
 
 class Sensors(Resources[Sensor]):
-    def print_full(self):
+    def print_full(self):    # pragma: no cover
         for i in self:
             print(f'{i.to_pandas()}\n')
 
-    def print_small(self):
+    def print_small(self):    # pragma: no cover
         for i in self:
             print(f"{i.to_pandas().loc[['name', 'id', 'campaign_id', 'description']]}\n")
 
-    def print_list(self):
+    def print_list(self):    # pragma: no cover
         print(f'id\tkind\tunit\tdescription')
         for i in self:
             print(f'{i.id}\t{i.kind}\t{i.unit}\t{i.description}')

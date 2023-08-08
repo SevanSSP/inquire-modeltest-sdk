@@ -6,7 +6,7 @@ from modeltestSDK.config import Config
 from modeltestSDK.client import Client
 from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibrationTest,
                                     WaveCalibrationTest, FloaterConfiguration, FloaterConfigurations, TimeSeries,
-                                    TimeSeriesList)
+                                    TimeSeriesList, DataPointsList, DataPoints)
 from datetime import datetime
 import os
 import random
@@ -239,8 +239,8 @@ def new_timeseries(client, secret_key, new_campaigns, new_sensors, new_tests):
                     sensor_id=sensor.id,
                     test_id=test.id,
                     fs=random_float(),
-                    default_start_time=100,
-                    default_end_time=900
+                    default_start_time=0,
+                    default_end_time=100000
                 ))
 
     yield ts_list
@@ -248,31 +248,20 @@ def new_timeseries(client, secret_key, new_campaigns, new_sensors, new_tests):
     # clean up
     for ts in ts_list:
         ts.delete(secret_key=secret_key)
-
 
 
 @pytest.fixture(scope='module')
 def new_datapoints(client, secret_key, new_timeseries):
     time = [random_float() for i in range(0, 400)]
     time.sort()
-    timeseries_id: str
 
+    dp_list = DataPointsList()
     for ts in new_timeseries:
-        sensors = camp.sensors()
-        tests = camp.tests()
-        for sensor in sensors:
-            for test in tests:
-                ts_list.append(TimeSeries(
-                    client=client,
-                    sensor_id=sensor.id,
-                    test_id=test.id,
-                    fs=random_float(),
-                    default_start_time=100,
-                    default_end_time=900
-                ))
+        values = [random_float() for i in range(0, len(time))]
+        dp_list.append(ts.add_data(
+            time=time,
+            values=values
+        ))
 
-    yield ts_list
+    yield dp_list
 
-    # clean up
-    for ts in ts_list:
-        ts.delete(secret_key=secret_key)
