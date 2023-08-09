@@ -69,4 +69,6 @@ def test_sensor_api(client, secret_key, admin_key, new_campaigns):
 
 def test_sensor_resource(client, secret_key, admin_key, new_sensors, new_timeseries):
     sensor = new_sensors[0]
-    sensor.timeseries()
+    ts_list = sensor.timeseries()
+    for i in ts_list:
+        assert i.sensor_id == sensor.id

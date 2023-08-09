@@ -6,7 +6,7 @@ from modeltestSDK.config import Config
 from modeltestSDK.client import Client
 from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibrationTest,
                                     WaveCalibrationTest, FloaterConfiguration, FloaterConfigurations, TimeSeries,
-                                    TimeSeriesList, DataPointsList, DataPoints)
+                                    TimeSeriesList, DataPointsList, Tags, Tag)
 from datetime import datetime
 import os
 import random
@@ -116,7 +116,6 @@ def new_sensors(client, new_campaigns, secret_key):
                 "external derived"]),
             x=random_float(),
             y=random_float(),
-            z=random_float(),
             position_reference=random.choice([
                 "local",
                 "global"]),
@@ -258,4 +257,17 @@ def new_datapoints(client, secret_key, new_timeseries):
         ))
 
     yield dp_list
+
+
+@pytest.fixture(scope='module')
+def new_tags(client, secret_key, new_timeseries, new_sensors, new_tests):
+    tag_list = Tags()
+    for ts in new_timeseries:
+        tag_list.append(Tag(client=client, name='quality: bad', comment=random_lower_string(), timeseries_id=ts.id))
+    for sensor in new_sensors:
+        tag_list.append(Tag(client=client, name='pitch', comment=random_lower_string(), sensor_id=sensor.id))
+    for test in new_tests:
+        tag_list.append(Tag(client=client, name='comment', comment=random_lower_string(), test_id=test.id))
+
+    yield tag_list
 

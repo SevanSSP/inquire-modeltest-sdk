@@ -34,6 +34,8 @@ def test_timeseries_resource(client, secret_key, admin_key, new_timeseries, new_
     ts_list_data = new_timeseries.get_data()
     qats_tsdb = new_timeseries.get_qats_tsdb()
 
+    assert len(data) == data_qats.n
+    assert len(ts_list_data) == qats_tsdb.n
     ts_new = TimeSeries(sensor_id=ts.sensor_id, test_id=ts.test_id, fs=ts.fs)
     with pytest.raises(AttributeError) as e:
         ts_new.create(admin_key=admin_key)

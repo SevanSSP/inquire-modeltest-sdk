@@ -22,4 +22,5 @@ def test_datapoints_resource(client, secret_key, admin_key, new_datapoints):
     df_list = new_datapoints.to_pandas()
     df = dp.to_pandas()
     dp_qats = dp.to_qats_ts()
-    assert len(dp) == len(df_list) == len(df)
+    assert len(dp) == len(df_list) == len(df) == dp_qats.n
+    assert np.mean(dp.value) == np.mean(df.values) == np.mean(dp_qats.x)

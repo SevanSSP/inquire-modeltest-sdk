@@ -1075,11 +1075,11 @@ class TagsAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=params)
-        return parse_obj_as(Tags, [parse_obj_as(Tag, dict(**_, client=self.client)) for _ in data])
+        return Tags([parse_obj_as(Tag, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, tag_id: str) -> Tag:
         """
-        Get single time series by id
+        Get single tag series by id
 
         Parameters
         ----------
