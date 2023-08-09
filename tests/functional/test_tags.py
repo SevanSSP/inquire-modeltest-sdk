@@ -4,6 +4,16 @@ from tests.utils import random_lower_int, random_float, random_lower_short_strin
 
 def test_tag_api(client, secret_key, new_tags):
     """The Api is now verified good to go and tests can interact with it"""
+    for tag in new_tags:
+        client.tag.get_by_id(tag.id)
+        client.tag.get_by_name(tag.name)
+        if tag.sensor_id:
+            client.tag.get_by_sensor_id(tag.sensor_id)
+        elif tag.test_id:
+            client.tag.get_by_test_id(tag.test_id)
+        else:
+            client.tag.get_by_timeseries_id(tag.timeseries_id)
+
     tags = client.tag.get()
     for tag in tags:
         assert tag in new_tags
