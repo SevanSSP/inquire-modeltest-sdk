@@ -143,6 +143,7 @@ class Statistics(Resource):
     m1: float
     m2: float
     m4: float
+    tp: float
 
 
 class Tag(Resource):
