@@ -15,7 +15,7 @@ include = [
 matplotlib = "^3.7.2"
 requests="2.31.0"
 python = ">=3.8.0,<3.11"
-pydantic = "^1.10.7,<2"
+pydantic = "^1.10.12,<2"
 requests-cache = "^1.1.0"
 qats = "^4.11.1"
 pandas = ">=1,<2"
