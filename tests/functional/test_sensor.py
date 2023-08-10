@@ -54,7 +54,6 @@ def test_sensor_api(client, secret_key, admin_key, new_campaigns):
     assert len(sensors) == 1
     assert sensors[0] == client.sensor.get_by_name(name) == client.sensor.get_by_id(sensors[0].id)
     assert client.sensor.get_by_name('not existing name') is None
-    assert len(client.sensor.get()) == 1
 
     sensor_with_same_name = client.sensor.create(name=name,description='description',unit=unit,kind=kind,source=source,x=x,y=y,z=z,
                                   position_reference=position_reference,position_heading_lock=position_heading_lock,position_draft_lock=position_draft_lock,

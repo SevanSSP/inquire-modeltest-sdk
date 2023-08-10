@@ -9,8 +9,17 @@ def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
     fc = new_floaterconfig[0]
     floaterconfig_id = fc.id
     assert client.floaterconfig.get_by_id(floaterconfig_id) == fc
-    assert client.floaterconfig.get(filter_by=[client.filter.floaterconfig.id==fc.id])[0] == fc
-    assert len(client.floaterconfig.get()) == len(new_floaterconfig)
+    assert client.floaterconfig.get(filter_by=[client.filter.floaterconfig.id == fc.id])[0] == fc
+
+    len_get_floaterconfig = 0
+    cmp_ids = set([fc_i.campaign_id for fc_i in new_floaterconfig])
+    for cmp_id in cmp_ids:
+        len_get_floaterconfig += len(
+            client.floaterconfig.get(filter_by=[
+                client.filter.floaterconfig.campaign_id == cmp_id
+            ]))
+    assert len_get_floaterconfig == len(new_floaterconfig)
+
     category = random.choice(["current force",
                               "wind force",
                               "decay",
@@ -36,7 +45,9 @@ def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
     assert len(tests) == 1
     assert tests[0] == client.test.get_by_number(number) == client.test.get_by_id(tests[0].id)
     assert client.test.get_by_number('not existing name') is None
-    tests_check = client.test.get()
+    tests_check = client.test.get(filter_by=[
+        client.filter.test.campaign_id == campaign_id,
+    ])
     assert len(tests_check) == 1
     floatertest_with_same_name = client.floatertest.create(number=number, description='description',
                                                            test_date=test_date, campaign_id=campaign_id,
@@ -50,7 +61,10 @@ def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
     assert len(test_fromcampaign) == 2
 
-    tests_check = client.floatertest.get()
+    tests_check = client.floatertest.get(filter_by=[
+        client.filter.floatertest.campaign_id == campaign_id
+    ])
+
     assert len(tests_check) == 2
     for i in test_fromcampaign:
         assert i in tests_check
@@ -99,9 +113,11 @@ def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
     assert client.wavecalibration.get_by_number('not existing name') is None
 
     assert tests[0] == client.wavecalibration.get_by_number(number)
-    tests_check = client.test.get()
+    tests_check = client.test.get(filter_by=[client.filter.test.campaign_id == campaign_id])
     assert len(tests_check) == 1
-    tests_check_wavecal = client.wavecalibration.get()
+    tests_check_wavecal = client.wavecalibration.get(filter_by=[
+        client.filter.wavecalibration.campaign_id == campaign_id
+    ])
     assert len(tests_check_wavecal) == 1
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id, test_type="Wave Calibration")
     assert len(test_fromcampaign) == 1
@@ -148,9 +164,13 @@ def test_windcalibrationtest_api(client, secret_key, admin_key, new_campaigns):
     assert client.test.get_by_number('not existing name') is None
     assert client.windcalibration.get_by_number('not existing name') is None
 
-    tests_check = client.test.get()
+    tests_check = client.test.get(filter_by=[
+        client.filter.test.campaign_id == campaign_id,
+    ])
     assert len(tests_check) == 1
-    tests_check_windcal = client.windcalibration.get()
+    tests_check_windcal = client.windcalibration.get(filter_by=[
+        client.filter.windcalibration.campaign_id == campaign_id,
+    ])
     assert len(tests_check_windcal) == 1
     windcal_samename = client.windcalibration.create(number=number, description='description', test_date=test_date,
                                                      campaign_id=campaign_id, wind_spectrum=wind_spectrum,

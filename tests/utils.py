@@ -23,9 +23,10 @@ def random_lower_short_string() -> str:
 def random_lower_int() -> int:
     return random.randint(10, 15)
 
+
 def random_int() -> int:
     return random.randint(1000, 9999)
 
 
 def rounded_compare(number_1: Union[float, np.array], number_2: Union[float, np.array], precision: float):
-    return abs((number_1-number_2) / number_1) < precision
+    return abs((number_1 - number_2) / number_1) < precision

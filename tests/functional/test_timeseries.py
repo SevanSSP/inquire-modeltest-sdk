@@ -19,7 +19,15 @@ def test_timeseries_api(client, secret_key, admin_key, new_timeseries):
 
     assert len(ts_list) == 1
 
-    assert len(client.timeseries.get()) == len(new_timeseries)
+    len_get_timeseries = 0
+    sensor_ids = set([ts_i.sensor_id for ts_i in new_timeseries])
+    for sensor_id in sensor_ids:
+        len_get_timeseries += len(client.timeseries.get(filter_by=[
+            client.filter.timeseries.sensor_id == sensor_id
+        ]))
+
+    assert len_get_timeseries == len(new_timeseries)
+
     assert client.timeseries.get_by_id(ts.id) == ts == client.timeseries.get_by_sensor_id_and_test_id(
         sensor_id=ts.sensor_id, test_id=ts.test_id)
     assert ts_list == client.timeseries.get_by_test_id(ts.test_id)

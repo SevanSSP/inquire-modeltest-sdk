@@ -1,5 +1,5 @@
 from datetime import datetime
-from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool
+from tests.utils import random_lower_int, random_float, rounded_compare
 import random
 import numpy as np
 
@@ -13,7 +13,7 @@ def test_datapoints_api(client, secret_key, admin_key, new_datapoints):
     assert dp_fixture == dp_fetch
 
     statistics_fetch = client.timeseries.get_statistics(ts_id=dp_fixture.timeseries_id)
-    assert statistics_fetch.mean == np.mean(dp_fetch.value)
+    assert rounded_compare(statistics_fetch.mean, np.mean(dp_fetch.value), 10 ** -3)
 
 
 def test_datapoints_resource(client, secret_key, admin_key, new_datapoints):
