@@ -38,26 +38,31 @@ def client(http_service, admin_key):
     resp = requests.post(f'{api_url}/api/v1/auth/users?administrator_key={admin_key}', json=user_dict)
     assert resp.status_code == 200
 
-    # create group user to admin group
+    # add user to admin group (create group if required)
     resp = requests.get(f'{api_url}/api/v1/auth/group?group_description=admin')
-    if resp.status_code != 404:
-        resp = requests.delete(f'{api_url}/api/v1/auth/group?administrator_key={admin_key}&group_description=admin')
+    if resp.status_code != 200:
+        group_dict = dict(description='admin')
+        resp = requests.post(f"{api_url}/api/v1/auth/group?administrator_key={admin_key}", json=group_dict)
         assert resp.status_code == 200
+        admin_group_existed = False
+    else:
+        admin_group_existed = True
 
-    group_dict = dict(description='admin')
-    resp = requests.post(f"{api_url}/api/v1/auth/group?administrator_key={admin_key}", json=group_dict)
-    assert resp.status_code == 200
     resp = requests.patch(
         f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}&group_description=admin&remove=false')
     assert resp.status_code == 200
 
     yield client
 
-    # user info
+    # clean-up
     user = requests.get(f'{api_url}/api/v1/auth/users?username=tester&administrator_key={admin_key}')
     resp = requests.delete(
         f'{api_url}/api/v1/auth/users?username={user.json()["username"]}&administrator_key={admin_key}')
     assert resp.status_code == 200
+
+    if not admin_group_existed:
+        resp = requests.delete(f'{api_url}/api/v1/auth/group?group_description=admin&administrator_key={admin_key}')
+        assert resp.status_code == 200
 
 
 @pytest.fixture(scope='module')
