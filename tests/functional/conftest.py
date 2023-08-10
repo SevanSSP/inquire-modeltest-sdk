@@ -68,7 +68,7 @@ def client(http_service, admin_key):
 @pytest.fixture(scope='module')
 def new_campaigns(client, secret_key, admin_key):
     campaigns = Campaigns()
-    for _ in range(random.randint(5, 15)):
+    for _ in range(random.randint(5, 40)):
         campaigns.append(Campaign(
             client=client,
             name=random_lower_string(),
@@ -77,7 +77,7 @@ def new_campaigns(client, secret_key, admin_key):
             location=random_lower_string(),
             scale_factor=random_float(),
             water_depth=random_float(),
-            read_only=random_bool()),
+            read_only=False),
             admin_key
         )
 
@@ -128,7 +128,7 @@ def new_sensors(client, new_campaigns, secret_key):
             position_heading_lock=random_bool(),
             positive_direction_definition=random_lower_string(),
             area=random_float(),
-            read_only=random_bool()
+            read_only=False
         ))
 
     yield sensors
@@ -276,3 +276,5 @@ def new_tags(client, secret_key, new_timeseries, new_sensors, new_tests):
 
     yield tag_list
 
+    for tag in tag_list:
+        tag.delete(secret_key=secret_key)

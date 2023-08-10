@@ -4,9 +4,10 @@ from tests.utils import random_lower_int, random_float, random_lower_short_strin
 
 def test_tag_api(client, secret_key, new_tags):
     """The Api is now verified good to go and tests can interact with it"""
-    for tag in new_tags:
+    for i, tag in enumerate(new_tags):
+        print(f'{i} / {len(new_tags)}')
         client.tag.get_by_id(tag.id)
-        client.tag.get_by_name(tag.name)
+        assert len(client.tag.get_by_name(tag.name)) > 0
         if tag.sensor_id:
             client.tag.get_by_sensor_id(tag.sensor_id)
         elif tag.test_id:
