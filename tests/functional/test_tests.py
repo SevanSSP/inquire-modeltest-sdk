@@ -191,3 +191,21 @@ def test_test_resources(client, secret_key, admin_key, new_tests, new_timeseries
     test = new_tests[0]
     ts = test.timeseries()[0]
     assert ts == test.timeseries(sensor_id=ts.sensor_id)
+
+
+def test_test_limit_skip(client, new_tests):
+    all_tests = client.test.get(limit=10000)
+
+    portion = max(1, len(all_tests) // 5)
+    part_of_tests = client.test.get(limit=portion, skip=0)
+    assert len(part_of_tests) == portion
+
+    n_skips = -(len(all_tests) // -portion)  # ceiling divide
+
+    all_tests_in_steps = []
+    for skip in range(n_skips):
+        all_tests_in_steps.extend(client.test.get(limit=portion, skip=skip * portion))
+
+    assert len(all_tests_in_steps) == len(all_tests)
+    for test in all_tests:
+        assert test in all_tests_in_steps

@@ -71,3 +71,21 @@ def test_sensor_resource(client, secret_key, admin_key, new_sensors, new_timeser
     ts_list = sensor.timeseries()
     for i in ts_list:
         assert i.sensor_id == sensor.id
+
+
+def test_sensor_limit_skip(client, new_sensors):
+    all_sensors = client.sensor.get(limit=10000)
+
+    portion = max(1, len(all_sensors) // 5)
+    part_of_sensors = client.sensor.get(limit=portion, skip=0)
+    assert len(part_of_sensors) == portion
+
+    n_skips = -(len(all_sensors) // -portion)  # ceiling divide
+
+    all_sensors_in_steps = []
+    for skip in range(n_skips):
+        all_sensors_in_steps.extend(client.sensor.get(limit=portion, skip=skip*portion))
+
+    assert len(all_sensors_in_steps) == len(all_sensors)
+    for sensor in all_sensors:
+        assert sensor in all_sensors_in_steps

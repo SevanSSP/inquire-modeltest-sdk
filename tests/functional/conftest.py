@@ -77,7 +77,7 @@ def new_campaigns(client, secret_key, admin_key):
             location=random_lower_string(),
             scale_factor=random_float(),
             water_depth=random_float(),
-            read_only=False),
+            read_only=random_bool()),
             admin_key
         )
 
@@ -128,7 +128,7 @@ def new_sensors(client, new_campaigns, secret_key):
             position_heading_lock=random_bool(),
             positive_direction_definition=random_lower_string(),
             area=random_float(),
-            read_only=False
+            read_only=random_bool()
         ))
 
     yield sensors
@@ -175,7 +175,7 @@ def new_tests(client, secret_key, new_floaterconfig, new_campaigns):
                                     "freak wave"
                                     ]),
             orientation=random_lower_int(),
-            number=random_int(),
+            number=str(random_int()),
             description=random_lower_string(),
             test_date=datetime.now(),
             campaign_id=fc.campaign_id)

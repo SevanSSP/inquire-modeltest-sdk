@@ -174,7 +174,7 @@ class CampaignAPI(BaseAPI):
 
 
 class TestAPI(BaseAPI):
-    def get(self, filter_by: list = None, sort_by: list = None) -> Tests:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Tests:
         """
         Get multiple tests
 
@@ -186,6 +186,10 @@ class TestAPI(BaseAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -197,7 +201,7 @@ class TestAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
         data_out = []
         for i in data:
             if i['type'] == 'Wave Calibration':
@@ -224,7 +228,8 @@ class TestAPI(BaseAPI):
         """
         return self.get(filter_by=[self.client.filter.test.id == test_id])[0]
 
-    def get_by_number(self, test_number: str) -> Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
+    def get_by_number(self, test_number: str) -> Union[
+        FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
         """"
         Get single test by number
 
@@ -264,14 +269,16 @@ class TestAPI(BaseAPI):
             Multiple tests
         """
         if test_type:
-            tests = self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id, self.client.filter.test.type == test_type])
+            tests = self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id,
+                                        self.client.filter.test.type == test_type])
         else:
             tests = self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id])
         return tests
 
 
 class FloaterTestAPI(TestAPI):
-    def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,  type: str = 'Floater Test',
+    def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
+               type: str = 'Floater Test',
                floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
         """
@@ -321,7 +328,7 @@ class FloaterTestAPI(TestAPI):
         data = self.client.post(self._resource_path, body=body)
         return FloaterTest(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> Tests:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Tests:
         """
         Get multiple floater tests
 
@@ -333,6 +340,10 @@ class FloaterTestAPI(TestAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -344,7 +355,8 @@ class FloaterTestAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
+
         return Tests([parse_obj_as(FloaterTest, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> FloaterTest:
@@ -448,7 +460,7 @@ class WaveCalibrationAPI(TestAPI):
         data = self.client.post(self._resource_path, body=body)
         return WaveCalibrationTest(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> Tests:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Tests:
         """
         Get multiple wave calibration tests
 
@@ -460,6 +472,10 @@ class WaveCalibrationAPI(TestAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -471,7 +487,8 @@ class WaveCalibrationAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
+
         return Tests([parse_obj_as(WaveCalibrationTest, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> WaveCalibrationTest:
@@ -520,7 +537,8 @@ class WaveCalibrationAPI(TestAPI):
 
 class WindCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
-               wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float, type: str = "Wind Calibration",
+               wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
+               type: str = "Wind Calibration",
                read_only: bool = False) -> WindCalibrationTest:
         """
         Create wind calibration test
@@ -566,7 +584,7 @@ class WindCalibrationAPI(TestAPI):
         data = self.client.post(self._resource_path, body=body)
         return WindCalibrationTest(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> Tests:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Tests:
         """
         Get multiple wind calibration tests
 
@@ -578,6 +596,10 @@ class WindCalibrationAPI(TestAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -589,7 +611,8 @@ class WindCalibrationAPI(TestAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
+
         return Tests([parse_obj_as(WindCalibrationTest, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, test_id: str) -> WindCalibrationTest:
@@ -701,7 +724,7 @@ class SensorAPI(BaseAPI):
         data = self.client.post(self._resource_path, body=body)
         return Sensor(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> Sensors:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Sensors:
         """
         Get multiple sensors
 
@@ -713,6 +736,10 @@ class SensorAPI(BaseAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -724,7 +751,7 @@ class SensorAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
         return Sensors([parse_obj_as(Sensor, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, sensor_id: str) -> Sensor:
@@ -786,7 +813,6 @@ class SensorAPI(BaseAPI):
         return self.get(filter_by=[self.client.filter.sensor.campaign_id == campaign_id])
 
 
-
 class TimeseriesAPI(BaseAPI):
     def create(self, sensor_id: str, test_id: str, default_start_time: float, default_end_time: float, fs: float,
                intermittent: bool = False, read_only: bool = False) -> TimeSeries:
@@ -828,7 +854,7 @@ class TimeseriesAPI(BaseAPI):
         data = self.client.post(self._resource_path, body=body)
         return TimeSeries(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> TimeSeriesList:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> TimeSeriesList:
         """
         Get multiple time series
 
@@ -840,6 +866,10 @@ class TimeseriesAPI(BaseAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -851,7 +881,8 @@ class TimeseriesAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
+
         return TimeSeriesList([parse_obj_as(TimeSeries, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, timeseries_id: str) -> TimeSeries:
@@ -1051,7 +1082,7 @@ class TagsAPI(BaseAPI):
         data = self.client.post(self._resource_path, body=body)
         return Tag(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> Tags:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Tags:
         """
         Get multiple tags
 
@@ -1063,6 +1094,10 @@ class TagsAPI(BaseAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -1074,7 +1109,7 @@ class TagsAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
         return Tags([parse_obj_as(Tag, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, tag_id: str) -> Tag:
@@ -1200,7 +1235,8 @@ class FloaterConfigAPI(BaseAPI):
         data = self.client.post(self._resource_path, body=body)
         return FloaterConfiguration(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None) -> FloaterConfigurations:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None,
+            limit: int = None) -> FloaterConfigurations:
         """
         Get multiple floater configuration
 
@@ -1212,6 +1248,10 @@ class FloaterConfigAPI(BaseAPI):
         sort_by : list, optional
             Expressions for sorting selection e.g.
                 [{'name': height, 'op': asc}]
+        skip : int, optional
+            Skip the first `skip` campaigns.
+        limit : int, optional
+            Do not return more than `limit` hits.
 
         Returns
         -------
@@ -1223,7 +1263,8 @@ class FloaterConfigAPI(BaseAPI):
         if sort_by is None:
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
-        data = self.client.get(self._resource_path, parameters=params)
+        data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
+
         return FloaterConfigurations([parse_obj_as(FloaterConfiguration, dict(**_, client=self.client)) for _ in data])
 
     def get_by_id(self, config_id: str) -> FloaterConfiguration:
