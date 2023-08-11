@@ -32,11 +32,11 @@ def test_tag_api(client, secret_key, new_tags):
 
     tags = []
     for sensor_id in set(tagged_sensor_ids):
-        tags.extend(client.tag.get(filter_by=[client.filter.tags.sensor_id == sensor_id]))
+        tags.extend(client.tag.get(filter_by=[client.filter.tag.sensor_id == sensor_id]))
     for test_id in set(tagged_test_ids):
-        tags.extend(client.tag.get(filter_by=[client.filter.tags.test_id == test_id]))
+        tags.extend(client.tag.get(filter_by=[client.filter.tag.test_id == test_id]))
     for timeseries_id in set(tagged_timeseries_ids):
-        tags.extend(client.tag.get(filter_by=[client.filter.tags.timeseries_id == timeseries_id]))
+        tags.extend(client.tag.get(filter_by=[client.filter.tag.timeseries_id == timeseries_id]))
 
     for tag in tags:
         assert tag in new_tags

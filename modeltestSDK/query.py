@@ -3,7 +3,7 @@ Classes and functions enabling advanced API queries
 """
 try:
     from typing_extensions import Literal  # Python 3.7
-except ImportError:     # pragma: no cover
+except ImportError:  # pragma: no cover
     from typing import Literal  # Python 3.8/3.9
 query_extension_types = Literal["sort", "filter"]
 
@@ -109,62 +109,62 @@ class Query:
                                                         'id',
                                                         'datapoints_created_at'])
         self.wavecalibration = class_factory(name="Wavecalibration", method_spec=method_spec,
-                                              attribute_list=['number',
-                                                              'description',
-                                                              'test_date',
-                                                              'campaign_id',
-                                                              'type',
-                                                              'wave_spectrum',
-                                                              'wave_height',
-                                                              'wave_period',
-                                                              'gamma',
-                                                              'wave_direction',
-                                                              'current_velocity',
-                                                              'current_direction',
-                                                              'read_only',
-                                                              'id'])
+                                             attribute_list=['number',
+                                                             'description',
+                                                             'test_date',
+                                                             'campaign_id',
+                                                             'type',
+                                                             'wave_spectrum',
+                                                             'wave_height',
+                                                             'wave_period',
+                                                             'gamma',
+                                                             'wave_direction',
+                                                             'current_velocity',
+                                                             'current_direction',
+                                                             'read_only',
+                                                             'id'])
 
         self.windcalibration = class_factory(name="Windcalibration", method_spec=method_spec,
-                                              attribute_list=['number',
-                                                              'description',
-                                                              'test_date',
-                                                              'campaign_id',
-                                                              'type',
-                                                              'wind_spectrum',
-                                                              'wind_velocity',
-                                                              'zref',
-                                                              'wind_direction',
-                                                              'read_only',
-                                                              'id'])
+                                             attribute_list=['number',
+                                                             'description',
+                                                             'test_date',
+                                                             'campaign_id',
+                                                             'type',
+                                                             'wind_spectrum',
+                                                             'wind_velocity',
+                                                             'zref',
+                                                             'wind_direction',
+                                                             'read_only',
+                                                             'id'])
         self.floatertest = class_factory(name="Floatertest", method_spec=method_spec,
-                                          attribute_list=['number',
-                                                          'description',
-                                                          'test_date',
-                                                          'campaign_id',
-                                                          'type',
-                                                          'category',
-                                                          'orientation',
-                                                          'wave_id',
-                                                          'wind_id',
-                                                          'floaterconfig_id',
-                                                          'read_only',
-                                                          'id'])
-        self.tags = class_factory(name="Tags", method_spec=method_spec,
-                                  attribute_list=['comment',
-                                                  'test_id',
-                                                  'sensor_id',
-                                                  'timeseries_id',
-                                                  'read_only',
-                                                  'name',
-                                                  'id'])
+                                         attribute_list=['number',
+                                                         'description',
+                                                         'test_date',
+                                                         'campaign_id',
+                                                         'type',
+                                                         'category',
+                                                         'orientation',
+                                                         'wave_id',
+                                                         'wind_id',
+                                                         'floaterconfig_id',
+                                                         'read_only',
+                                                         'id'])
+        self.tag = class_factory(name="Tag", method_spec=method_spec,
+                                 attribute_list=['comment',
+                                                 'test_id',
+                                                 'sensor_id',
+                                                 'timeseries_id',
+                                                 'read_only',
+                                                 'name',
+                                                 'id'])
         self.floaterconfig = class_factory(name="Floaterconfig", method_spec=method_spec,
-                                            attribute_list=['name',
-                                                            'description',
-                                                            'characteristic_length',
-                                                            'campaign_id',
-                                                            'draft',
-                                                            'read_only',
-                                                            'id'])
+                                           attribute_list=['name',
+                                                           'description',
+                                                           'characteristic_length',
+                                                           'campaign_id',
+                                                           'draft',
+                                                           'read_only',
+                                                           'id'])
 
 
 def create_query_parameters(filter_expressions: list, sorting_expressions: list) -> dict:

@@ -147,7 +147,7 @@ class CampaignAPI(BaseAPI):
         data = self.client.get(self._resource_path, campaign_id)
         return Campaign(**data, client=self.client)
 
-    def get_by_name(self, name: str) -> Union[Campaign, None]:
+    def get_by_name(self, name: str) -> Campaigns:
         """
         Get single campaign by name
 
@@ -161,16 +161,7 @@ class CampaignAPI(BaseAPI):
         Campaign
             Campaign data
         """
-        campaigns = self.get(filter_by=[self.client.filter.campaign.name == name])
-
-        if len(campaigns) == 0:
-            logging.info(f"Did not find a campaign with name='{name}'.")
-            return None
-        elif len(campaigns) > 1:
-            logging.warning(f"Found multiple campaigns with name='{name}'. Returning the first match.")
-            return campaigns[0]
-        else:
-            return campaigns[0]
+        return self.get(filter_by=[self.client.filter.campaign.name == name])
 
 
 class TestAPI(BaseAPI):
@@ -684,7 +675,7 @@ class SensorAPI(BaseAPI):
         data = self.client.get(self._resource_path, sensor_id)
         return Sensor(**data, client=self.client)
 
-    def get_by_name(self, name: str) -> Union[Sensor, None]:
+    def get_by_name(self, name: str) -> Sensors:
         """"
         Get single sensor by name
 
@@ -698,16 +689,7 @@ class SensorAPI(BaseAPI):
         Sensor
             Sensor data
         """
-        sensors = self.get(filter_by=[self.client.filter.sensor.name == name])
-
-        if len(sensors) == 0:
-            logging.info(f"Did not find a sensor with name='{name}'.")
-            return None
-        elif len(sensors) > 1:
-            logging.warning(f"Found multiple sensors with name='{name}'. Returning the first match.")
-            return sensors[0]
-        else:
-            return sensors[0]
+        return self.get(filter_by=[self.client.filter.sensor.name == name])
 
     def get_by_campaign_id(self, campaign_id: str) -> Sensors:
         """"
@@ -1056,7 +1038,7 @@ class TagsAPI(BaseAPI):
         Tags
             Sensor tags
         """
-        tags = self.get(filter_by=[self.client.filter.tags.sensor_id == sensor_id])
+        tags = self.get(filter_by=[self.client.filter.tag.sensor_id == sensor_id])
         return tags
 
     def get_by_test_id(self, test_id: str) -> Tags:
@@ -1073,7 +1055,7 @@ class TagsAPI(BaseAPI):
         Tags
             Test tags
         """
-        tags = self.get(filter_by=[self.client.filter.tags.test_id == test_id])
+        tags = self.get(filter_by=[self.client.filter.tag.test_id == test_id])
         return tags
 
     def get_by_timeseries_id(self, ts_id: str) -> Tags:
@@ -1090,7 +1072,7 @@ class TagsAPI(BaseAPI):
         Tags
             Time series tags
         """
-        tags = self.get(filter_by=[self.client.filter.tags.timeseries_id == ts_id])
+        tags = self.get(filter_by=[self.client.filter.tag.timeseries_id == ts_id])
         return tags
 
     def get_by_name(self, name: str) -> Tags:
@@ -1107,7 +1089,7 @@ class TagsAPI(BaseAPI):
         Tags
             Tags
         """
-        tags = self.get(filter_by=[self.client.filter.tags.name == name])
+        tags = self.get(filter_by=[self.client.filter.tag.name == name])
         return tags
 
 
