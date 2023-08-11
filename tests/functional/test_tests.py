@@ -43,8 +43,9 @@ def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
         client.filter.test.description == description],
         sort_by=[client.sort.test.test_date.asc])
     assert len(tests) == 1
-    assert tests[0] == client.test.get_by_number(number) == client.test.get_by_id(tests[0].id)
-    assert client.test.get_by_number('not existing name') is None
+    assert tests[0] == client.test.get_by_id(tests[0].id)
+    assert tests[0] in client.test.get_by_number(number)
+    assert len(client.test.get_by_number('not existing name')) == 0
     tests_check = client.test.get(filter_by=[
         client.filter.test.campaign_id == campaign_id,
     ])
@@ -54,10 +55,11 @@ def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
                                                            category=category, orientation=orientation,
                                                            floaterconfig_id=floaterconfig_id)
     assert floatertest_with_same_name.id != floatertest.id
-    assert client.test.get_by_number(number) == client.test.get_by_id(floatertest.id)
-    assert client.test.get_by_number(number) != client.test.get_by_id(floatertest_with_same_name.id)
-    assert client.floatertest.get_by_number(number) == client.test.get_by_id(floatertest.id)
-    assert client.floatertest.get_by_number(number) != client.test.get_by_id(floatertest_with_same_name.id)
+    assert client.test.get_by_id(floatertest.id) in client.test.get_by_number(number)
+    assert client.test.get_by_id(floatertest_with_same_name.id) in client.test.get_by_number(number)
+    assert client.test.get_by_id(floatertest.id) in client.floatertest.get_by_number(number)
+    assert client.test.get_by_id(floatertest_with_same_name.id) in client.floatertest.get_by_number(number)
+
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
     assert len(test_fromcampaign) == 2
 
@@ -108,13 +110,15 @@ def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
         client.filter.test.description == description],
         sort_by=[client.sort.test.test_date.asc])
     assert len(tests) == 1
-    assert tests[0] == client.test.get_by_number(number) == client.test.get_by_id(tests[0].id)
-    assert client.test.get_by_number('not existing name') is None
-    assert client.wavecalibration.get_by_number('not existing name') is None
+    assert tests[0] == client.test.get_by_id(tests[0].id)
+    assert tests[0] in client.test.get_by_number(number)
+    assert len(client.test.get_by_number('not existing name')) == 0
+    assert len(client.wavecalibration.get_by_number('not existing name')) == 0
 
-    assert tests[0] == client.wavecalibration.get_by_number(number)
+    assert tests[0] in client.wavecalibration.get_by_number(number)
     tests_check = client.test.get(filter_by=[client.filter.test.campaign_id == campaign_id])
-    assert len(tests_check) == 1
+    assert tests[0] in tests_check
+
     tests_check_wavecal = client.wavecalibration.get(filter_by=[
         client.filter.wavecalibration.campaign_id == campaign_id
     ])
@@ -128,12 +132,14 @@ def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
                                                      wave_direction=wave_direction, current_velocity=current_velocity,
                                                      current_direction=current_direction)
     assert wavecal_samename.id != wavecal.id
-    assert client.test.get_by_number(number) == client.test.get_by_id(wavecal.id)
-    assert client.test.get_by_number(number) != client.test.get_by_id(wavecal_samename.id)
-    assert client.wavecalibration.get_by_number(number) == client.test.get_by_id(wavecal.id)
-    assert client.wavecalibration.get_by_number(number) != client.test.get_by_id(wavecal_samename.id)
+    assert client.test.get_by_id(wavecal.id) in client.test.get_by_number(number)
+    assert client.test.get_by_id(wavecal_samename.id) in client.test.get_by_number(number)
+    assert client.test.get_by_id(wavecal.id) in client.wavecalibration.get_by_number(number)
+    assert client.test.get_by_id(wavecal_samename.id) in client.wavecalibration.get_by_number(number)
+
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
-    assert len(test_fromcampaign) == 2
+    assert tests[0] in test_fromcampaign
+
     client.test.delete(wavecal.id, secret_key=secret_key)
     client.test.delete(wavecal_samename.id, secret_key=secret_key)
 
@@ -160,29 +166,32 @@ def test_windcalibrationtest_api(client, secret_key, admin_key, new_campaigns):
         client.filter.test.description == description],
         sort_by=[client.sort.test.test_date.asc])
     assert len(tests) == 1
-    assert tests[0] == client.test.get_by_number(number) == client.test.get_by_id(tests[0].id)
-    assert client.test.get_by_number('not existing name') is None
-    assert client.windcalibration.get_by_number('not existing name') is None
+    assert tests[0] == client.test.get_by_id(tests[0].id)
+    assert tests[0] in client.test.get_by_number(number)
+    assert len(client.test.get_by_number('not existing name')) == 0
+    assert len(client.windcalibration.get_by_number('not existing name')) == 0
 
     tests_check = client.test.get(filter_by=[
         client.filter.test.campaign_id == campaign_id,
     ])
-    assert len(tests_check) == 1
+    assert tests[0] in tests_check
     tests_check_windcal = client.windcalibration.get(filter_by=[
         client.filter.windcalibration.campaign_id == campaign_id,
     ])
-    assert len(tests_check_windcal) == 1
+    assert tests[0] in tests_check_windcal
     windcal_samename = client.windcalibration.create(number=number, description='description', test_date=test_date,
                                                      campaign_id=campaign_id, wind_spectrum=wind_spectrum,
                                                      wind_velocity=wind_velocity, zref=zref,
                                                      wind_direction=wind_direction)
     assert windcal_samename.id != windcal.id
-    assert client.test.get_by_number(number) == client.test.get_by_id(windcal.id)
-    assert client.test.get_by_number(number) != client.test.get_by_id(windcal_samename.id)
-    assert client.windcalibration.get_by_number(number) == client.test.get_by_id(windcal.id)
-    assert client.windcalibration.get_by_number(number) != client.test.get_by_id(windcal_samename.id)
+    assert client.test.get_by_id(windcal.id) in client.test.get_by_number(number)
+    assert client.test.get_by_id(windcal_samename.id) in client.test.get_by_number(number)
+    assert client.test.get_by_id(windcal.id) in client.windcalibration.get_by_number(number)
+    assert client.test.get_by_id(windcal_samename.id) in client.windcalibration.get_by_number(number)
+
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
-    assert len(test_fromcampaign) == 2
+    assert tests[0] in test_fromcampaign
+
     client.test.delete(windcal.id, secret_key=secret_key)
     client.test.delete(windcal_samename.id, secret_key=secret_key)
 

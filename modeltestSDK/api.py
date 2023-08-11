@@ -228,8 +228,7 @@ class TestAPI(BaseAPI):
         """
         return self.get(filter_by=[self.client.filter.test.id == test_id])[0]
 
-    def get_by_number(self, test_number: str) -> Union[
-        FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
+    def get_by_number(self, test_number: str) -> Tests:
         """"
         Get single test by number
 
@@ -243,16 +242,7 @@ class TestAPI(BaseAPI):
         Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]
             Test data
         """
-        tests = self.get(filter_by=[self.client.filter.test.number == test_number])
-
-        if len(tests) == 0:
-            logging.info(f"Did not find a test with number='{test_number}'.")
-            return None
-        elif len(tests) > 1:
-            logging.warning(f"Found multiple tests with number='{test_number}'. Returning the first match.")
-            return tests[0]
-        else:
-            return tests[0]
+        return self.get(filter_by=[self.client.filter.test.number == test_number])
 
     def get_by_campaign_id(self, campaign_id: str, test_type: str = None) -> Tests:
         """"
@@ -376,31 +366,6 @@ class FloaterTestAPI(TestAPI):
         data = self.client.get(self._resource_path, test_id)
         return FloaterTest(**data, client=self.client)
 
-    def get_by_number(self, test_number: str) -> Union[FloaterTest, None]:
-        """"
-        Get single floater test by number
-
-        Parameters
-        ----------
-        test_number : str
-            Test number
-
-        Returns
-        -------
-        Test
-            Test data
-        """
-        tests = self.get(filter_by=[self.client.filter.floatertest.number == test_number])
-
-        if len(tests) == 0:
-            logging.info(f"Did not find a floater test with name='{test_number}'.")
-            return None
-        elif len(tests) > 1:
-            logging.warning(f"Found multiple floater tests with name='{test_number}'. Returning the first match.")
-            return tests[0]
-        else:
-            return tests[0]
-
 
 class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
@@ -508,32 +473,6 @@ class WaveCalibrationAPI(TestAPI):
         data = self.client.get(self._resource_path, test_id)
         return WaveCalibrationTest(**data, client=self.client)
 
-    def get_by_number(self, test_number: str) -> Union[WaveCalibrationTest, None]:
-        """"
-        Get single wave calibration test by number
-
-        Parameters
-        ----------
-        test_number : str
-            Test number
-
-        Returns
-        -------
-        Test
-            Test data
-        """
-        tests = self.get(filter_by=[self.client.filter.wavecalibration.number == test_number])
-
-        if len(tests) == 0:
-            logging.info(f"Did not find a wave calibration test with name='{test_number}'.")
-            return None
-        elif len(tests) > 1:
-            logging.warning(f"Found multiple wave calibration tests with name='{test_number}'. "
-                            f"Returning the first match.")
-            return tests[0]
-        else:
-            return tests[0]
-
 
 class WindCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
@@ -631,32 +570,6 @@ class WindCalibrationAPI(TestAPI):
         """
         data = self.client.get(self._resource_path, test_id)
         return WindCalibrationTest(**data, client=self.client)
-
-    def get_by_number(self, test_number: str) -> Union[WindCalibrationTest, None]:
-        """"
-        Get single wind calibration test by number
-
-        Parameters
-        ----------
-        test_number : str
-            Test number
-
-        Returns
-        -------
-        Test
-            Test data
-        """
-        tests = self.get(filter_by=[self.client.filter.windcalibration.number == test_number])
-
-        if len(tests) == 0:
-            logging.info(f"Did not find a wind calibration test with name='{test_number}'.")
-            return None
-        elif len(tests) > 1:
-            logging.warning(f"Found multiple wind calibration tests with name='{test_number}'. "
-                            f"Returning the first match.")
-            return tests[0]
-        else:
-            return tests[0]
 
 
 class SensorAPI(BaseAPI):

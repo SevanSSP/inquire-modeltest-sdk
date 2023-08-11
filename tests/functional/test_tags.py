@@ -2,7 +2,7 @@ from datetime import datetime
 from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool
 
 
-def test_tag_api(client, new_tags):
+def test_tag_api(client, secret_key, new_tags):
     """The Api is now verified good to go and tests can interact with it"""
     tagged_sensor_ids, tagged_test_ids, tagged_timeseries_ids = [], [], []
 
@@ -20,11 +20,15 @@ def test_tag_api(client, new_tags):
             for get_tag in get_tags:
                 assert get_tag in new_tags
                 tagged_test_ids.append(get_tag.test_id)
-        else:
+        elif tag.timeseries_id:
             get_tags = client.tag.get_by_timeseries_id(tag.timeseries_id)
             for get_tag in get_tags:
                 assert get_tag in new_tags
-                tagged_timeseries_ids.append(get_tag.timeseries_id)
+                if get_tag.timeseries_id:
+                    tagged_timeseries_ids.append(get_tag.timeseries_id)
+        else:
+            # orphan tag
+            tag.delete(secret_key=secret_key)
 
     tags = []
     for sensor_id in set(tagged_sensor_ids):
@@ -57,7 +61,7 @@ def test_tag_limit_skip(client, new_tags):
 
     all_tags_in_steps = []
     for skip in range(n_skips):
-        all_tags_in_steps.append(client.tag.get(limit=portion, skip=skip * portion))
+        all_tags_in_steps.extend(client.tag.get(limit=portion, skip=skip * portion))
 
     assert len(all_tags_in_steps) == len(all_tags)
     for tag in all_tags:
