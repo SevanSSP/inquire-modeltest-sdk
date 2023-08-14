@@ -2,7 +2,6 @@ import pytest
 import requests
 from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool, \
     random_int
-from modeltestSDK.config import Config
 from modeltestSDK.client import Client
 from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibration,
                                     WaveCalibration, FloaterConfig, FloaterConfigs, TimeSeries,
@@ -25,6 +24,8 @@ def client(http_service, admin_key):
     os.environ['INQUIRE_MODELTEST_API_USER'] = 'tester'
     os.environ['INQUIRE_MODELTEST_API_PASSWORD'] = 'password'
     os.environ["INQUIRE_MODELTEST_API_HOST"] = api_url
+
+    from modeltestSDK.config import Config
     config = Config
 
     client = Client(config)
