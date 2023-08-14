@@ -17,7 +17,14 @@ jobs:
         python-version: '3.9'
     - name: Install dependencies
       run: pip install nox poetry
-    - name: Run tests
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v2
+      with:
+        registry: ghcr.io
+        username: ${{ github.repository_owner }}
+        password: ${{ secrets.GHCR_PAT }}
+
+    - name: Run tests with Nox
       run: nox -s lint tests_github --verbose
     - name: Publish package
       run: |
