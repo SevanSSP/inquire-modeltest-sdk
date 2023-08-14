@@ -5,8 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
-from pydantic.typing import Literal
-from typing import List, Optional, Union, Any
+from typing import List, Optional, Union, Any, Literal
 from datetime import datetime
 from .utils import make_serializable
 from qats import TimeSeries as QatsTimeSeries

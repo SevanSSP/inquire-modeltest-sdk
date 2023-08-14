@@ -2,7 +2,7 @@
 API methods
 """
 import logging
-from typing import Union
+from typing import Union, Literal
 from .utils import format_class_name
 from .resources import (
     Campaign, Campaigns, Test, Tests, Sensor, Sensors, TimeSeries, TimeSeriesList, DataPoints, FloaterTest,
@@ -260,7 +260,7 @@ class TestAPI(BaseAPI):
 class FloaterTestAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
                floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
-               read_only: bool = False) -> FloaterTest:
+               type: Literal["Floater Test"] = 'Floater Test', read_only: bool = False) -> FloaterTest:
         """
         Create floater test
 
@@ -284,6 +284,8 @@ class FloaterTestAPI(TestAPI):
             Identifier of the applied wave
         wind_id : str
             Identifier of the applied wind
+        type : Literal["Floater Test"], optional
+            Specifying test type
         read_only : bool, optional
             Make the test read only
 
@@ -361,7 +363,7 @@ class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: Union[str, None], wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
-               read_only: bool = False) -> WaveCalibration:
+               type: Literal["Wave Calibration"] = 'Wave Calibration', read_only: bool = False) -> WaveCalibration:
         """
         Create wave calibration test
 
@@ -389,6 +391,8 @@ class WaveCalibrationAPI(TestAPI):
             Current velocity (m/s)
         current_direction : float
             Current direction (degrees)
+        type : Literal["Wave Calibration"], optional
+            Specifying test type
         read_only : bool, optional
             Make the test read only
 
@@ -467,7 +471,7 @@ class WaveCalibrationAPI(TestAPI):
 class WindCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
-               read_only: bool = False) -> WindCalibration:
+               type: Literal["Wind Calibration"] = 'Wind Calibration', read_only: bool = False) -> WindCalibration:
         """
         Create wind calibration test
 
@@ -489,6 +493,8 @@ class WindCalibrationAPI(TestAPI):
             Vertical reference height (m)
         wind_direction : float
             Wave direction (degrees)
+        type : Literal["Wind Calibration"], optional
+            Specifying test type
         read_only : bool, optional
             Make the test read only
 
