@@ -1,0 +1,36 @@
+name: Security check - Bandit
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    name: Code analysis with Bandit with ${{matrix.python}} on Ubuntu
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: ["3.9", "3.10"]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Generate report folder and Install Bandit
+      run: mkdir -p path/to/file | pip install poetry bandit
+
+    - name: Bandit check
+      if: always()
+      run: bandit -r app -o path/to/file/bandit_report.txt
+
+    - uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: Safety Reports
+        path: path/to/file
