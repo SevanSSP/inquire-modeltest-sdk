@@ -21,10 +21,11 @@ def client(http_service, admin_key):
                      email='test@testing.com',
                      password='password',
                      disabled=False)
-    config = Config
-    config.host = api_url
+
     os.environ['INQUIRE_MODELTEST_API_USER'] = 'tester'
     os.environ['INQUIRE_MODELTEST_API_PASSWORD'] = 'password'
+    os.environ["INQUIRE_MODELTEST_API_HOST"] = api_url
+    config = Config
 
     client = Client(config)
     assert client.__str__()

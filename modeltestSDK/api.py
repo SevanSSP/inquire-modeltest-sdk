@@ -259,7 +259,6 @@ class TestAPI(BaseAPI):
 
 class FloaterTestAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
-               type: str = 'Floater Test',
                floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
                read_only: bool = False) -> FloaterTest:
         """
@@ -279,7 +278,7 @@ class FloaterTestAPI(TestAPI):
             The kind of test, "current force", "wind force", "decay", "regular wave", "irregular wave" or "pull out"
         orientation : float
             Orientation (degrees)
-        floater_config_id : id
+        floaterconfig_id : id
             Identifier of the applied floater configuration
         wave_id : str
             Identifier of the applied wave
@@ -296,7 +295,7 @@ class FloaterTestAPI(TestAPI):
         body = dict(
             number=number,
             description=description,
-            type=type,
+            type='Floater Test',
             test_date=test_date,
             campaign_id=campaign_id,
             category=category,
@@ -361,7 +360,7 @@ class FloaterTestAPI(TestAPI):
 class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: Union[str, None], wave_height: float, wave_period: float, gamma: float,
-               wave_direction: float, current_velocity: float, current_direction: float, type: str = "Wave Calibration",
+               wave_direction: float, current_velocity: float, current_direction: float,
                read_only: bool = False) -> WaveCalibration:
         """
         Create wave calibration test
@@ -401,7 +400,7 @@ class WaveCalibrationAPI(TestAPI):
         body = dict(
             number=number,
             description=description,
-            type=type,
+            type="Wave Calibration",
             test_date=test_date,
             campaign_id=campaign_id,
             wave_spectrum=wave_spectrum,
@@ -468,7 +467,6 @@ class WaveCalibrationAPI(TestAPI):
 class WindCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
-               type: str = "Wind Calibration",
                read_only: bool = False) -> WindCalibration:
         """
         Create wind calibration test
@@ -503,7 +501,7 @@ class WindCalibrationAPI(TestAPI):
             number=number,
             description=description,
             test_date=test_date,
-            type=type,
+            type="Wind Calibration",
             campaign_id=campaign_id,
             wind_spectrum=wind_spectrum,
             wind_velocity=wind_velocity,
