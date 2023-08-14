@@ -45,11 +45,19 @@ class Client:
         self.timeseries = TimeseriesAPI(client=self)
         self.sensor = SensorAPI(client=self)
         self.test = TestAPI(client=self)
-        self.floater_test = FloaterTestAPI(client=self)
-        self.wind_calibration = WindCalibrationAPI(client=self)
-        self.wave_calibration = WaveCalibrationAPI(client=self)
+        self.floatertest = FloaterTestAPI(client=self)
+        self.windcalibration = WindCalibrationAPI(client=self)
+        self.wavecalibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
-        self.floater_config = FloaterConfigAPI(client=self)
+        self.floaterconfig = FloaterConfigAPI(client=self)
+
+        # check environmental variables
+        if os.getenv("INQUIRE_MODELTEST_API_USER") is None:
+            raise EnvironmentError("You have to set the INQUIRE_MODELTEST_API_USER environment variable to login.")
+        if os.getenv("INQUIRE_MODELTEST_API_PASSWORD") is None:
+            raise EnvironmentError("You have to set the INQUIRE_MODELTEST_API_PASSWORD environment variable to login.")
+        if os.getenv("INQUIRE_MODELTEST_API_HOST") is None:
+            raise EnvironmentError("You have to set the INQUIRE_MODELTEST_API_HOST environment variable to login.")
 
         # configure logging
         log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
@@ -79,29 +87,27 @@ class Client:
             logging.info("Authenticating by user impersonation.")
             user = os.getenv("INQUIRE_MODELTEST_API_USER")
             passwd = os.getenv("INQUIRE_MODELTEST_API_PASSWORD")
-            assert user is not None and passwd is not None, "You have to set the following two environment variables " \
-                                                            "to login and acquire an access token\n" \
-                                                            "\n\t'INQUIRE_MODELTEST_API_USER'" \
-                                                            "\n\t'INQUIRE_MODELTEST_API_PASSWORD'."
 
             s = requests.session()
             s.mount('http://', HTTPAdapter(max_retries=retries))
 
             r = s.post(
                 self._create_url(resource="auth", endpoint="token"),
-                data=dict(
-                    username=user,
-                    password=passwd
-                )
+                data=dict(grant_type=None,
+                          username=user,
+                          password=passwd,
+                          scope=None,
+                          client_id=None,
+                          client_secret=None)
             )
             r.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError as e:  # pragma: no cover
             raise e
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError as e:  # pragma: no cover
             raise e
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout as e:  # pragma: no cover
             raise e
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as e:  # pragma: no cover
             raise e
         else:
             # update env vars
@@ -199,15 +205,15 @@ class Client:
             else:
                 r = s.request(method, url, params=parameters, json=body, headers=headers)
                 r.raise_for_status()
-        except requests.exceptions.HTTPError as e:
+        except requests.exceptions.HTTPError as e:  # pragma: no cover
             logging.error("Request body:  " + str(body))
             logging.error("Request response: " + r.text)
             raise e
-        except requests.exceptions.ConnectionError as e:
+        except requests.exceptions.ConnectionError as e:  # pragma: no cover
             raise e
-        except requests.exceptions.Timeout as e:
+        except requests.exceptions.Timeout as e:  # pragma: no cover
             raise e
-        except requests.exceptions.RequestException as e:
+        except requests.exceptions.RequestException as e:  # pragma: no cover
             raise e
         else:
             return r.json()
@@ -336,5 +342,5 @@ class Client:
         """
         Removes cached datapoints (from mtdb.sqlite at local cache folder)
         """
-        with requests_cache.enabled(**Config.cache_settings):
+        with requests_cache.enabled(**Config.cache_settings):  # pragma: no cover
             requests_cache.clear()

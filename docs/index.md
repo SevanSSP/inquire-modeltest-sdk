@@ -23,4 +23,4 @@ Where
 
 
 ### Prerequisites
-* Python 3, version 3.7.0 or later
+* Python 3, version 3.8.0 or later

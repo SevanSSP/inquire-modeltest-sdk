@@ -1,52 +1,43 @@
 import pytest
 from datetime import datetime
-from modeltestSDK.resources import Campaign, Sensor, TimeSeries, Tests, FloaterTest
+from modeltestSDK.resources import Campaign, Sensor, TimeSeries, Tests, FloaterTest, FloaterConfig, WaveCalibration, WindCalibration, DataPoints
+from uuid import uuid4
+from tests.utils import random_lower_int, random_float
 
 
 @pytest.fixture(scope="module")
 def new_campaign():
     camp = Campaign(
-        name="asdfg",
-        description="sdh dfgh rghh",
-        date=datetime.utcnow(),
-        location="Ålesund",
-        scale_factor=1,
-        water_depth=1200,
-        )
+        name = 'TestCampaign',
+        description = 'Description of testcampaign',
+        date = datetime(2020, 10, 1),
+        location = 'Oslo',
+        scale_factor = 1,
+        water_depth = 4,
+    )
+    camp.id = str(uuid4())
     return camp
 
 
 @pytest.fixture(scope="module")
-def new_sensor():
+def new_sensor(new_campaign):
     sens = Sensor(
-        name="sdfghjk",
-        description="eghj dfj dfgh",
-        unit="kg",
-        kind="length",
-        source="fantasy",
-        x=1.4,
-        y=-1.9,
-        z=1.0,
-        position_reference='global',
-        positive_direction_definition='onwards,',
-        position_heading_lock=False,
+        name='SB accelerometer',
+        description='SB accelerometer type 3',
+        unit='m/s',
+        kind='acceleration',
+        source='basin derived',
+        x=40,
+        y=-20,
+        z=5,
+        position_reference='local',
+        position_heading_lock=True,
         position_draft_lock=False,
-        campaign_id="rthjkjnfd"
+        positive_direction_definition='up',
+        campaign_id=new_campaign.id
     )
+    sens.id = str(uuid4())
     return sens
-
-
-@pytest.fixture(scope="module")
-def new_timeseries():
-    ts = TimeSeries(
-        sensor_id="12345678123456781234567812345678",
-        test_id="12345678123456781234567812345678",
-        fs=2.5,
-        default_start_time=1,
-        default_end_time=2,
-
-    )
-    return ts
 
 
 @pytest.fixture(scope='module')
@@ -69,3 +60,92 @@ def tests_class():
 @pytest.fixture(scope="module")
 def floater_test_class():
     return FloaterTest
+
+@pytest.fixture(scope="module")
+def new_wavecalibration(new_campaign):
+    wavecalibration = WaveCalibration(
+        type='Wave Calibration',
+        number='X331',
+        description='Description of test',
+        test_date=datetime(2020, 10, 1),
+        wave_spectrum='torsethaugen',
+        wave_height=13,
+        wave_period=17,
+        gamma=2.4,
+        wave_direction=265,
+        current_velocity=7,
+        current_direction=285,
+        campaign_id=new_campaign.id
+    )
+    wavecalibration.id = str(uuid4())
+    return wavecalibration
+
+
+@pytest.fixture(scope='module')
+def new_windcalibration(new_campaign):
+    windcalibration = WindCalibration(
+        type="Wind Calibration",
+        number='Y331',
+        description='Description of test',
+        test_date=datetime(2020, 10, 1),
+        wind_spectrum='NPD',
+        wind_velocity=20,
+        zref=10,
+        wind_direction=270,
+        campaign_id=new_campaign.id
+    )
+    windcalibration.id = str(uuid4())
+    return windcalibration
+
+@pytest.fixture(scope="module")
+def new_floater_configuration(new_campaign):
+    fc = FloaterConfig(
+        name="test",
+        description="description",
+        campaign_id=new_campaign.id,
+        characteristic_length=1.0,
+        draft=1.0,
+    )
+    fc.id = str(uuid4())
+    return fc
+
+
+@pytest.fixture(scope='module')
+def new_floatertest(new_wavecalibration, new_windcalibration, new_floater_configuration):
+    floatertest = FloaterTest(
+        type="Floater Test",
+        number='REC331',
+        description='Description of test',
+        test_date=datetime(2020, 10, 1),
+        category='decay',
+        orientation=180,
+        wave_id=new_wavecalibration.id,
+        wind_id=new_windcalibration.id,
+        floaterconfig_id=new_floater_configuration.id,
+        campaign_id=new_wavecalibration.campaign_id
+    )
+    floatertest.id = str(uuid4())
+    return floatertest
+
+
+@pytest.fixture(scope="module")
+def new_timeseries(new_sensor, new_floatertest):
+    ts = TimeSeries(
+        sensor_id=new_sensor.id,
+        test_id=new_floatertest.id,
+        fs=2.5,
+        default_start_time=1,
+        default_end_time=2,
+
+    )
+    ts.id=str(uuid4())
+    return ts
+
+@pytest.fixture(scope='module')
+def new_datapoints(new_timeseries):
+    dp= DataPoints(
+        time=[random_float() for i in range(0,100)],
+        value=[random_float() for i in range(0,100)],
+        timeseries_id = new_timeseries.id
+    )
+    return dp

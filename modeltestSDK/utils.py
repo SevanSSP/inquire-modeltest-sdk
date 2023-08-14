@@ -80,7 +80,7 @@ def to_snake_case(d):
     """
 
     def snake(s):
-        s1 = first_cap_re.sub(r'\1_\2', s)
+        s1 = first_cap_re.sub(r'\1_\2', s).replace('__', '_')
         return all_cap_re.sub(r'\1_\2', s1).lower()
 
     if isinstance(d, str):
@@ -95,6 +95,8 @@ def to_snake_case(d):
 
             if isinstance(v, (list, dict)):
                 v = to_snake_case(v)
+            elif isinstance(v, str):
+                v = snake(v)
 
             dd[k] = v
         return dd
@@ -129,6 +131,8 @@ def to_camel_case(d):
 
             if isinstance(v, (list, dict)):
                 v = to_camel_case(v)
+            elif isinstance(v, str):
+                v = camel(v)
 
             dd[k] = v
         return dd
@@ -168,26 +172,3 @@ def from_datetime_string(s):
 def format_class_name(s):
     s = s.split("API")
     return s[0].lower()
-
-
-class TwoWayDict(dict):
-    """
-    Special dict where index and value is searchable
-    """
-
-    def __setitem__(self, key, value):
-        # Remove any previous connections with these values
-        if key in self:
-            del self[key]
-        if value in self:
-            del self[value]
-        dict.__setitem__(self, key, value)
-        dict.__setitem__(self, value, key)
-
-    def __delitem__(self, key):
-        dict.__delitem__(self, self[key])
-        dict.__delitem__(self, key)
-
-    def __len__(self):
-        """Returns the number of connections"""
-        return dict.__len__(self) // 2
