@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from modeltestSDK.resources import Campaign, Sensor, TimeSeries, Tests, FloaterTest, FloaterConfiguration, WaveCalibrationTest, WindCalibrationTest, DataPoints
+from modeltestSDK.resources import Campaign, Sensor, TimeSeries, Tests, FloaterTest, FloaterConfig, WaveCalibration, WindCalibration, DataPoints
 from uuid import uuid4
 from tests.utils import random_lower_int, random_float
 
@@ -63,7 +63,7 @@ def floater_test_class():
 
 @pytest.fixture(scope="module")
 def new_wavecalibration(new_campaign):
-    wavecalibration = WaveCalibrationTest(
+    wavecalibration = WaveCalibration(
         type='Wave Calibration',
         number='X331',
         description='Description of test',
@@ -83,7 +83,7 @@ def new_wavecalibration(new_campaign):
 
 @pytest.fixture(scope='module')
 def new_windcalibration(new_campaign):
-    windcalibration = WindCalibrationTest(
+    windcalibration = WindCalibration(
         type="Wind Calibration",
         number='Y331',
         description='Description of test',
@@ -99,7 +99,7 @@ def new_windcalibration(new_campaign):
 
 @pytest.fixture(scope="module")
 def new_floater_configuration(new_campaign):
-    fc = FloaterConfiguration(
+    fc = FloaterConfig(
         name="test",
         description="description",
         campaign_id=new_campaign.id,

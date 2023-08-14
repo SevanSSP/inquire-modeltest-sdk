@@ -6,7 +6,7 @@ from typing import Union
 from .utils import format_class_name
 from .resources import (
     Campaign, Campaigns, Test, Tests, Sensor, Sensors, TimeSeries, TimeSeriesList, DataPoints, FloaterTest,
-    WaveCalibrationTest, WindCalibrationTest, Tag, Tags, FloaterConfiguration, FloaterConfigurations, Statistics
+    WaveCalibration, WindCalibration, Tag, Tags, FloaterConfig, FloaterConfigs, Statistics
 )
 from .query import create_query_parameters
 from pydantic import parse_obj_as
@@ -128,7 +128,7 @@ class CampaignAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return Campaigns([parse_obj_as(Campaign, dict(**_, client=self.client)) for _ in data])
+        return Campaigns([parse_obj_as(Campaign, dict(**i, client=self.client)) for i in data])
 
     def get_by_id(self, campaign_id: str) -> Campaign:
         """
@@ -203,7 +203,7 @@ class TestAPI(BaseAPI):
                 data_out.append(self.client.floatertest.get_by_id(i['id']))
         return Tests(data_out)
 
-    def get_by_id(self, test_id: str) -> Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
+    def get_by_id(self, test_id: str) -> Union[FloaterTest, WaveCalibration, WindCalibration, Test, None]:
         """
         Get single test by id
 
@@ -214,7 +214,7 @@ class TestAPI(BaseAPI):
 
         Returns
         -------
-        Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]:
+        Union[FloaterTest, WaveCalibration, WindCalibration, Test, None]:
             Test data
         """
         return self.get(filter_by=[self.client.filter.test.id == test_id])[0]
@@ -230,7 +230,7 @@ class TestAPI(BaseAPI):
 
         Returns
         -------
-        Union[FloaterTest, WaveCalibrationTest, WindCalibrationTest, Test, None]
+        Union[FloaterTest, WaveCalibration, WindCalibration, Test, None]
             Test data
         """
         return self.get(filter_by=[self.client.filter.test.number == test_number])
@@ -338,7 +338,7 @@ class FloaterTestAPI(TestAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return Tests([parse_obj_as(FloaterTest, dict(**_, client=self.client)) for _ in data])
+        return Tests([parse_obj_as(FloaterTest, dict(**i, client=self.client)) for i in data])
 
     def get_by_id(self, test_id: str) -> FloaterTest:
         """
@@ -362,7 +362,7 @@ class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: Union[str, None], wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float, type: str = "Wave Calibration",
-               read_only: bool = False) -> WaveCalibrationTest:
+               read_only: bool = False) -> WaveCalibration:
         """
         Create wave calibration test
 
@@ -395,7 +395,7 @@ class WaveCalibrationAPI(TestAPI):
 
         Returns
         -------
-        WaveCalibrationTest
+        WaveCalibration
             Test data
         """
         body = dict(
@@ -414,7 +414,7 @@ class WaveCalibrationAPI(TestAPI):
             read_only=read_only
         )
         data = self.client.post(self._resource_path, body=body)
-        return WaveCalibrationTest(**data, client=self.client)
+        return WaveCalibration(**data, client=self.client)
 
     def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Tests:
         """
@@ -445,9 +445,9 @@ class WaveCalibrationAPI(TestAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return Tests([parse_obj_as(WaveCalibrationTest, dict(**_, client=self.client)) for _ in data])
+        return Tests([parse_obj_as(WaveCalibration, dict(**i, client=self.client)) for i in data])
 
-    def get_by_id(self, test_id: str) -> WaveCalibrationTest:
+    def get_by_id(self, test_id: str) -> WaveCalibration:
         """
         Get single wave calibration test by id
 
@@ -462,14 +462,14 @@ class WaveCalibrationAPI(TestAPI):
             Test data
         """
         data = self.client.get(self._resource_path, test_id)
-        return WaveCalibrationTest(**data, client=self.client)
+        return WaveCalibration(**data, client=self.client)
 
 
 class WindCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
                type: str = "Wind Calibration",
-               read_only: bool = False) -> WindCalibrationTest:
+               read_only: bool = False) -> WindCalibration:
         """
         Create wind calibration test
 
@@ -496,7 +496,7 @@ class WindCalibrationAPI(TestAPI):
 
         Returns
         -------
-        WindCalibrationTest
+        WindCalibration
             Wind calibration data
         """
         body = dict(
@@ -512,7 +512,7 @@ class WindCalibrationAPI(TestAPI):
             read_only=read_only
         )
         data = self.client.post(self._resource_path, body=body)
-        return WindCalibrationTest(**data, client=self.client)
+        return WindCalibration(**data, client=self.client)
 
     def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> Tests:
         """
@@ -543,9 +543,9 @@ class WindCalibrationAPI(TestAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return Tests([parse_obj_as(WindCalibrationTest, dict(**_, client=self.client)) for _ in data])
+        return Tests([parse_obj_as(WindCalibration, dict(**i, client=self.client)) for i in data])
 
-    def get_by_id(self, test_id: str) -> WindCalibrationTest:
+    def get_by_id(self, test_id: str) -> WindCalibration:
         """
         Get single wind calibration test by id
 
@@ -560,7 +560,7 @@ class WindCalibrationAPI(TestAPI):
             Test data
         """
         data = self.client.get(self._resource_path, test_id)
-        return WindCalibrationTest(**data, client=self.client)
+        return WindCalibration(**data, client=self.client)
 
 
 class SensorAPI(BaseAPI):
@@ -656,7 +656,7 @@ class SensorAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
-        return Sensors([parse_obj_as(Sensor, dict(**_, client=self.client)) for _ in data])
+        return Sensors([parse_obj_as(Sensor, dict(**i, client=self.client)) for i in data])
 
     def get_by_id(self, sensor_id: str) -> Sensor:
         """
@@ -778,7 +778,7 @@ class TimeseriesAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return TimeSeriesList([parse_obj_as(TimeSeries, dict(**_, client=self.client)) for _ in data])
+        return TimeSeriesList([parse_obj_as(TimeSeries, dict(**i, client=self.client)) for i in data])
 
     def get_by_id(self, timeseries_id: str) -> TimeSeries:
         """
@@ -1005,7 +1005,7 @@ class TagsAPI(BaseAPI):
             sort_by = list()
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
-        return Tags([parse_obj_as(Tag, dict(**_, client=self.client)) for _ in data])
+        return Tags([parse_obj_as(Tag, dict(**i, client=self.client)) for i in data])
 
     def get_by_id(self, tag_id: str) -> Tag:
         """
@@ -1095,7 +1095,7 @@ class TagsAPI(BaseAPI):
 
 class FloaterConfigAPI(BaseAPI):
     def create(self, name: str, description: str, campaign_id: str, draft: float, characteristic_length: float,
-               read_only: bool = False) -> FloaterConfiguration:
+               read_only: bool = False) -> FloaterConfig:
         """
         Create a floater config
 
@@ -1116,7 +1116,7 @@ class FloaterConfigAPI(BaseAPI):
 
         Returns
         -------
-        FloaterConfiguration
+        FloaterConfig
             Floater configuration
         """
         body = dict(
@@ -1128,10 +1128,10 @@ class FloaterConfigAPI(BaseAPI):
             read_only=read_only
         )
         data = self.client.post(self._resource_path, body=body)
-        return FloaterConfiguration(**data, client=self.client)
+        return FloaterConfig(**data, client=self.client)
 
     def get(self, filter_by: list = None, sort_by: list = None, skip: int = None,
-            limit: int = None) -> FloaterConfigurations:
+            limit: int = None) -> FloaterConfigs:
         """
         Get multiple floater configuration
 
@@ -1150,7 +1150,7 @@ class FloaterConfigAPI(BaseAPI):
 
         Returns
         -------
-        FloaterConfigurations
+        FloaterConfigs
             Multiple floater configurations
         """
         if filter_by is None:
@@ -1160,9 +1160,9 @@ class FloaterConfigAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return FloaterConfigurations([parse_obj_as(FloaterConfiguration, dict(**_, client=self.client)) for _ in data])
+        return FloaterConfigs([parse_obj_as(FloaterConfig, dict(**i, client=self.client)) for i in data])
 
-    def get_by_id(self, config_id: str) -> FloaterConfiguration:
+    def get_by_id(self, config_id: str) -> FloaterConfig:
         """
         Get single floater configuration by id
 
@@ -1173,13 +1173,13 @@ class FloaterConfigAPI(BaseAPI):
 
         Returns
         -------
-        FloaterConfiguration
+        FloaterConfig
             Floater configuration
         """
         data = self.client.get(self._resource_path, config_id)
-        return FloaterConfiguration(**data, client=self.client)
+        return FloaterConfig(**data, client=self.client)
 
-    def get_by_campaign_id(self, campaign_id: str) -> FloaterConfigurations:
+    def get_by_campaign_id(self, campaign_id: str) -> FloaterConfigs:
         """"
         Get configuration by parent campaign
 
@@ -1190,7 +1190,7 @@ class FloaterConfigAPI(BaseAPI):
 
         Returns
         -------
-        FloaterConfigurations
+        FloaterConfigs
             Floater configurations
         """
         configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id])

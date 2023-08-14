@@ -21,12 +21,6 @@ class Resource(BaseModel):
     def _api_object(self):
         if hasattr(self.client, self.__class__.__name__.lower()):
             return getattr(self.client, self.__class__.__name__.lower())
-        elif hasattr(self.client, self.__class__.__name__[:-5].lower()):
-            return getattr(self.client, self.__class__.__name__[:-5].lower())
-        elif hasattr(self.client, self.__class__.__name__[:-7].lower()):
-            return getattr(self.client, self.__class__.__name__[:-7].lower())
-        elif hasattr(self.client, self.__class__.__name__[:-4].lower()):
-            return getattr(self.client, self.__class__.__name__[:-4].lower())
         else:
             return None
 
@@ -79,19 +73,18 @@ class Resources(List[Resource]):
             self._check_types(items)
             super().__init__(items)
 
-    def _check_types(self, items: List[Resource]) -> None:
-        expected_types = self.__orig_bases__[0].__args__[0].__args__ \
+
+    def _expected_types(self):
+        return self.__orig_bases__[0].__args__[0].__args__ \
             if isinstance(self.__orig_bases__[0].__args__[0], typing._UnionGenericAlias) \
             else [self.__orig_bases__[0].__args__[0]]
+    def _check_types(self, items: List[Resource]) -> None:
         for item in items:
-            if not any(type(item).__name__ == t.__name__ for t in expected_types):
+            if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
                 raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
     def append(self, item: Resource, admin_key: str = None) -> None:
-        expected_types = self.__orig_bases__[0].__args__[0].__args__ \
-            if isinstance(self.__orig_bases__[0].__args__[0], typing._UnionGenericAlias) \
-            else [self.__orig_bases__[0].__args__[0]]
-        if not any(type(item).__name__ == t.__name__ for t in expected_types):
+        if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
         if item.id or item.__class__.__name__ == 'DataPoints':
             super().append(item)
@@ -121,7 +114,7 @@ class Resources(List[Resource]):
         return pd.DataFrame([_.dict(exclude={"client"}, **kwargs) for _ in self])
 
 
-class FloaterConfiguration(Resource):
+class FloaterConfig(Resource):
     id: Optional[str]
     name: str
     description: str
@@ -130,7 +123,7 @@ class FloaterConfiguration(Resource):
     draft: float
 
 
-class FloaterConfigurations(Resources[FloaterConfiguration]):
+class FloaterConfigs(Resources[FloaterConfig]):
     pass
 
 
@@ -496,7 +489,7 @@ class FloaterTest(Test):
     read_only: Optional[bool] = False
 
 
-class WaveCalibrationTest(Test):
+class WaveCalibration(Test):
     type: Literal["Wave Calibration"] = "Wave Calibration"
     wave_spectrum: Optional[str]
     wave_height: Optional[float]
@@ -508,7 +501,7 @@ class WaveCalibrationTest(Test):
     read_only: Optional[bool] = False
 
 
-class WindCalibrationTest(Test):
+class WindCalibration(Test):
     type: Literal["Wind Calibration"] = "Wind Calibration"
     wind_spectrum: Optional[str]
     wind_velocity: Optional[float]
@@ -517,7 +510,7 @@ class WindCalibrationTest(Test):
     read_only: Optional[bool] = False
 
 
-class Tests(Resources[Union[Test, FloaterTest, WaveCalibrationTest, WindCalibrationTest]]):
+class Tests(Resources[Union[Test, FloaterTest, WaveCalibration, WindCalibration]]):
     __test__ = False
 
     def print_full(self):  # pragma: no cover
@@ -551,7 +544,7 @@ class Campaign(Resource):
         """Fetch tests."""
         return self.client.test.get_by_campaign_id(self.id, test_type=test_type)
 
-    def floater_configurations(self) -> FloaterConfigurations:
+    def floater_configurations(self) -> FloaterConfigs:
         """Fetch floater configurations."""
         return self.client.floaterconfig.get_by_campaign_id(self.id)
 

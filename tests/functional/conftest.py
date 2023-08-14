@@ -4,8 +4,8 @@ from tests.utils import random_lower_int, random_float, random_lower_short_strin
     random_int
 from modeltestSDK.config import Config
 from modeltestSDK.client import Client
-from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibrationTest,
-                                    WaveCalibrationTest, FloaterConfiguration, FloaterConfigurations, TimeSeries,
+from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibration,
+                                    WaveCalibration, FloaterConfig, FloaterConfigs, TimeSeries,
                                     TimeSeriesList, DataPointsList, Tags, Tag)
 from datetime import datetime
 import os
@@ -140,10 +140,10 @@ def new_sensors(client, new_campaigns, secret_key):
 
 @pytest.fixture(scope='module')
 def new_floaterconfig(client, new_campaigns, secret_key):
-    floaterconfigs = FloaterConfigurations()
+    floaterconfigs = FloaterConfigs()
 
     for campaign in new_campaigns:
-        floaterconfigs.append(FloaterConfiguration(
+        floaterconfigs.append(FloaterConfig(
             client=client,
             name=random_lower_string(),
             description=random_lower_string(),
@@ -182,7 +182,7 @@ def new_tests(client, secret_key, new_floaterconfig, new_campaigns):
         )
 
     for camp in new_campaigns:
-        tests.append(WaveCalibrationTest(
+        tests.append(WaveCalibration(
             client=client,
             wave_spectrum=random.choice(["jonswap",
                                          "torsethaugen",
@@ -204,7 +204,7 @@ def new_tests(client, secret_key, new_floaterconfig, new_campaigns):
         )
 
     for camp in new_campaigns:
-        tests.append(WindCalibrationTest(
+        tests.append(WindCalibration(
             client=client,
             wind_spectrum=random_lower_short_string(),
             wind_velocity=random_float(),

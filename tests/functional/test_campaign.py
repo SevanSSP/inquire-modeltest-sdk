@@ -34,7 +34,7 @@ def test_campaign_api(client, secret_key, admin_key):
 
 
 def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_floaterconfig):
-    campaigns_from_db = client.campaign.get()
+    campaigns_from_db = client.campaign.get(limit=999999)
 
     for campaign in new_campaigns:
         assert campaign in campaigns_from_db
