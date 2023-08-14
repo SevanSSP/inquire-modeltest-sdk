@@ -4,7 +4,7 @@
 Python software developer kit (SDK) for the Sevan modeltest API
 
 ## Status
-![Pytest with minimum 95% coverage](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Build%20and%20test%20package/badge.svghttps://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Pytest%20with%20minimum%2095%%20coverage/badge.svg?branch=master)![Build documentation](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Build%20documentation/badge.svg?branch=master)![Publish Python package to Packagr](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Publish%20Python%20package%20to%20Packagr/badge.svg?branch=master)
+![Pytest with minimum 95% coverage](https://github.com/SevanSSP/inquire-modeltest-sdk/actions/workflows/test.yml/badge.svg)![Build documentation](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Build%20documentation/badge.svg?branch=master)[![Publish Python package to Packagr](https://github.com/SevanSSP/inquire-modeltest-sdk/actions/workflows/publish.yml/badge.svg)](https://github.com/SevanSSP/inquire-modeltest-sdk/actions/workflows/publish.yml)
 
 ## Get started
 Install the SDK from Sevan's private package index by
@@ -20,7 +20,7 @@ These instructions will get you a copy of the project up and running on your loc
 purposes. See deployment for notes on how to deploy the project on a live system.
 
 ### Prerequisites
-Install Python version 3.8.0 or later from either https://www.python.org or https://www.anaconda.com.
+Install Python version 3.9 or 3.10 from either https://www.python.org or https://www.anaconda.com.
 
 We use Poetry for dependency management and packaging. Install it as shown [here](https://python-poetry.org/docs/#installation).
 
@@ -50,7 +50,7 @@ pytest tests
 or
 
 ```console
-nox
+nox -s tests
 ```
 
 Local functional testing requires that the model test API is running at http://127.0.0.1:8000 (local host)

@@ -18,7 +18,7 @@ jobs:
     - name: Install dependencies
       run: pip install nox poetry
     - name: Run tests
-      run: nox -s tests
+      run: nox -s lint tests_github --verbose
     - name: Publish package
       run: |
         poetry config repositories.packagr ${{ secrets.PACKAGR_REPOSITORY_URL }}
