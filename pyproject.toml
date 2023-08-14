@@ -36,9 +36,6 @@ pytest-docker = "^2.0.0"
 download = "https://api.packagr.app/EYvhW6SyL/"
 issues = "https://github.com/SevanSSP/inquire-modeltest-sdk/issues"
 
-[tool.poetry.group.dev.dependencies]
-bandit = "^1.7.5"
-
 [build-system]
 requires = ["poetry>=1.1.4"]
 build-backend = "poetry.masonry.api"
