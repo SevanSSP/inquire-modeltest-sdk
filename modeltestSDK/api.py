@@ -963,8 +963,6 @@ class TagsAPI(BaseAPI):
             Tag information
 
         """
-        assert test_id is not None or sensor_id is not None or timeseries_id is not None, \
-            "Specify which test, sensor or time series the tag applies to."
 
         body = dict(
             name=name,
