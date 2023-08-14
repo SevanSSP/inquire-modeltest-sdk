@@ -4,7 +4,7 @@
 Python software developer kit (SDK) for the Sevan modeltest API
 
 ## Status
-![Pytest with minimum 95% coverage](https://github.com/SevanSSP/inquire-modeltest-sdk/actions/workflows/test.yml/badge.svg)![Build documentation](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Build%20documentation/badge.svg?branch=master)[![Publish Python package to Packagr](https://github.com/SevanSSP/inquire-modeltest-sdk/actions/workflows/publish.yml/badge.svg)](https://github.com/SevanSSP/inquire-modeltest-sdk/actions/workflows/publish.yml)
+![Pytest with minimum 95% coverage](https://github.com/SevanSSP/inquire-modeltest-sdk/actions/workflows/test.yml/badge.svg?branch=master)![Security check - Bandit](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Security%20check%20-%20Bandit/badge.svg?branch=master)![Build documentation](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Build%20documentation/badge.svg?branch=master)![Publish Python package to Packagr](https://github.com/SevanSSP/inquire-modeltest-sdk/workflows/Publish%20Python%20package%20to%20Packagr/badge.svg)
 
 ## Get started
 Install the SDK from Sevan's private package index by
