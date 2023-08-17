@@ -890,7 +890,7 @@ class TimeseriesAPI(BaseAPI):
         data['data']['timeseries_id'] = ts_id
         return DataPoints(**data.get("data"), client=self.client)
 
-    def add_data_points(self, ts_id: str, time: list, values: list) -> DataPoints:
+    def add_data_points(self, ts_id: str, time: list, values: list, secret_key: str = None) -> DataPoints:
         """
         Add data points to timeseries
 
@@ -902,6 +902,8 @@ class TimeseriesAPI(BaseAPI):
             Time (s)
         values : list
             Values corresponding to time
+        secret_key : str, optional
+            Secret key, required to add new data points if old should be overwritten
 
         Returns
         -------
@@ -909,7 +911,8 @@ class TimeseriesAPI(BaseAPI):
             Data points
         """
         body = dict(data=dict(time=time, value=values))
-        data = self.client.post(resource=self._resource_path, endpoint=f"{ts_id}/data", body=body)
+        data = self.client.post(resource=self._resource_path, parameters=dict(secret_key=secret_key),
+                                endpoint=f"{ts_id}/data", body=body)
         return DataPoints(**data.get("data"), timeseries_id=ts_id, client=self.client)
 
     def get_statistics(self, ts_id: str, scaling_length: float = None) -> Statistics:

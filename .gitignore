@@ -34,6 +34,7 @@ venv.bak/
 
 #Pytest
 .pytest_cache/
+.coverage
 
 #Nox
 .nox

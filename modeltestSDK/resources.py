@@ -159,6 +159,9 @@ class DataPoints(Resource):
     def __len__(self):
         return len(self.time)
 
+    def timeseries(self):
+        return self.client.timeseries.get_by_id(self.timeseries_id)
+
     def plot(self, **kwargs):  # pragma: no cover
         """
         Plot the dataapoints.
@@ -234,7 +237,7 @@ class TimeSeries(Resource):
     default_end_time: Optional[float]
     read_only: Optional[bool] = False
 
-    def add_data(self, time: list, values: list) -> DataPoints:
+    def add_data(self, time: list, values: list, secret_key: str = None) -> DataPoints:
         """
         Add data points.
 
@@ -244,6 +247,8 @@ class TimeSeries(Resource):
             Time in seconds
         values : list
             Data corresponding to time
+        secret_key : str, optional
+            Secret key, required to add new data points if old should be overwritten
 
 
         Returns
@@ -251,7 +256,7 @@ class TimeSeries(Resource):
         DataPoints
             Data points
         """
-        dps = self.client.timeseries.add_data_points(self.id, time, values)
+        dps = self.client.timeseries.add_data_points(self.id, time, values, secret_key)
         return dps
 
     def sensor(self):
@@ -369,7 +374,7 @@ class TimeSeriesList(Resources[TimeSeries]):
         """
         db = QatsTsDB()
         for i in self:
-            db.add(i.get_qats_ts())
+            db.add(i.get_qats_ts(start=start, end=end, scaling_length=scaling_length, all_data=all_data))
         return db
 
     def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):  # pragma: no cover

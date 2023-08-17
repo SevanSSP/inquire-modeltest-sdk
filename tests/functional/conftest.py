@@ -241,7 +241,8 @@ def new_timeseries(client, secret_key, new_campaigns, new_sensors, new_tests):
                     test_id=test.id,
                     fs=random_float(),
                     default_start_time=0,
-                    default_end_time=100000
+                    default_end_time=100000,
+                    read_only=True
                 ))
 
     yield ts_list
