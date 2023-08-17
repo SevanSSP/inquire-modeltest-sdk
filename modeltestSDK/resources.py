@@ -159,20 +159,24 @@ class DataPoints(Resource):
     def __len__(self):
         return len(self.time)
 
+    @property
     def timeseries(self):
         return self.client.timeseries.get_by_id(self.timeseries_id)
 
-    def plot(self, **kwargs):  # pragma: no cover
+    def plot(self, show: bool = True, **kwargs):  # pragma: no cover
         """
-        Plot the dataapoints.
+        Plot the datapoints.
 
         Parameters
         ----------
+        show : bool, default True
+            Whether to show the plot
         kwargs
             See pandas.DataFrame.plot for options.
         """
         self.to_pandas().plot(**kwargs)
-        plt.show()
+        if show:
+            plt.show()
 
     def to_pandas(self) -> pd.DataFrame:
         """
@@ -187,29 +191,33 @@ class DataPoints(Resource):
         --------
         See keyword arguments on pydantic.BaseModel.dict()
         """
-        return pd.DataFrame(dict(value=self.value), index=self.time)
+        sensor = self.timeseries.sensor
+        test = self.timeseries.test
+        return pd.DataFrame(data=self.value, index=self.time, columns=[f'{test.number} - {sensor.name}'])
 
     def to_qats_ts(self) -> QatsTimeSeries:
-        ts = self.client.timeseries.get_by_id(self.timeseries_id)
-        sensor = self.client.sensor.get_by_id(ts.sensor_id)
-        test_name = self.client.test.get_by_id(ts.test_id).description
-        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(self.value), t=np.array(self.time),
+        sensor = self.timeseries.sensor
+        test = self.timeseries.test
+        return QatsTimeSeries(name=f'{test.number} - {sensor.name}', x=np.array(self.value), t=np.array(self.time),
                               kind=sensor.kind, unit=sensor.unit)
 
 
 class DataPointsList(Resources[DataPoints]):
 
-    def plot(self, **kwargs):  # pragma: no cover
+    def plot(self, show: bool = True, **kwargs):  # pragma: no cover
         """
         Plot data points.
 
         Parameters
         ----------
+        show : bool, default True
+            Whether to show the plot
         kwargs
             See pandas.DataFrame.plot for options
         """
         self.to_pandas().plot(**kwargs)
-        plt.show()
+        if show:
+            plt.show()
 
     def to_pandas(self):
         """
@@ -259,8 +267,13 @@ class TimeSeries(Resource):
         dps = self.client.timeseries.add_data_points(self.id, time, values, secret_key)
         return dps
 
+    @property
     def sensor(self):
         return self.client.sensor.get_by_id(self.sensor_id)
+
+    @property
+    def test(self):
+        return self.client.test.get_by_id(self.test_id)
 
     def get_data(self, start: float = None, end: float = None, scaling_length: float = None,
                  all_data: bool = False) -> DataPoints:
@@ -331,7 +344,8 @@ class TimeSeries(Resource):
 
 
 class TimeSeriesList(Resources[TimeSeries]):
-    def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPointsList:
+    def get_data(self, start: float = None, end: float = None, all_data: bool = False,
+                 scaling_length: float = None) -> DataPointsList:
         """
         Get data points
 
@@ -341,6 +355,8 @@ class TimeSeriesList(Resources[TimeSeries]):
             Fetch data points after this time (s).
         end : float, optional
             Fetch data points before this time (s).
+        all_data: bool = False, optional
+            Flag to fetch all available data or use default start-end values. Overrides start and end.
         scaling_length : float, optional
             Scale the data to this reference length according to Froude law (m).
 
@@ -349,7 +365,7 @@ class TimeSeriesList(Resources[TimeSeries]):
         DataPoints
             Data points
         """
-        dps = DataPointsList([ts.get_data(start=start, end=end, scaling_length=scaling_length) for ts in self])
+        dps = DataPointsList([ts.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length) for ts in self])
         return dps
 
     def get_qats_tsdb(self, start: float = None, end: float = None, scaling_length: float = None,
@@ -377,7 +393,8 @@ class TimeSeriesList(Resources[TimeSeries]):
             db.add(i.get_qats_ts(start=start, end=end, scaling_length=scaling_length, all_data=all_data))
         return db
 
-    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):  # pragma: no cover
+    def plot(self, start: float = None, end: float = None, scaling_length: float = None,
+             all_data: bool = False, show: bool = True, **kwargs):  # pragma: no cover
         """
         Plot time series
 
@@ -389,11 +406,15 @@ class TimeSeriesList(Resources[TimeSeries]):
             Fetch data points before this time (s).
         scaling_length : float, optional
             Scale the data to this reference length according to Froude law (m).
+        all_data: bool = False, optional
+            Flag to fetch all available data or use default start-end values. true overrides start and end
+        show: bool = True, optional
+            Flag to show the plot
         kwargs
             See optional arguments for pandas.DataFrame.plot.
         """
-        dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
-        dps.plot(**kwargs)
+        dps = self.get_data(start=start, end=end, scaling_length=scaling_length, all_data=all_data)
+        dps.plot(show=show, **kwargs)
 
 
 class Sensor(Resource):
