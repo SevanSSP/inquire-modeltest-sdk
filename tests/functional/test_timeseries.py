@@ -2,7 +2,8 @@ from datetime import datetime
 from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool
 import random
 import pytest
-from modeltestSDK.resources import TimeSeries
+from matplotlib import pyplot as plt
+from modeltestSDK.resources import TimeSeries, TimeSeriesList
 
 
 def test_timeseries_api(client, secret_key, admin_key, new_timeseries):
@@ -35,7 +36,7 @@ def test_timeseries_api(client, secret_key, admin_key, new_timeseries):
 
 def test_timeseries_resource(client, secret_key, admin_key, new_timeseries, new_datapoints):
     ts = new_timeseries[0]
-    sensor = ts.sensor()
+    sensor = ts.sensor
     assert sensor == client.sensor.get_by_id(ts.sensor_id)
     data = ts.get_data()
     data_qats = ts.get_qats_ts()
@@ -47,3 +48,42 @@ def test_timeseries_resource(client, secret_key, admin_key, new_timeseries, new_
     ts_new = TimeSeries(sensor_id=ts.sensor_id, test_id=ts.test_id, fs=ts.fs)
     with pytest.raises(AttributeError) as e:
         ts_new.create(admin_key=admin_key)
+
+    assert 'No client provided, unable to create object' in str(e)
+
+
+def test_timeseries_plot(new_timeseries, new_datapoints):
+    tss = new_timeseries
+    ts = new_timeseries[0]
+
+    ts.plot(show=False)
+    fig = plt.gcf()
+    assert fig.axes[0].xaxis.label.get_text() == 'Time [s]'
+    assert fig.axes[0].yaxis.label.get_text() == f'{ts.sensor.kind.capitalize()} [{ts.sensor.unit}]'
+    plt.close(fig)
+
+    ts.plot(show=False, xlabel='this one', ylabel='that one')
+    fig = plt.gcf()
+    assert fig.axes[0].xaxis.label.get_text() == 'this one'
+    assert fig.axes[0].yaxis.label.get_text() == 'that one'
+    plt.close(fig)
+
+    tss.plot(show=False)
+    fig = plt.gcf()
+    assert fig.axes[0].xaxis.label.get_text() == 'Time [s]'
+    assert fig.axes[0].yaxis.label.get_text() == ''
+    plt.close(fig)
+
+    timeseries_with_same_sensor = [ts]
+    for ts_i in tss:
+        if ts_i.sensor == ts.sensor:
+            timeseries_with_same_sensor.append(ts_i)
+            if len(timeseries_with_same_sensor) == 5:
+                break
+
+    timeseries_with_same_sensor = TimeSeriesList(timeseries_with_same_sensor)
+    timeseries_with_same_sensor.plot(show=False, xlabel='this one', ylabel='that one')
+    fig = plt.gcf()
+    assert fig.axes[0].xaxis.label.get_text() == 'this one'
+    assert fig.axes[0].yaxis.label.get_text() == 'that one'
+    plt.close(fig)
