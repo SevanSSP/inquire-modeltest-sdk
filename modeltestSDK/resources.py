@@ -161,7 +161,7 @@ class DataPoints(Resource):
 
     @property
     def timeseries(self):
-        if self.client is not None:
+        if self.client:
             return self.client.timeseries.get_by_id(self.timeseries_id)
         else:
             return None
@@ -299,14 +299,14 @@ class TimeSeries(Resource):
 
     @property
     def sensor(self):
-        if self.client is not None:
+        if self.client:
             return self.client.sensor.get_by_id(self.sensor_id)
         else:
             return None
 
     @property
     def test(self):
-        if self.client is not None:
+        if self.client:
             return self.client.test.get_by_id(self.test_id)
         else:
             return None
