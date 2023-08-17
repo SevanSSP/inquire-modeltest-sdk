@@ -17,12 +17,12 @@ def test_types(new_datapoints):
         default_end_time=2,
 
     )
-    ts.id=str(uuid4())
+    ts.id = str(uuid4())
 
     dp2 = DataPoints(
         time=new_datapoints.time,
-        value=[random_float() for i in range(0,100)],
-        timeseries_id = ts.id
+        value=[random_float() for i in range(0, 100)],
+        timeseries_id=ts.id
     )
 
     dplist = DataPointsList([new_datapoints, dp2])

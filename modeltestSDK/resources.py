@@ -161,7 +161,10 @@ class DataPoints(Resource):
 
     @property
     def timeseries(self):
-        return self.client.timeseries.get_by_id(self.timeseries_id)
+        if self.client is not None:
+            return self.client.timeseries.get_by_id(self.timeseries_id)
+        else:
+            return None
 
     def plot(self, show: bool = True, **kwargs):  # pragma: no cover
         """
@@ -296,11 +299,17 @@ class TimeSeries(Resource):
 
     @property
     def sensor(self):
-        return self.client.sensor.get_by_id(self.sensor_id)
+        if self.client is not None:
+            return self.client.sensor.get_by_id(self.sensor_id)
+        else:
+            return None
 
     @property
     def test(self):
-        return self.client.test.get_by_id(self.test_id)
+        if self.client is not None:
+            return self.client.test.get_by_id(self.test_id)
+        else:
+            return None
 
     def get_data(self, start: float = None, end: float = None, scaling_length: float = None,
                  all_data: bool = False) -> DataPoints:
