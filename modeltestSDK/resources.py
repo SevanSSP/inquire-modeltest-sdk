@@ -37,7 +37,7 @@ class Resource(BaseModel):
             if self.client is None:
                 raise AttributeError('No client provided, unable to create object')
             else:
-                raise e # pragma: no cover
+                raise e  # pragma: no cover
 
     def update(self, secret_key: str = None):
         self._api_object().update(item_id=self.id, body=make_serializable(self.dict(exclude={"client", 'id'})),
@@ -65,7 +65,9 @@ class Resource(BaseModel):
                 df.loc[name] = [value]
         return df
 
+
 T = TypeVar('T', bound=Resource)
+
 
 class Resources(List[T]):
     def __init__(self, items: List[T] = None) -> None:
@@ -89,7 +91,8 @@ class Resources(List[T]):
         -------
             Filtered resources.
         """
-        filtered_resources = [resource for resource in self if all(getattr(resource, attr) == value for attr, value in kwargs.items())]
+        filtered_resources = [resource for resource in self if
+                              all(getattr(resource, attr) == value for attr, value in kwargs.items())]
         if inplace:
             self.clear()
             self.extend(filtered_resources)
@@ -100,6 +103,7 @@ class Resources(List[T]):
         return self.__orig_bases__[0].__args__[0].__args__ \
             if isinstance(self.__orig_bases__[0].__args__[0], typing._UnionGenericAlias) \
             else [self.__orig_bases__[0].__args__[0]]
+
     def _check_types(self, items: List[Resource]) -> None:
         for item in items:
             if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
@@ -149,7 +153,10 @@ class FloaterConfigs(Resources[FloaterConfig]):
     pass
 
 
-class Statistics(Resource):
+class Statistics(BaseModel):
+    test_id: Optional[str]
+    sensor_id: Optional[str]
+    timeseries_id: Optional[str]
     min: float
     max: float
     std: float
@@ -351,6 +358,9 @@ class TimeSeries(Resource):
         test_name = self.client.test.get_by_id(self.test_id).description
         return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
                               kind=sensor.kind, unit=sensor.unit)
+
+    def statistics(self, scaling_length=None):
+        return self.client.timeseries.get_statistics(ts=self, scaling_length=scaling_length)
 
 
 class TimeSeriesList(Resources[TimeSeries]):
