@@ -352,6 +352,7 @@ class TimeSeries(Resource):
         DataPoints
             Data points
         """
+        self.check_tags_for_warnings()
         dps = self.client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length,
                                                      all_data=all_data)
         return dps
@@ -408,6 +409,21 @@ class TimeSeries(Resource):
         test = self.test
         return QatsTimeSeries(name=f'{test.number} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
                               kind=sensor.kind, unit=sensor.unit)
+
+    def tags(self):
+        return self.client.tag.get_by_timeseries_id(self.id)
+
+    def check_tags_for_warnings(self) -> int:
+        warning_tag_names = ['quality: bad', 'quality: questionable', 'failed']
+        n_warnings = 0
+        for tag in self.tags():
+            if tag.name in warning_tag_names:
+                n_warnings += 1
+                print('## WARNING ')
+                print(f'## Timeseries {self.id} is tagged {tag.name}. Use data cautiously ##')
+                print('                   ###')
+
+        return n_warnings
 
 
 class TimeSeriesList(Resources[TimeSeries]):

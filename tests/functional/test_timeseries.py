@@ -87,3 +87,15 @@ def test_timeseries_plot(new_timeseries, new_datapoints):
     assert fig.axes[0].xaxis.label.get_text() == 'this one'
     assert fig.axes[0].yaxis.label.get_text() == 'that one'
     plt.close(fig)
+
+
+def test_warning_check(new_timeseries, new_datapoints, new_tags):
+
+    for ts in new_timeseries:
+        n_warning = ts.check_tags_for_warnings()
+        n_warning_found_in_tags = 0
+        for tag in ts.tags():
+            if tag.name == 'quality: bad' or tag.name == 'quality: questionable' or tag.name == 'failed':
+                n_warning_found_in_tags += 1
+
+        assert n_warning_found_in_tags == n_warning
