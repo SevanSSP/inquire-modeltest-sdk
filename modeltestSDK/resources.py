@@ -65,10 +65,10 @@ class Resource(BaseModel):
                 df.loc[name] = [value]
         return df
 
+T = TypeVar('T', bound=Resource)
 
-
-class Resources(List[Resource]):
-    def __init__(self, items: List[Resource] = None) -> None:
+class Resources(List[T]):
+    def __init__(self, items: List[T] = None) -> None:
         if items:
             self._check_types(items)
             super().__init__(items)
