@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
-from typing import List, Optional, Union, Any, Literal
+from typing import List, Optional, Union, Any, Literal, TypeVar
 from datetime import datetime
 from .utils import make_serializable
 from qats import TimeSeries as QatsTimeSeries
@@ -66,12 +66,33 @@ class Resource(BaseModel):
         return df
 
 
+
 class Resources(List[Resource]):
     def __init__(self, items: List[Resource] = None) -> None:
         if items:
             self._check_types(items)
             super().__init__(items)
 
+    def filter(self, inplace: bool = False, **kwargs):
+        """
+        Filter resources based on keyword arguments.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments used for filtering.
+
+        Returns
+        -------
+        Resources[T]
+            Filtered resources.
+        """
+        filtered_resources = [resource for resource in self if all(getattr(resource, attr) == value for attr, value in kwargs.items())]
+        if inplace:
+            self.clear()
+            self.extend(filtered_resources)
+        else:
+            return type(self)(filtered_resources)
 
     def _expected_types(self):
         return self.__orig_bases__[0].__args__[0].__args__ \

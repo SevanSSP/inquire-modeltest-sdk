@@ -58,6 +58,14 @@ def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_f
         for test in campaign.tests():
             assert test in tests_from_db
 
+    camp_name = new_campaigns[0].name
+    camp_list = new_campaigns
+    camp_list_filtered = camp_list.filter(name=camp_name)
+    assert len(camp_list_filtered) == 1
+    camp_list.filter(name=camp_name, inplace=True)
+    assert len(camp_list) == 1
+
+
 
 def test_update_campaign(client, new_campaigns, secret_key):
     for campaign in new_campaigns:
