@@ -37,7 +37,7 @@ class Resource(BaseModel):
             if self.client is None:
                 raise AttributeError('No client provided, unable to create object')
             else:
-                raise e # pragma: no cover
+                raise e  # pragma: no cover
 
     def update(self, secret_key: str = None):
         self._api_object().update(item_id=self.id, body=make_serializable(self.dict(exclude={"client", 'id'})),
@@ -72,11 +72,11 @@ class Resources(List[Resource]):
             self._check_types(items)
             super().__init__(items)
 
-
     def _expected_types(self):
         return self.__orig_bases__[0].__args__[0].__args__ \
             if isinstance(self.__orig_bases__[0].__args__[0], typing._UnionGenericAlias) \
             else [self.__orig_bases__[0].__args__[0]]
+
     def _check_types(self, items: List[Resource]) -> None:
         for item in items:
             if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
@@ -174,6 +174,14 @@ class DataPoints(Resource):
         kwargs
             See pandas.DataFrame.plot for options.
         """
+        # Set the x-axis label to "Time [s]" if not specified in the additional arguments
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = 'Time [s]'
+
+        # set the y-axis label based on the kind and unit if not specified in the additional arguments
+        if 'ylabel' not in kwargs:
+            kwargs['ylabel'] = f'{self.timeseries.sensor.kind.capitalize()} [{self.timeseries.sensor.unit}]'
+
         self.to_pandas().plot(**kwargs)
         if show:
             plt.show()
@@ -215,6 +223,25 @@ class DataPointsList(Resources[DataPoints]):
         kwargs
             See pandas.DataFrame.plot for options
         """
+
+        # Set the x-axis label to "Time [s]" if not specified in the additional arguments
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = 'Time [s]'
+
+        # set the y-axis label based on the kind and unit of the first data point if not specified in the additional
+        # arguments and all sensor have the same kind and unit
+        if 'ylabel' not in kwargs:
+            first_kind = self[0].timeseries.sensor.kind
+            first_unit = self[0].timeseries.sensor.unit
+            equal = True
+            for element in self[1:]:
+                if element.timeseries.sensor.kind != first_kind or element.timeseries.sensor.unit != first_unit:
+                    equal = False
+                    break
+
+            if equal:
+                kwargs['ylabel'] = f'{first_kind.capitalize()} [{first_unit}]'
+
         self.to_pandas().plot(**kwargs)
         if show:
             plt.show()
@@ -230,7 +257,7 @@ class DataPointsList(Resources[DataPoints]):
         """
         dfs = [dps.to_pandas() for dps in self]
         conc = pd.concat(dfs, axis="columns")
-        conc.columns = [i.timeseries_id for i in self]
+        # conc.columns = [i.timeseries_id for i in self]
         return conc
 
 
@@ -286,6 +313,8 @@ class TimeSeries(Resource):
             Fetch data points after this time (s).
         end : float, optional
             Fetch data points before this time (s).
+        all_data : bool, optional
+            Flag to fetch all available data or use default start-end values. Overrides start and end.
         scaling_length : float, optional
             Scale the data to this reference length according to Froude law (m).
 
@@ -314,6 +343,15 @@ class TimeSeries(Resource):
             See optional arguments for pandas.DataFrame.plot.
         """
         dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
+
+        # Set the x-axis label to "Time [s]" if not specified in the additional arguments
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = 'Time [s]'
+
+        # set the y-axis label based on the kind and unit if not specified in the additional arguments
+        if 'ylabel' not in kwargs:
+            kwargs['ylabel'] = f'{self.sensor.kind.capitalize()} [{self.sensor.unit}]'
+
         dps.plot(**kwargs)
 
     def get_qats_ts(self, start: float = None, end: float = None, scaling_length: float = None,
@@ -337,9 +375,9 @@ class TimeSeries(Resource):
             Qats TimeSeries object
         """
         dp = self.get_data(start=start, end=end, scaling_length=scaling_length, all_data=all_data)
-        sensor = self.client.sensor.get_by_id(self.sensor_id)
-        test_name = self.client.test.get_by_id(self.test_id).description
-        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
+        sensor = self.sensor
+        test = self.test
+        return QatsTimeSeries(name=f'{test.number} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
                               kind=sensor.kind, unit=sensor.unit)
 
 
@@ -365,7 +403,8 @@ class TimeSeriesList(Resources[TimeSeries]):
         DataPoints
             Data points
         """
-        dps = DataPointsList([ts.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length) for ts in self])
+        dps = DataPointsList(
+            [ts.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length) for ts in self])
         return dps
 
     def get_qats_tsdb(self, start: float = None, end: float = None, scaling_length: float = None,
@@ -414,6 +453,25 @@ class TimeSeriesList(Resources[TimeSeries]):
             See optional arguments for pandas.DataFrame.plot.
         """
         dps = self.get_data(start=start, end=end, scaling_length=scaling_length, all_data=all_data)
+
+        # Set the x-axis label to "Time [s]" if not specified in the additional arguments
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = 'Time [s]'
+
+        # set the y-axis label based on the kind and unit of the first data point if not specified in the additional
+        # arguments and all sensor have the same kind and unit
+        if 'ylabel' not in kwargs:
+            first_kind = dps[0].timeseries.sensor.kind
+            first_unit = dps[0].timeseries.sensor.unit
+            equal = True
+            for element in dps[1:]:
+                if element.timeseries.sensor.kind != first_kind or element.timeseries.sensor.unit != first_unit:
+                    equal = False
+                    break
+
+            if equal:
+                kwargs['ylabel'] = f'{first_kind.capitalize()} [{first_unit}]'
+
         dps.plot(show=show, **kwargs)
 
 
