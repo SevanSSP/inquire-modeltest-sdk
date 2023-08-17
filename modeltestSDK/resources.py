@@ -81,10 +81,12 @@ class Resources(List[T]):
         ----------
         **kwargs : dict
             Keyword arguments used for filtering.
+        inplace : bool
+            Flag to indicate if list should be filtered in-place or return new list
+
 
         Returns
         -------
-        Resources[T]
             Filtered resources.
         """
         filtered_resources = [resource for resource in self if all(getattr(resource, attr) == value for attr, value in kwargs.items())]
