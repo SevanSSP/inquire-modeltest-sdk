@@ -36,7 +36,7 @@ def test_timeseries_resource(client, secret_key, admin_key, new_timeseries, new_
     sensor = ts.sensor()
     assert sensor == client.sensor.get_by_id(ts.sensor_id)
     data = ts.get_data()
-    statistics_fetch = ts.statistics()
+    statistics_fetch = ts.get_statistics()
     assert rounded_compare(statistics_fetch.mean, np.mean(data.value), 10 ** -3)
 
 

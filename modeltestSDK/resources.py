@@ -359,7 +359,7 @@ class TimeSeries(Resource):
         return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
                               kind=sensor.kind, unit=sensor.unit)
 
-    def statistics(self, scaling_length=None):
+    def get_statistics(self, scaling_length=None):
         return self.client.timeseries.get_statistics(ts=self, scaling_length=scaling_length)
 
 
