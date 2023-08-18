@@ -915,7 +915,7 @@ class TimeseriesAPI(BaseAPI):
                                 endpoint=f"{ts_id}/data", body=body)
         return DataPoints(**data.get("data"), timeseries_id=ts_id, client=self.client)
 
-    def get_statistics(self, ts: TimeSeries, scaling_length: float = None) -> Statistics:
+    def get_statistics(self, ts_id: str, scaling_length: float = None) -> Statistics:
         """
         Fetch time series statistics.
 
@@ -924,7 +924,7 @@ class TimeseriesAPI(BaseAPI):
         ts_id : str
             Time series identifier
         scaling_length : float, optional
-            Scale data points to the the specified scaling length according to Froude law from the original
+            Scale data points to the specified scaling length according to Froude law from the original
             reference length.
 
         Returns
@@ -933,11 +933,8 @@ class TimeseriesAPI(BaseAPI):
             Data points
         """
         parameters = dict(scaling_length=scaling_length)
-        data = self.client.get(resource=self._resource_path, endpoint=f"{ts.id}/statistics", parameters=parameters)
-        data['timeseries_id'] = ts.id
-        data['sensor_id'] = ts.sensor_id
-        data['test_id'] = ts.test_id
-        return Statistics(**data, client=self.client)
+        data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/statistics", parameters=parameters)
+        return Statistics(**data)
 
 
 class TagsAPI(BaseAPI):

@@ -13,7 +13,7 @@ def test_datapoints_api(client, secret_key, admin_key, new_datapoints):
     dp_fetch = client.timeseries.get_data_points(ts_id=dp_fixture.timeseries_id, all_data=True)
     assert dp_fixture == dp_fetch
     ts = client.timeseries.get_by_id(dp_fixture.timeseries_id)
-    statistics_fetch = client.timeseries.get_statistics(ts=ts)
+    statistics_fetch = client.timeseries.get_statistics(ts_id=ts.id)
     assert rounded_compare(statistics_fetch.mean, np.mean(dp_fetch.value), 10 ** -3)
 
 

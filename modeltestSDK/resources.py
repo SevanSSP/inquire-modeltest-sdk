@@ -154,9 +154,6 @@ class FloaterConfigs(Resources[FloaterConfig]):
 
 
 class Statistics(BaseModel):
-    test_id: Optional[str]
-    sensor_id: Optional[str]
-    timeseries_id: Optional[str]
     min: float
     max: float
     std: float
@@ -359,8 +356,8 @@ class TimeSeries(Resource):
         return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
                               kind=sensor.kind, unit=sensor.unit)
 
-    def get_statistics(self, scaling_length=None):
-        return self.client.timeseries.get_statistics(ts=self, scaling_length=scaling_length)
+    def get_statistics(self, scaling_length=None) -> Statistics:
+        return self.client.timeseries.get_statistics(ts_id=self.id, scaling_length=scaling_length)
 
 
 class TimeSeriesList(Resources[TimeSeries]):
