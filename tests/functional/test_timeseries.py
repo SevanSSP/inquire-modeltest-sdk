@@ -1,9 +1,7 @@
-from datetime import datetime
-from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool
-import random
+from tests.utils import rounded_compare
 import pytest
 from modeltestSDK.resources import TimeSeries
-
+import numpy as np
 
 def test_timeseries_api(client, secret_key, admin_key, new_timeseries):
     """The Api is now verified good to go and tests can interact with it"""
@@ -38,6 +36,10 @@ def test_timeseries_resource(client, secret_key, admin_key, new_timeseries, new_
     sensor = ts.sensor()
     assert sensor == client.sensor.get_by_id(ts.sensor_id)
     data = ts.get_data()
+    statistics_fetch = ts.get_statistics()
+    assert rounded_compare(statistics_fetch.mean, np.mean(data.value), 10 ** -3)
+
+
     data_qats = ts.get_qats_ts()
     ts_list_data = new_timeseries.get_data()
     qats_tsdb = new_timeseries.get_qats_tsdb()
