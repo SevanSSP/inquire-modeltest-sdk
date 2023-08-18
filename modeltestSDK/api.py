@@ -857,7 +857,7 @@ class TimeseriesAPI(BaseAPI):
         return self.get(filter_by=[self.client.filter.timeseries.test_id == test_id],
                         limit=limit, skip=skip)
 
-    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> TimeSeriesList:
+    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> Union[TimeSeries, None]:
         """"
         Get single time series by sensor id and test id
 
@@ -879,7 +879,10 @@ class TimeseriesAPI(BaseAPI):
                 self.client.filter.timeseries.test_id == test_id
             ]
         )
-        return ts
+        if len(ts) == 1:
+            return ts[0]
+        else:
+            return None
 
     def get_data_points(self, ts_id: str, start: float = None, end: float = None, scaling_length: float = None,
                         all_data: bool = False, cache: bool = True) -> DataPoints:

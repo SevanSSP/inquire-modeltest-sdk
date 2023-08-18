@@ -654,7 +654,7 @@ class Test(Resource):
         """Retrieve tags on time serie."""
         return self.client.tag.get_by_test_id(self.id, limit=limit, skip=skip)
 
-    def timeseries(self, sensor_id: str = None, limit: int = 100, skip: int = 100) -> Union[TimeSeriesList, TimeSeries]:
+    def timeseries(self, sensor_id: str = None, limit: int = 100, skip: int = 0) -> Union[TimeSeriesList, TimeSeries]:
         """
         Retrieve time series on sensor.
 
