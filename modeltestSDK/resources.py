@@ -122,7 +122,7 @@ class Resources(List[ResourceType]):
         for i in self:
             if i.id == id:
                 return i
-        raise KeyError(f"ID: {id} not found in  {self.__class__.__name__}")
+        return None
 
     def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
