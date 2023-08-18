@@ -280,7 +280,6 @@ class DataPointsList(Resources[DataPoints]):
         """
         dfs = [dps.to_pandas() for dps in self]
         conc = pd.concat(dfs, axis="columns")
-        # conc.columns = [i.timeseries_id for i in self]
         return conc
 
 
@@ -357,7 +356,8 @@ class TimeSeries(Resource):
                                                      all_data=all_data)
         return dps
 
-    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):  # pragma: no cover
+    def plot(self, start: float = None, end: float = None, all_data: bool = False,
+             scaling_length: float = None, show: bool = True, **kwargs):  # pragma: no cover
         """
         Plot time series
 
@@ -372,7 +372,7 @@ class TimeSeries(Resource):
         kwargs
             See optional arguments for pandas.DataFrame.plot.
         """
-        dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
+        dps = self.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length)
 
         # Set the x-axis label to "Time [s]" if not specified in the additional arguments
         if 'xlabel' not in kwargs:
@@ -382,7 +382,7 @@ class TimeSeries(Resource):
         if 'ylabel' not in kwargs:
             kwargs['ylabel'] = f'{self.sensor.kind.capitalize()} [{self.sensor.unit}]'
 
-        dps.plot(**kwargs)
+        dps.plot(show=show, **kwargs)
 
     def get_qats_ts(self, start: float = None, end: float = None, scaling_length: float = None,
                     all_data: bool = False) -> QatsTimeSeries:
@@ -543,7 +543,10 @@ class Sensor(Resource):
 
     def tags(self) -> Tags:
         """Retrieve tags on sensor."""
-        return self.client.tag.get_by_sensor_id(self.id)
+        if self.client:
+            return self.client.tag.get_by_sensor_id(self.id)
+        else:
+            return None
 
     def timeseries(self) -> TimeSeriesList:
         """Retrieve time series on sensor."""
@@ -588,7 +591,10 @@ class Test(Resource):
 
     def tags(self) -> Tags:
         """Retrieve tags on time serie."""
-        return self.client.tag.get_by_test_id(self.id)
+        if self.client:
+            return self.client.tag.get_by_test_id(self.id)
+        else:
+            return None
 
     def timeseries(self, sensor_id: str = None) -> Union[TimeSeriesList, TimeSeries]:
         """
@@ -604,10 +610,13 @@ class Test(Resource):
         TimeSeriesList
             Time series
         """
-        if sensor_id is not None:
-            return self.client.timeseries.get_by_sensor_id_and_test_id(sensor_id=sensor_id, test_id=self.id)
+        if self.client:
+            if sensor_id is not None:
+                return self.client.timeseries.get_by_sensor_id_and_test_id(sensor_id=sensor_id, test_id=self.id)
+            else:
+                return self.client.timeseries.get_by_test_id(test_id=self.id)
         else:
-            return self.client.timeseries.get_by_test_id(test_id=self.id)
+            return None
 
 
 class FloaterTest(Test):
@@ -618,6 +627,27 @@ class FloaterTest(Test):
     wave_id: Optional[str]
     wind_id: Optional[str]
     read_only: Optional[bool] = False
+
+    @property
+    def wave_calibration(self):
+        if self.client and self.wave_id:
+            return self.client.wavecalibration.get_by_id(self.wave_id)
+        else:
+            return None
+
+    @property
+    def wind_calibration(self):
+        if self.client and self.wind_id:
+            return self.client.wind_calibration.get_by_id(self.wind_id)
+        else:
+            return None
+
+    @property
+    def floater_config(self):
+        if self.client:
+            return self.client.floater_config.get_by_id(self.floaterconfig_id)
+        else:
+            return None
 
 
 class WaveCalibration(Test):
@@ -631,6 +661,14 @@ class WaveCalibration(Test):
     current_direction: Optional[float]
     read_only: Optional[bool] = False
 
+    def floater_tests(self, limit: int = 100, skip: int = 0):
+        if self.client:
+            return self.client.floater_test.get(
+                filter_by=[self.client.filter.floater_test.wave_calibration_id == self.id],
+                limit=limit, skip=skip)
+        else:
+            return None
+
 
 class WindCalibration(Test):
     type: Literal["Wind Calibration"] = "Wind Calibration"
@@ -639,6 +677,14 @@ class WindCalibration(Test):
     zref: Optional[float]
     wind_direction: Optional[float]
     read_only: Optional[bool] = False
+
+    def floater_tests(self, limit: int = 100, skip: int = 0):
+        if self.client:
+            return self.client.floater_test.get(
+                filter_by=[self.client.filter.floater_test.wind_calibration_id == self.id],
+                limit=limit, skip=skip)
+        else:
+            return None
 
 
 class Tests(Resources[Union[Test, FloaterTest, WaveCalibration, WindCalibration]]):
