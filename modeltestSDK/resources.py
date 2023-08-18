@@ -28,10 +28,10 @@ class Resource(BaseModel):
         try:
             if admin_key is None:
                 resource = self._api_object().create(
-                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at'})))
+                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})))
             else:
                 resource = self._api_object().create(
-                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at'})),
+                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
                     admin_key=admin_key)
             self.id = resource.id
         except AttributeError as e:

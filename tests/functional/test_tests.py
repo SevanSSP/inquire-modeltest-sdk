@@ -123,7 +123,7 @@ def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
         client.filter.wavecalibration.campaign_id == campaign_id
     ])
     assert len(tests_check_wavecal) == 1
-    test_fromcampaign = client.test.get_by_campaign_id(campaign_id, test_type="Wave Calibration")
+    test_fromcampaign = client.test.get_by_campaign_id(campaign_id).filter(type="Wave Calibration")
     assert len(test_fromcampaign) == 1
 
     wavecal_samename = client.wavecalibration.create(number=number, description='description', test_date=test_date,
