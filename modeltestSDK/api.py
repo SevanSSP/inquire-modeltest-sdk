@@ -1,8 +1,7 @@
 """
 API methods
 """
-import logging
-from typing import Union, Literal
+from typing import Union
 from .utils import format_class_name
 from .resources import (
     Campaign, Campaigns, Test, Tests, Sensor, Sensors, TimeSeries, TimeSeriesList, DataPoints, FloaterTest,
@@ -147,7 +146,7 @@ class CampaignAPI(BaseAPI):
         data = self.client.get(self._resource_path, campaign_id)
         return Campaign(**data, client=self.client)
 
-    def get_by_name(self, name: str) -> Campaigns:
+    def get_by_name(self, name: str, limit=100, skip=0) -> Campaigns:
         """
         Get single campaign by name
 
@@ -155,13 +154,18 @@ class CampaignAPI(BaseAPI):
         ----------
         name : str
             Campaign name
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
-        Campaign
-            Campaign data
+        Campaigns
+            Campaigns data
         """
-        return self.get(filter_by=[self.client.filter.campaign.name == name])
+        return self.get(filter_by=[self.client.filter.campaign.name == name],
+                        limit=limit, skip=skip)
 
 
 class TestAPI(BaseAPI):
@@ -219,48 +223,53 @@ class TestAPI(BaseAPI):
         """
         return self.get(filter_by=[self.client.filter.test.id == test_id])[0]
 
-    def get_by_number(self, test_number: str) -> Tests:
-        """"
-        Get single test by number
+    def get_by_number(self, test_number: str, limit=100, skip=0) -> Tests:
+        """
+        Get tests by number
 
         Parameters
         ----------
         test_number : str
             Test number
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         Union[FloaterTest, WaveCalibration, WindCalibration, Test, None]
             Test data
         """
-        return self.get(filter_by=[self.client.filter.test.number == test_number])
+        return self.get(filter_by=[self.client.filter.test.number == test_number],
+                        limit=limit, skip=skip)
 
-    def get_by_campaign_id(self, campaign_id: str, test_type: str = None) -> Tests:
-        """"
+    def get_by_campaign_id(self, campaign_id: str, limit=100, skip=0) -> Tests:
+        """
         Get tests by parent campaign
 
         Parameters
         ----------
         campaign_id : str
             Campaign identifier
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         Tests
             Multiple tests
         """
-        if test_type:
-            tests = self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id,
-                                        self.client.filter.test.type == test_type])
-        else:
-            tests = self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id])
-        return tests
+        return self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id],
+                        limit=limit, skip=skip)
 
 
 class FloaterTestAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
                floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
-               type: Literal["Floater Test"] = 'Floater Test', read_only: bool = False) -> FloaterTest:
+               read_only: bool = False) -> FloaterTest:
         """
         Create floater test
 
@@ -284,8 +293,6 @@ class FloaterTestAPI(TestAPI):
             Identifier of the applied wave
         wind_id : str
             Identifier of the applied wind
-        type : Literal["Floater Test"], optional
-            Specifying test type
         read_only : bool, optional
             Make the test read only
 
@@ -363,7 +370,7 @@ class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: Union[str, None], wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
-               type: Literal["Wave Calibration"] = 'Wave Calibration', read_only: bool = False) -> WaveCalibration:
+               read_only: bool = False) -> WaveCalibration:
         """
         Create wave calibration test
 
@@ -391,8 +398,6 @@ class WaveCalibrationAPI(TestAPI):
             Current velocity (m/s)
         current_direction : float
             Current direction (degrees)
-        type : Literal["Wave Calibration"], optional
-            Specifying test type
         read_only : bool, optional
             Make the test read only
 
@@ -471,7 +476,7 @@ class WaveCalibrationAPI(TestAPI):
 class WindCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
-               type: Literal["Wind Calibration"] = 'Wind Calibration', read_only: bool = False) -> WindCalibration:
+               read_only: bool = False) -> WindCalibration:
         """
         Create wind calibration test
 
@@ -493,8 +498,6 @@ class WindCalibrationAPI(TestAPI):
             Vertical reference height (m)
         wind_direction : float
             Wave direction (degrees)
-        type : Literal["Wind Calibration"], optional
-            Specifying test type
         read_only : bool, optional
             Make the test read only
 
@@ -560,7 +563,7 @@ class WindCalibrationAPI(TestAPI):
 
         Returns
         -------
-        Test
+        WindCalibration
             Test data
         """
         data = self.client.get(self._resource_path, test_id)
@@ -679,37 +682,47 @@ class SensorAPI(BaseAPI):
         data = self.client.get(self._resource_path, sensor_id)
         return Sensor(**data, client=self.client)
 
-    def get_by_name(self, name: str) -> Sensors:
-        """"
-        Get single sensor by name
+    def get_by_name(self, name: str, limit=100, skip=0) -> Sensors:
+        """
+        Get sensors by name
 
         Parameters
         ----------
         name : str
             Sensor name
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         Sensor
             Sensor data
         """
-        return self.get(filter_by=[self.client.filter.sensor.name == name])
+        return self.get(filter_by=[self.client.filter.sensor.name == name],
+                        limit=limit, skip=skip)
 
-    def get_by_campaign_id(self, campaign_id: str) -> Sensors:
-        """"
+    def get_by_campaign_id(self, campaign_id: str, limit=100, skip=0) -> Sensors:
+        """
         Get sensors by parent campaign
 
         Parameters
         ----------
         campaign_id : str
             Campaign identifier
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         Sensors
             Multiple sensors
         """
-        return self.get(filter_by=[self.client.filter.sensor.campaign_id == campaign_id])
+        return self.get(filter_by=[self.client.filter.sensor.campaign_id == campaign_id],
+                        limit=limit, skip=skip)
 
 
 class TimeseriesAPI(BaseAPI):
@@ -801,40 +814,50 @@ class TimeseriesAPI(BaseAPI):
         data = self.client.get(self._resource_path, timeseries_id)
         return TimeSeries(**data, client=self.client)
 
-    def get_by_sensor_id(self, sensor_id: str) -> TimeSeriesList:
-        """"
+    def get_by_sensor_id(self, sensor_id: str, limit=100, skip=0) -> TimeSeriesList:
+        """
         Get time series by sensor id
 
         Parameters
         ----------
         sensor_id : str
             Sensor id
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         TimeSeriesList
             Time series
         """
-        timeseries = self.get(filter_by=[self.client.filter.timeseries.sensor_id == sensor_id])
+        timeseries = self.get(filter_by=[self.client.filter.timeseries.sensor_id == sensor_id],
+                              limit=limit, skip=skip)
         return timeseries
 
-    def get_by_test_id(self, test_id: str) -> TimeSeriesList:
-        """"
+    def get_by_test_id(self, test_id: str, limit=100, skip=0) -> TimeSeriesList:
+        """
         Get time series by test id
 
         Parameters
         ----------
         test_id : str
             Test id
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         TimeSeriesList
             Time series
         """
-        return self.get(filter_by=[self.client.filter.timeseries.test_id == test_id])
+        return self.get(filter_by=[self.client.filter.timeseries.test_id == test_id],
+                        limit=limit, skip=skip)
 
-    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> TimeSeries:
+    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> TimeSeriesList:
         """"
         Get single time series by sensor id and test id
 
@@ -856,7 +879,7 @@ class TimeseriesAPI(BaseAPI):
                 self.client.filter.timeseries.test_id == test_id
             ]
         )
-        return ts[0]
+        return ts
 
     def get_data_points(self, ts_id: str, start: float = None, end: float = None, scaling_length: float = None,
                         all_data: bool = False, cache: bool = True) -> DataPoints:
@@ -872,7 +895,7 @@ class TimeseriesAPI(BaseAPI):
         end : float, optional
             Fetch data point before this end time (s)
         scaling_length : float, optional
-            Scale data points to the the specified scaling length according to Froude law from the original
+            Scale data points to the specified scaling length according to Froude law from the original
             reference length.
         all_data : bool, optional
             Fetch all data points including the transients which are masked by default.
@@ -1029,72 +1052,92 @@ class TagsAPI(BaseAPI):
         data = self.client.get(self._resource_path, tag_id)
         return Tag(**data, client=self.client)
 
-    def get_by_sensor_id(self, sensor_id: str) -> Tags:
-        """"
+    def get_by_sensor_id(self, sensor_id: str, limit=100, skip=0) -> Tags:
+        """
         Get tags by sensor id
 
         Parameters
         ----------
         sensor_id : str
             Sensor id
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         Tags
             Sensor tags
         """
-        tags = self.get(filter_by=[self.client.filter.tag.sensor_id == sensor_id])
+        tags = self.get(filter_by=[self.client.filter.tag.sensor_id == sensor_id],
+                        limit=limit, skip=skip)
         return tags
 
-    def get_by_test_id(self, test_id: str) -> Tags:
-        """"
+    def get_by_test_id(self, test_id: str, limit=100, skip=0) -> Tags:
+        """
         Get tags by test id
 
         Parameters
         ----------
         test_id : str
             Test id
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         Tags
             Test tags
         """
-        tags = self.get(filter_by=[self.client.filter.tag.test_id == test_id])
+        tags = self.get(filter_by=[self.client.filter.tag.test_id == test_id],
+                        limit=limit, skip=skip)
         return tags
 
-    def get_by_timeseries_id(self, ts_id: str) -> Tags:
-        """"
+    def get_by_timeseries_id(self, ts_id: str, limit=100, skip=0) -> Tags:
+        """
         Get tags by time series id
 
         Parameters
         ----------
         ts_id : str
             Time series id
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         Tags
             Time series tags
         """
-        tags = self.get(filter_by=[self.client.filter.tag.timeseries_id == ts_id])
+        tags = self.get(filter_by=[self.client.filter.tag.timeseries_id == ts_id],
+                        limit=limit, skip=skip)
         return tags
 
-    def get_by_name(self, name: str) -> Tags:
-        """"
+    def get_by_name(self, name: str, limit=100, skip=0) -> Tags:
+        """
         Get tags by name
 
         Parameters
         ----------
         name : str
             Tag name
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         Tags
             Tags
         """
-        tags = self.get(filter_by=[self.client.filter.tag.name == name])
+        tags = self.get(filter_by=[self.client.filter.tag.name == name],
+                        limit=limit, skip=skip)
         return tags
 
 
@@ -1184,19 +1227,24 @@ class FloaterConfigAPI(BaseAPI):
         data = self.client.get(self._resource_path, config_id)
         return FloaterConfig(**data, client=self.client)
 
-    def get_by_campaign_id(self, campaign_id: str) -> FloaterConfigs:
-        """"
+    def get_by_campaign_id(self, campaign_id: str, limit=100, skip=0) -> FloaterConfigs:
+        """
         Get configuration by parent campaign
 
         Parameters
         ----------
         campaign_id : str
             Campaign identifier
+        limit : int, optional
+            Limit the number of results, default is 100
+        skip : int, optional
+            Skip the first `skip` results, default is 0
 
         Returns
         -------
         FloaterConfigs
             Floater configurations
         """
-        configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id])
+        configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id],
+                           limit=limit, skip=skip)
         return configs
