@@ -924,7 +924,7 @@ class TimeseriesAPI(BaseAPI):
         ts_id : str
             Time series identifier
         scaling_length : float, optional
-            Scale data points to the the specified scaling length according to Froude law from the original
+            Scale data points to the specified scaling length according to Froude law from the original
             reference length.
 
         Returns
@@ -934,7 +934,7 @@ class TimeseriesAPI(BaseAPI):
         """
         parameters = dict(scaling_length=scaling_length)
         data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/statistics", parameters=parameters)
-        return Statistics(**data, client=self.client)
+        return Statistics(**data)
 
 
 class TagsAPI(BaseAPI):
