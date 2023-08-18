@@ -36,5 +36,4 @@ def test_floater_configurations(new_floater_configuration, new_sensor, new_campa
     fc_check = floaterconfigs.get_by_id(fc2.id)
     assert fc_check == fc2
 
-    with pytest.raises(KeyError):
-        floaterconfigs.get_by_id('notfoundid')
+    assert floaterconfigs.get_by_id('notfoundid') is None

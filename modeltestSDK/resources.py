@@ -1,11 +1,12 @@
 """
 Resource models
 """
+from __future__ import annotations
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from pydantic import BaseModel
-from typing import List, Optional, Union, Any, Literal
+from typing import List, Optional, Union, Any, Literal, TypeVar
 from datetime import datetime
 from .utils import make_serializable
 from qats import TimeSeries as QatsTimeSeries
@@ -66,11 +67,38 @@ class Resource(BaseModel):
         return df
 
 
-class Resources(List[Resource]):
-    def __init__(self, items: List[Resource] = None) -> None:
+ResourceType = TypeVar('ResourceType', bound=Resource)
+
+
+class Resources(List[ResourceType]):
+    def __init__(self, items: List[ResourceType] = None) -> None:
         if items:
             self._check_types(items)
             super().__init__(items)
+
+    def filter(self, inplace: bool = False, **kwargs) -> Union[None, Resources]:
+        """
+        Filter resources based on keyword arguments.
+
+        Parameters
+        ----------
+        **kwargs : dict
+            Keyword arguments used for filtering.
+        inplace : bool
+            Flag to indicate if list should be filtered in-place or return new list
+
+
+        Returns
+        -------
+            Filtered resources.
+        """
+        filtered_resources = [resource for resource in self if
+                              all(getattr(resource, attr) == value for attr, value in kwargs.items())]
+        if inplace:
+            self.clear()
+            self.extend(filtered_resources)
+        else:
+            return type(self)(filtered_resources)
 
     def _expected_types(self):
         return self.__orig_bases__[0].__args__[0].__args__ \
@@ -82,7 +110,7 @@ class Resources(List[Resource]):
             if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
                 raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
-    def append(self, item: Resource, admin_key: str = None) -> None:
+    def append(self, item: ResourceType, admin_key: str = None) -> None:
         if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
         if item.id or item.__class__.__name__ == 'DataPoints':
@@ -91,11 +119,11 @@ class Resources(List[Resource]):
             item.create(admin_key=admin_key)
             super().append(item)
 
-    def get_by_id(self, id):
+    def get_by_id(self, id) -> Union[ResourceType, None]:
         for i in self:
             if i.id == id:
                 return i
-        raise KeyError(f"ID: {id} not found in  {self.__class__.__name__}")
+        return None
 
     def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
@@ -126,7 +154,7 @@ class FloaterConfigs(Resources[FloaterConfig]):
     pass
 
 
-class Statistics(Resource):
+class Statistics(BaseModel):
     min: float
     max: float
     std: float
@@ -424,6 +452,9 @@ class TimeSeries(Resource):
                 print('                   ###')
 
         return n_warnings
+
+    def get_statistics(self, scaling_length=None) -> Statistics:
+        return self.client.timeseries.get_statistics(ts_id=self.id, scaling_length=scaling_length)
 
 
 class TimeSeriesList(Resources[TimeSeries]):
