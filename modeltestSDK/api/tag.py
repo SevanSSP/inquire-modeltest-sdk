@@ -6,7 +6,7 @@ from pydantic import parse_obj_as
 from .base import BaseAPI
 
 
-class TagAPI(BaseAPI):
+class TagsAPI(BaseAPI):
     def create(self, name: str, comment: str = None, test_id: str = None, sensor_id: str = None,
                timeseries_id: str = None, read_only: bool = False) -> Tag:
         """

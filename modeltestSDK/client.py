@@ -6,7 +6,7 @@ import logging
 import numpy as np
 from datetime import datetime
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
-                  WaveCalibrationAPI, TagAPI, FloaterConfigAPI)
+                  WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
 from .config import Config
 from requests.adapters import HTTPAdapter, Retry
@@ -48,7 +48,7 @@ class Client:
         self.floatertest = FloaterTestAPI(client=self)
         self.windcalibration = WindCalibrationAPI(client=self)
         self.wavecalibration = WaveCalibrationAPI(client=self)
-        self.tag = TagAPI(client=self)
+        self.tag = TagsAPI(client=self)
         self.floaterconfig = FloaterConfigAPI(client=self)
 
         # check environmental variables
