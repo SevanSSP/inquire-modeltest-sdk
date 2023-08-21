@@ -224,7 +224,7 @@ class DataPoints(Resource):
         else:
             return None
 
-    def plot(self, show: bool = True, **kwargs):  # pragma: no cover
+    def plot(self, show: bool = True, **kwargs):
         """
         Plot the datapoints.
 
