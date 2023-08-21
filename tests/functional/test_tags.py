@@ -66,3 +66,13 @@ def test_tag_limit_skip(client, new_tags):
     assert len(all_tags_in_steps) == len(all_tags)
     for tag in all_tags:
         assert tag in all_tags_in_steps
+
+
+def test_references(client, new_tags):
+    for tag in new_tags:
+        if tag.sensor_id:
+            assert client.sensor.get_by_id(tag.sensor_id) == tag.sensor
+        if tag.test_id:
+            assert client.test.get_by_id(tag.test_id) == tag.test
+        if tag.timeseries_id:
+            assert client.timeseries.get_by_id(tag.timeseries_id) == tag.timeseries

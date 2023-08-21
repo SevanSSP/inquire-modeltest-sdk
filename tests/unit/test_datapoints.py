@@ -28,3 +28,11 @@ def test_types(new_datapoints):
     dplist = DataPointsList([new_datapoints, dp2])
 
     assert len(dplist.to_pandas()) == 100
+
+
+def test_to_qats(new_datapoints):
+    ts = new_datapoints.to_qats_ts()
+
+    assert ts.name == 'unknown'
+    assert ts.kind is None
+    assert ts.unit is None

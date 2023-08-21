@@ -185,12 +185,13 @@ class Tag(Resource):
     def test(self) -> Union[FloaterTest, WindCalibration, WaveCalibration, None]:
         if self.client and self.test_id:
             test = self.client.test.get_by_id(self.test_id)
-            if test.type == 'floater_test':
-                return self.client.floater_test.get_by_id(self.test_id)
-            elif test.type == 'wave_calibration':
-                return self.client.wave_calibration.get_by_id(self.test_id)
-            elif test.type == 'wind_calibration':
-                return self.client.wind_calibration.get_by_id(self.test_id)
+            print(test)
+            if test.type == 'Floater Test':
+                return self.client.floatertest.get_by_id(self.test_id)
+            elif test.type == 'Wave Calibration':
+                return self.client.wavecalibration.get_by_id(self.test_id)
+            elif test.type == 'Wind Calibration':
+                return self.client.windcalibration.get_by_id(self.test_id)
             else:
                 raise ValueError('Unknown test type')
         else:
@@ -471,7 +472,7 @@ class TimeSeries(Resource):
         return QatsTimeSeries(name=f'{test.number} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
                               kind=sensor.kind, unit=sensor.unit)
 
-    def tags(self, limit: int = 100, skip: int = 100) -> Tags:
+    def tags(self, limit: int = 100, skip: int = 0) -> Tags:
         return self.client.tag.get_by_timeseries_id(self.id, limit=limit, skip=skip)
 
     def check_tags_for_warnings(self) -> int:
