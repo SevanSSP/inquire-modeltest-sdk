@@ -1,7 +1,7 @@
 from typing import Optional
 from .base import Resource, Resources
 from .tag import Tags
-from .timeseries import TimeSeriesList
+from .timeseries import TimeseriesList
 
 
 class Sensor(Resource):
@@ -26,7 +26,7 @@ class Sensor(Resource):
         """Retrieve tags on sensor."""
         return self.client.tag.get_by_sensor_id(self.id, limit=limit, skip=skip)
 
-    def timeseries(self, limit: int = 100, skip: int = 100) -> TimeSeriesList:
+    def timeseries(self, limit: int = 100, skip: int = 100) -> TimeseriesList:
         """Retrieve time series on sensor."""
         return self.client.timeseries.get_by_sensor_id(self.id, limit=limit, skip=skip)
 

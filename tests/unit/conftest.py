@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from modeltestSDK.resources import Campaign, Sensor, TimeSeries, Tests, FloaterTest, FloaterConfig, WaveCalibration, \
+from modeltestSDK.resources import Campaign, Sensor, Timeseries, Tests, FloaterTest, FloaterConfig, WaveCalibration, \
     WindCalibration, DataPoints, Tag, Tags
 from uuid import uuid4
 from tests.utils import random_lower_int, random_float
@@ -65,8 +65,8 @@ def floater_test_class():
 
 
 @pytest.fixture(scope="module")
-def new_wavecalibration(new_campaign):
-    wavecalibration = WaveCalibration(
+def new_wave_calibration(new_campaign):
+    wave_calibration = WaveCalibration(
         type='Wave Calibration',
         number='X331',
         description='Description of test',
@@ -80,13 +80,13 @@ def new_wavecalibration(new_campaign):
         current_direction=285,
         campaign_id=new_campaign.id
     )
-    wavecalibration.id = str(uuid4())
-    return wavecalibration
+    wave_calibration.id = str(uuid4())
+    return wave_calibration
 
 
 @pytest.fixture(scope='module')
-def new_windcalibration(new_campaign):
-    windcalibration = WindCalibration(
+def new_wind_calibration(new_campaign):
+    wind_calibration = WindCalibration(
         type="Wind Calibration",
         number='Y331',
         description='Description of test',
@@ -97,8 +97,8 @@ def new_windcalibration(new_campaign):
         wind_direction=270,
         campaign_id=new_campaign.id
     )
-    windcalibration.id = str(uuid4())
-    return windcalibration
+    wind_calibration.id = str(uuid4())
+    return wind_calibration
 
 
 @pytest.fixture(scope="module")
@@ -115,28 +115,28 @@ def new_floater_configuration(new_campaign):
 
 
 @pytest.fixture(scope='module')
-def new_floatertest(new_wavecalibration, new_windcalibration, new_floater_configuration):
-    floatertest = FloaterTest(
+def new_floater_test(new_wave_calibration, new_wind_calibration, new_floater_configuration):
+    floater_test = FloaterTest(
         type="Floater Test",
         number='REC331',
         description='Description of test',
         test_date=datetime(2020, 10, 1),
         category='decay',
         orientation=180,
-        wave_id=new_wavecalibration.id,
-        wind_id=new_windcalibration.id,
+        wave_id=new_wave_calibration.id,
+        wind_id=new_wind_calibration.id,
         floaterconfig_id=new_floater_configuration.id,
-        campaign_id=new_wavecalibration.campaign_id
+        campaign_id=new_wave_calibration.campaign_id
     )
-    floatertest.id = str(uuid4())
-    return floatertest
+    floater_test.id = str(uuid4())
+    return floater_test
 
 
 @pytest.fixture(scope="module")
-def new_timeseries(new_sensor, new_floatertest):
-    ts = TimeSeries(
+def new_timeseries(new_sensor, new_floater_test):
+    ts = Timeseries(
         sensor_id=new_sensor.id,
-        test_id=new_floatertest.id,
+        test_id=new_floater_test.id,
         fs=2.5,
         default_start_time=1,
         default_end_time=2,
@@ -157,11 +157,11 @@ def new_datapoints(new_timeseries):
 
 
 @pytest.fixture(scope='module')
-def new_tags(new_timeseries, new_sensor, new_floatertest):
+def new_tags(new_timeseries, new_sensor, new_floater_test):
     tags = Tags([
         Tag(name='quality: bad', comment='bad quality', timeseries_id=new_timeseries.id),
         Tag(name='comment', comment='comment', sensor_id=new_sensor.id),
-        Tag(name='comment', comment='another comment', test_id=new_floatertest.id)
+        Tag(name='comment', comment='another comment', test_id=new_floater_test.id)
     ]
     )
     for tag in tags:

@@ -108,7 +108,7 @@ class Query:
                                                         'read_only',
                                                         'id',
                                                         'datapoints_created_at'])
-        self.wavecalibration = class_factory(name="Wavecalibration", method_spec=method_spec,
+        self.wave_calibration = class_factory(name="Wavecalibration", method_spec=method_spec,
                                              attribute_list=['number',
                                                              'description',
                                                              'test_date',
@@ -124,7 +124,7 @@ class Query:
                                                              'read_only',
                                                              'id'])
 
-        self.windcalibration = class_factory(name="Windcalibration", method_spec=method_spec,
+        self.wind_calibration = class_factory(name="Windcalibration", method_spec=method_spec,
                                              attribute_list=['number',
                                                              'description',
                                                              'test_date',
@@ -136,7 +136,7 @@ class Query:
                                                              'wind_direction',
                                                              'read_only',
                                                              'id'])
-        self.floatertest = class_factory(name="Floatertest", method_spec=method_spec,
+        self.floater_test = class_factory(name="Floatertest", method_spec=method_spec,
                                          attribute_list=['number',
                                                          'description',
                                                          'test_date',

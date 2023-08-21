@@ -39,11 +39,11 @@ class TestAPI(BaseAPI):
         data_out = []
         for i in data:
             if i['type'] == 'Wave Calibration':
-                data_out.append(self.client.wavecalibration.get_by_id(i['id']))
+                data_out.append(self.client.wave_calibration.get_by_id(i['id']))
             elif i['type'] == 'Wind Calibration':
-                data_out.append(self.client.windcalibration.get_by_id(i['id']))
+                data_out.append(self.client.wind_calibration.get_by_id(i['id']))
             else:
-                data_out.append(self.client.floatertest.get_by_id(i['id']))
+                data_out.append(self.client.floater_test.get_by_id(i['id']))
         return Tests(data_out)
 
     def get_by_id(self, test_id: str) -> Union[FloaterTest, WaveCalibration, WindCalibration, Test, None]:

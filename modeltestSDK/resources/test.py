@@ -2,7 +2,7 @@ from typing import Optional, Union, Literal
 from datetime import datetime
 from .base import Resource, Resources
 from .tag import Tags
-from .timeseries import TimeSeries, TimeSeriesList
+from .timeseries import Timeseries, TimeseriesList
 
 
 class Test(Resource):
@@ -30,7 +30,7 @@ class Test(Resource):
         """Retrieve tags on time serie."""
         return self.client.tag.get_by_test_id(self.id, limit=limit, skip=skip)
 
-    def timeseries(self, sensor_id: str = None, limit: int = 100, skip: int = 0) -> Union[TimeSeriesList, TimeSeries]:
+    def timeseries(self, sensor_id: str = None, limit: int = 100, skip: int = 0) -> Union[TimeseriesList, Timeseries]:
         """
         Retrieve time series on sensor.
 
@@ -45,7 +45,7 @@ class Test(Resource):
 
         Returns
         -------
-        TimeSeriesList
+        TimeseriesList
             Time series
         """
         if self.client:
@@ -69,7 +69,7 @@ class FloaterTest(Test):
     @property
     def wave_calibration(self):
         if self.client and self.wave_id:
-            return self.client.wavecalibration.get_by_id(self.wave_id)
+            return self.client.wave_calibration.get_by_id(self.wave_id)
         else:
             return None
 

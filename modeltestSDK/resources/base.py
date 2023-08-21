@@ -1,17 +1,23 @@
+from __future__ import annotations
 import pandas as pd
 from pydantic import BaseModel
 from typing import List, Optional, Union, Any, TypeVar
 from modeltestSDK.utils import make_serializable
 import typing
+import re
 
 
 class Resource(BaseModel):
     client: Optional[Any]
     id: Optional[str]
 
+    @staticmethod
+    def _api_object_name(resource_name: str):
+        return resource_name[0].lower() + re.sub('([A-Z]{1})', r'_\1', resource_name[1:]).lower()
+
     def _api_object(self):
-        if hasattr(self.client, self.__class__.__name__.lower()):
-            return getattr(self.client, self.__class__.__name__.lower())
+        if hasattr(self.client, self._api_object_name(self.__class__.__name__)):
+            return getattr(self.client, self._api_object_name(self.__class__.__name__))
         else:
             return None
 
@@ -67,7 +73,7 @@ class Resources(List[ResourceType]):
             self._check_types(items)
             super().__init__(items)
 
-    def filter(self, inplace: bool = False, **kwargs) -> Union[None, "Resources"]:
+    def filter(self, inplace: bool = False, **kwargs) -> Union[None, Resources]:
         """
         Filter resources based on keyword arguments.
 

@@ -1,6 +1,6 @@
 from typing import Union
 from modeltestSDK.resources import (
-    Statistics, DataPoints, TimeSeries, TimeSeriesList
+    Statistics, DataPoints, Timeseries, TimeseriesList
 )
 from modeltestSDK.query import create_query_parameters
 from pydantic import parse_obj_as
@@ -9,7 +9,7 @@ from .base import BaseAPI
 
 class TimeseriesAPI(BaseAPI):
     def create(self, sensor_id: str, test_id: str, default_start_time: float, default_end_time: float, fs: float,
-               intermittent: bool = False, read_only: bool = False) -> TimeSeries:
+               intermittent: bool = False, read_only: bool = False) -> Timeseries:
         """
         Create time series
 
@@ -46,9 +46,9 @@ class TimeseriesAPI(BaseAPI):
             read_only=read_only
         )
         data = self.client.post(self._resource_path, body=body)
-        return TimeSeries(**data, client=self.client)
+        return Timeseries(**data, client=self.client)
 
-    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> TimeSeriesList:
+    def get(self, filter_by: list = None, sort_by: list = None, skip: int = None, limit: int = None) -> TimeseriesList:
         """
         Get multiple time series
 
@@ -67,7 +67,7 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSeriesList
+        TimeseriesList
             Multiple time series
         """
         if filter_by is None:
@@ -77,9 +77,9 @@ class TimeseriesAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return TimeSeriesList([parse_obj_as(TimeSeries, dict(**i, client=self.client)) for i in data])
+        return TimeseriesList([parse_obj_as(Timeseries, dict(**i, client=self.client)) for i in data])
 
-    def get_by_id(self, timeseries_id: str) -> TimeSeries:
+    def get_by_id(self, timeseries_id: str) -> Timeseries:
         """
         Get single time series by id
 
@@ -90,13 +90,13 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSeries
+        Timeseries
             Time series
         """
         data = self.client.get(self._resource_path, timeseries_id)
-        return TimeSeries(**data, client=self.client)
+        return Timeseries(**data, client=self.client)
 
-    def get_by_sensor_id(self, sensor_id: str, limit=100, skip=0) -> TimeSeriesList:
+    def get_by_sensor_id(self, sensor_id: str, limit=100, skip=0) -> TimeseriesList:
         """
         Get time series by sensor id
 
@@ -111,14 +111,14 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSeriesList
+        TimeseriesList
             Time series
         """
         timeseries = self.get(filter_by=[self.client.filter.timeseries.sensor_id == sensor_id],
                               limit=limit, skip=skip)
         return timeseries
 
-    def get_by_test_id(self, test_id: str, limit=100, skip=0) -> TimeSeriesList:
+    def get_by_test_id(self, test_id: str, limit=100, skip=0) -> TimeseriesList:
         """
         Get time series by test id
 
@@ -133,13 +133,13 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSeriesList
+        TimeseriesList
             Time series
         """
         return self.get(filter_by=[self.client.filter.timeseries.test_id == test_id],
                         limit=limit, skip=skip)
 
-    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> Union[TimeSeries, None]:
+    def get_by_sensor_id_and_test_id(self, sensor_id: str, test_id: str) -> Union[Timeseries, None]:
         """"
         Get single time series by sensor id and test id
 
@@ -152,7 +152,7 @@ class TimeseriesAPI(BaseAPI):
 
         Returns
         -------
-        TimeSeries
+        Timeseries
             Time series
         """
         ts = self.get(

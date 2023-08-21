@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from typing import List
-from qats import TimeSeries as QatsTimeSeries
+from qats import TimeSeries as QatsTimeseries
 from .base import Resource, Resources
 
 
@@ -69,7 +69,7 @@ class DataPoints(Resource):
             columns = [f'{test.number} - {sensor.name}']
         return pd.DataFrame(data=self.value, index=self.time, columns=columns)
 
-    def to_qats_ts(self) -> QatsTimeSeries:
+    def to_qats_ts(self) -> QatsTimeseries:
         try:
             sensor = self.timeseries.sensor
             test = self.timeseries.test
@@ -81,7 +81,7 @@ class DataPoints(Resource):
             name = f'{test.number} - {sensor.name}'
             kind = sensor.kind
             unit = sensor.unit
-        return QatsTimeSeries(name=name, x=np.array(self.value), t=np.array(self.time),
+        return QatsTimeseries(name=name, x=np.array(self.value), t=np.array(self.time),
                               kind=kind, unit=unit)
 
 

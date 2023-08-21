@@ -1,7 +1,7 @@
 """
 Test the DataPoints models
 """
-from modeltestSDK.resources import DataPoints, DataPointsList, TimeSeries
+from modeltestSDK.resources import DataPoints, DataPointsList, Timeseries
 from tests.utils import random_lower_int, random_float
 from uuid import uuid4
 
@@ -9,7 +9,7 @@ from uuid import uuid4
 def test_types(new_datapoints):
     assert len(new_datapoints) == 100
 
-    ts = TimeSeries(
+    ts = Timeseries(
         sensor_id='2',
         test_id='2',
         fs=2.5,

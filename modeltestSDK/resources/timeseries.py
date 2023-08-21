@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Optional
-from qats import TimeSeries as QatsTimeSeries
+from qats import TimeSeries as QatsTimeseries
 from qats import TsDB as QatsTsDB
 from .base import Resource, Resources
 from .statistics import Statistics
@@ -8,7 +8,7 @@ from .tag import Tags
 from .datapoint import DataPoints, DataPointsList
 
 
-class TimeSeries(Resource):
+class Timeseries(Resource):
     id: Optional[str]
     sensor_id: str
     test_id: str
@@ -114,7 +114,7 @@ class TimeSeries(Resource):
         dps.plot(show=show, **kwargs)
 
     def get_qats_ts(self, start: float = None, end: float = None, scaling_length: float = None,
-                    all_data: bool = False) -> QatsTimeSeries:
+                    all_data: bool = False) -> QatsTimeseries:
         """
         Get Qats timeseries
 
@@ -130,13 +130,13 @@ class TimeSeries(Resource):
             Flag to fetch all available data or use default start-end values
         Returns
         -------
-        QatsTimeSeries
-            Qats TimeSeries object
+        QatsTimeseries
+            Qats Timeseries object
         """
         dp = self.get_data(start=start, end=end, scaling_length=scaling_length, all_data=all_data)
         sensor = self.sensor
         test = self.test
-        return QatsTimeSeries(name=f'{test.number} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
+        return QatsTimeseries(name=f'{test.number} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
                               kind=sensor.kind, unit=sensor.unit)
 
     def tags(self, limit: int = 100, skip: int = 0) -> Tags:
@@ -158,7 +158,7 @@ class TimeSeries(Resource):
         return self.client.timeseries.get_statistics(ts_id=self.id, scaling_length=scaling_length)
 
 
-class TimeSeriesList(Resources[TimeSeries]):
+class TimeseriesList(Resources[Timeseries]):
     def get_data(self, start: float = None, end: float = None, all_data: bool = False,
                  scaling_length: float = None) -> DataPointsList:
         """

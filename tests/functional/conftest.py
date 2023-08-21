@@ -5,8 +5,8 @@ from tests.utils import random_lower_int, random_float, random_lower_short_strin
 from modeltestSDK.client import Client
 from modeltestSDK.config import Config
 from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibration,
-                                    WaveCalibration, FloaterConfig, FloaterConfigs, TimeSeries,
-                                    TimeSeriesList, DataPointsList, Tags, Tag)
+                                    WaveCalibration, FloaterConfig, FloaterConfigs, Timeseries,
+                                    TimeseriesList, DataPointsList, Tags, Tag)
 from datetime import datetime
 import os
 import random
@@ -229,13 +229,13 @@ def new_tests(client, secret_key, new_floaterconfig, new_campaigns):
 
 @pytest.fixture(scope='module')
 def new_timeseries(client, secret_key, new_campaigns, new_sensors, new_tests):
-    ts_list = TimeSeriesList()
+    ts_list = TimeseriesList()
     for camp in new_campaigns:
         sensors = camp.sensors()
         tests = camp.tests()
         for sensor in sensors:
             for test in tests:
-                ts_list.append(TimeSeries(
+                ts_list.append(Timeseries(
                     client=client,
                     sensor_id=sensor.id,
                     test_id=test.id,

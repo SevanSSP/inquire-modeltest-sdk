@@ -1,7 +1,7 @@
 from tests.utils import rounded_compare
 import pytest
 from matplotlib import pyplot as plt
-from modeltestSDK.resources import TimeSeries, TimeSeriesList
+from modeltestSDK.resources import Timeseries, TimeseriesList
 import numpy as np
 
 def test_timeseries_api(client, secret_key, admin_key, new_timeseries):
@@ -47,7 +47,7 @@ def test_timeseries_resource(client, secret_key, admin_key, new_timeseries, new_
 
     assert len(data) == data_qats.n
     assert len(ts_list_data) == qats_tsdb.n
-    ts_new = TimeSeries(sensor_id=ts.sensor_id, test_id=ts.test_id, fs=ts.fs)
+    ts_new = Timeseries(sensor_id=ts.sensor_id, test_id=ts.test_id, fs=ts.fs)
     with pytest.raises(AttributeError) as e:
         ts_new.create(admin_key=admin_key)
 
@@ -83,7 +83,7 @@ def test_timeseries_plot(new_timeseries, new_datapoints):
             if len(timeseries_with_same_sensor) == 5:
                 break
 
-    timeseries_with_same_sensor = TimeSeriesList(timeseries_with_same_sensor)
+    timeseries_with_same_sensor = TimeseriesList(timeseries_with_same_sensor)
     timeseries_with_same_sensor.plot(show=False, xlabel='this one', ylabel='that one')
     fig = plt.gcf()
     assert fig.axes[0].xaxis.label.get_text() == 'this one'

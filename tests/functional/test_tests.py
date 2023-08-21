@@ -4,7 +4,7 @@ from tests.utils import random_lower_int, random_float, random_lower_short_strin
 import random
 
 
-def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
+def test_floater_test_api(client, secret_key, admin_key, new_floaterconfig):
     """The Api is now verified good to go and tests can interact with it"""
     fc = new_floaterconfig[0]
     floaterconfig_id = fc.id
@@ -34,10 +34,10 @@ def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
     description = random_lower_string()
     test_date = str(datetime.now())
     campaign_id = fc.campaign_id
-    floatertest = client.floatertest.create(number=number, description=description, test_date=test_date,
+    floater_test = client.floater_test.create(number=number, description=description, test_date=test_date,
                                             campaign_id=campaign_id, category=category, orientation=orientation,
                                             floaterconfig_id=floaterconfig_id)
-    assert client.floatertest.get_by_number(number)
+    assert client.floater_test.get_by_number(number)
     tests = client.test.get(filter_by=[
         client.filter.test.number == number,
         client.filter.test.description == description],
@@ -50,21 +50,21 @@ def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
         client.filter.test.campaign_id == campaign_id,
     ])
     assert len(tests_check) == 1
-    floatertest_with_same_name = client.floatertest.create(number=number, description='description',
+    floater_test_with_same_name = client.floater_test.create(number=number, description='description',
                                                            test_date=test_date, campaign_id=campaign_id,
                                                            category=category, orientation=orientation,
                                                            floaterconfig_id=floaterconfig_id)
-    assert floatertest_with_same_name.id != floatertest.id
-    assert client.test.get_by_id(floatertest.id) in client.test.get_by_number(number)
-    assert client.test.get_by_id(floatertest_with_same_name.id) in client.test.get_by_number(number)
-    assert client.test.get_by_id(floatertest.id) in client.floatertest.get_by_number(number)
-    assert client.test.get_by_id(floatertest_with_same_name.id) in client.floatertest.get_by_number(number)
+    assert floater_test_with_same_name.id != floater_test.id
+    assert client.test.get_by_id(floater_test.id) in client.test.get_by_number(number)
+    assert client.test.get_by_id(floater_test_with_same_name.id) in client.test.get_by_number(number)
+    assert client.test.get_by_id(floater_test.id) in client.floater_test.get_by_number(number)
+    assert client.test.get_by_id(floater_test_with_same_name.id) in client.floater_test.get_by_number(number)
 
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
     assert len(test_fromcampaign) == 2
 
-    tests_check = client.floatertest.get(filter_by=[
-        client.filter.floatertest.campaign_id == campaign_id
+    tests_check = client.floater_test.get(filter_by=[
+        client.filter.floater_test.campaign_id == campaign_id
     ])
 
     assert len(tests_check) == 2
@@ -72,13 +72,13 @@ def test_floatertest_api(client, secret_key, admin_key, new_floaterconfig):
         assert i in tests_check
 
     assert not client.test.get_by_number(94493)
-    assert not client.floatertest.get_by_number(94439)
+    assert not client.floater_test.get_by_number(94439)
 
-    client.test.delete(floatertest.id, secret_key=secret_key)
-    client.test.delete(floatertest_with_same_name.id, secret_key=secret_key)
+    client.test.delete(floater_test.id, secret_key=secret_key)
+    client.test.delete(floater_test_with_same_name.id, secret_key=secret_key)
 
 
-def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
+def test_wave_calibrationtest_api(client, secret_key, admin_key, new_campaigns):
     """The Api is now verified good to go and tests can interact with it"""
     camp = new_campaigns[0]
     wave_spectrum = random.choice(["jonswap",
@@ -98,13 +98,13 @@ def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
     description = random_lower_string()
     test_date = str(datetime.now())
 
-    wavecal = client.wavecalibration.create(number=number, description=description, test_date=test_date,
+    wavecal = client.wave_calibration.create(number=number, description=description, test_date=test_date,
                                             campaign_id=campaign_id, wave_spectrum=wave_spectrum,
                                             wave_height=wave_height, wave_period=wave_period, gamma=gamma,
                                             wave_direction=wave_direction, current_velocity=current_velocity,
                                             current_direction=current_direction)
 
-    assert client.wavecalibration.get_by_number(number)
+    assert client.wave_calibration.get_by_number(number)
     tests = client.test.get(filter_by=[
         client.filter.test.number == number,
         client.filter.test.description == description],
@@ -113,20 +113,20 @@ def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
     assert tests[0] == client.test.get_by_id(tests[0].id)
     assert tests[0] in client.test.get_by_number(number)
     assert len(client.test.get_by_number('not existing name')) == 0
-    assert len(client.wavecalibration.get_by_number('not existing name')) == 0
+    assert len(client.wave_calibration.get_by_number('not existing name')) == 0
 
-    assert tests[0] in client.wavecalibration.get_by_number(number)
+    assert tests[0] in client.wave_calibration.get_by_number(number)
     tests_check = client.test.get(filter_by=[client.filter.test.campaign_id == campaign_id])
     assert tests[0] in tests_check
 
-    tests_check_wavecal = client.wavecalibration.get(filter_by=[
-        client.filter.wavecalibration.campaign_id == campaign_id
+    tests_check_wavecal = client.wave_calibration.get(filter_by=[
+        client.filter.wave_calibration.campaign_id == campaign_id
     ])
     assert len(tests_check_wavecal) == 1
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id).filter(type="Wave Calibration")
     assert len(test_fromcampaign) == 1
 
-    wavecal_samename = client.wavecalibration.create(number=number, description='description', test_date=test_date,
+    wavecal_samename = client.wave_calibration.create(number=number, description='description', test_date=test_date,
                                                      campaign_id=campaign_id, wave_spectrum=wave_spectrum,
                                                      wave_height=wave_height, wave_period=wave_period, gamma=gamma,
                                                      wave_direction=wave_direction, current_velocity=current_velocity,
@@ -134,8 +134,8 @@ def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
     assert wavecal_samename.id != wavecal.id
     assert client.test.get_by_id(wavecal.id) in client.test.get_by_number(number)
     assert client.test.get_by_id(wavecal_samename.id) in client.test.get_by_number(number)
-    assert client.test.get_by_id(wavecal.id) in client.wavecalibration.get_by_number(number)
-    assert client.test.get_by_id(wavecal_samename.id) in client.wavecalibration.get_by_number(number)
+    assert client.test.get_by_id(wavecal.id) in client.wave_calibration.get_by_number(number)
+    assert client.test.get_by_id(wavecal_samename.id) in client.wave_calibration.get_by_number(number)
 
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
     assert tests[0] in test_fromcampaign
@@ -144,7 +144,7 @@ def test_wavecalibrationtest_api(client, secret_key, admin_key, new_campaigns):
     client.test.delete(wavecal_samename.id, secret_key=secret_key)
 
 
-def test_windcalibrationtest_api(client, secret_key, admin_key, new_campaigns):
+def test_wind_calibrationtest_api(client, secret_key, admin_key, new_campaigns):
     """The Api is now verified good to go and tests can interact with it"""
     camp = new_campaigns[0]
     wind_spectrum = random_lower_short_string()
@@ -156,11 +156,11 @@ def test_windcalibrationtest_api(client, secret_key, admin_key, new_campaigns):
     description = random_lower_string()
     test_date = str(datetime.now())
 
-    windcal = client.windcalibration.create(number=number, description=description, test_date=test_date,
+    windcal = client.wind_calibration.create(number=number, description=description, test_date=test_date,
                                             campaign_id=campaign_id, wind_spectrum=wind_spectrum,
                                             wind_velocity=wind_velocity, zref=zref, wind_direction=wind_direction)
 
-    assert client.windcalibration.get_by_number(number)
+    assert client.wind_calibration.get_by_number(number)
     tests = client.test.get(filter_by=[
         client.filter.test.number == number,
         client.filter.test.description == description],
@@ -169,25 +169,25 @@ def test_windcalibrationtest_api(client, secret_key, admin_key, new_campaigns):
     assert tests[0] == client.test.get_by_id(tests[0].id)
     assert tests[0] in client.test.get_by_number(number)
     assert len(client.test.get_by_number('not existing name')) == 0
-    assert len(client.windcalibration.get_by_number('not existing name')) == 0
+    assert len(client.wind_calibration.get_by_number('not existing name')) == 0
 
     tests_check = client.test.get(filter_by=[
         client.filter.test.campaign_id == campaign_id,
     ])
     assert tests[0] in tests_check
-    tests_check_windcal = client.windcalibration.get(filter_by=[
-        client.filter.windcalibration.campaign_id == campaign_id,
+    tests_check_windcal = client.wind_calibration.get(filter_by=[
+        client.filter.wind_calibration.campaign_id == campaign_id,
     ])
     assert tests[0] in tests_check_windcal
-    windcal_samename = client.windcalibration.create(number=number, description='description', test_date=test_date,
+    windcal_samename = client.wind_calibration.create(number=number, description='description', test_date=test_date,
                                                      campaign_id=campaign_id, wind_spectrum=wind_spectrum,
                                                      wind_velocity=wind_velocity, zref=zref,
                                                      wind_direction=wind_direction)
     assert windcal_samename.id != windcal.id
     assert client.test.get_by_id(windcal.id) in client.test.get_by_number(number)
     assert client.test.get_by_id(windcal_samename.id) in client.test.get_by_number(number)
-    assert client.test.get_by_id(windcal.id) in client.windcalibration.get_by_number(number)
-    assert client.test.get_by_id(windcal_samename.id) in client.windcalibration.get_by_number(number)
+    assert client.test.get_by_id(windcal.id) in client.wind_calibration.get_by_number(number)
+    assert client.test.get_by_id(windcal_samename.id) in client.wind_calibration.get_by_number(number)
 
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
     assert tests[0] in test_fromcampaign
