@@ -25,7 +25,7 @@ class Campaign(Resource):
 
     def floater_configurations(self, limit: int = 100, skip: int = 0) -> FloaterConfigs:
         """Fetch floater configurations."""
-        return self.client.floaterconfig.get_by_campaign_id(self.id, limit=limit, skip=skip)
+        return self.client.floater_config.get_by_campaign_id(self.id, limit=limit, skip=skip)
 
 
 class Campaigns(Resources[Campaign]):

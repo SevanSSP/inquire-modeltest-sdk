@@ -10,16 +10,16 @@ def test_floater_configuration(new_floater_configuration):
 
 
 def test_floater_configurations(new_floater_configuration, new_sensor, new_campaign):
-    floaterconfigs = FloaterConfigs([new_floater_configuration])
+    floater_configs = FloaterConfigs([new_floater_configuration])
 
-    assert len(floaterconfigs) == 1
-    assert len(floaterconfigs.to_pandas()) == 1
-
-    with pytest.raises(TypeError):
-        failed_floaterconfigs = FloaterConfigs([new_floater_configuration, new_sensor])
+    assert len(floater_configs) == 1
+    assert len(floater_configs.to_pandas()) == 1
 
     with pytest.raises(TypeError):
-        floaterconfigs.append(new_sensor)
+        failed_floater_configs = FloaterConfigs([new_floater_configuration, new_sensor])
+
+    with pytest.raises(TypeError):
+        floater_configs.append(new_sensor)
 
     fc2 = FloaterConfig(
         name="test2",
@@ -29,11 +29,11 @@ def test_floater_configurations(new_floater_configuration, new_sensor, new_campa
         draft=1.0,
     )
     fc2.id = str(uuid4())
-    floaterconfigs.append(fc2)
+    floater_configs.append(fc2)
 
-    assert len(floaterconfigs) == 2
+    assert len(floater_configs) == 2
 
-    fc_check = floaterconfigs.get_by_id(fc2.id)
+    fc_check = floater_configs.get_by_id(fc2.id)
     assert fc_check == fc2
 
-    assert floaterconfigs.get_by_id('notfoundid') is None
+    assert floater_configs.get_by_id('notfoundid') is None

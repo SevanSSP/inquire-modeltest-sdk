@@ -157,7 +157,7 @@ class Query:
                                                  'read_only',
                                                  'name',
                                                  'id'])
-        self.floaterconfig = class_factory(name="Floaterconfig", method_spec=method_spec,
+        self.floater_config = class_factory(name="Floaterconfig", method_spec=method_spec,
                                            attribute_list=['name',
                                                            'description',
                                                            'characteristic_length',

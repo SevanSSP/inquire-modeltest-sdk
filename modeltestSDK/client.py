@@ -37,7 +37,7 @@ class Client:
     """
 
     def __init__(self, config=Config):
-        """Initilize objects for interacting with the API"""
+        """Initialize objects for interacting with the API"""
         self.config = config
         self.filter = Query(method_spec='filter')
         self.sort = Query(method_spec='sort')
