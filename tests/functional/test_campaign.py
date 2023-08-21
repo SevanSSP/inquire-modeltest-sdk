@@ -77,7 +77,7 @@ def test_update_campaign(client, new_campaigns, secret_key):
 
 def test_campaign_resource(client, new_campaigns, new_tests):
     camp = new_campaigns[0]
-    for test in camp.floater_tests():
+    for test in camp.tests().filter(type='Floater Test'):
         assert test in new_tests
 
 

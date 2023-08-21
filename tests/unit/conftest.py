@@ -1,19 +1,21 @@
 import pytest
 from datetime import datetime
-from modeltestSDK.resources import Campaign, Sensor, TimeSeries, Tests, FloaterTest, FloaterConfig, WaveCalibration, WindCalibration, DataPoints
+from modeltestSDK.resources import Campaign, Sensor, TimeSeries, Tests, FloaterTest, FloaterConfig, WaveCalibration, \
+    WindCalibration, DataPoints, Tag, Tags
 from uuid import uuid4
 from tests.utils import random_lower_int, random_float
+import random
 
 
 @pytest.fixture(scope="module")
 def new_campaign():
     camp = Campaign(
-        name = 'TestCampaign',
-        description = 'Description of testcampaign',
-        date = datetime(2020, 10, 1),
-        location = 'Oslo',
-        scale_factor = 1,
-        water_depth = 4,
+        name='TestCampaign',
+        description='Description of testcampaign',
+        date=datetime(2020, 10, 1),
+        location='Oslo',
+        scale_factor=1,
+        water_depth=4,
     )
     camp.id = str(uuid4())
     return camp
@@ -61,6 +63,7 @@ def tests_class():
 def floater_test_class():
     return FloaterTest
 
+
 @pytest.fixture(scope="module")
 def new_wavecalibration(new_campaign):
     wavecalibration = WaveCalibration(
@@ -96,6 +99,7 @@ def new_windcalibration(new_campaign):
     )
     windcalibration.id = str(uuid4())
     return windcalibration
+
 
 @pytest.fixture(scope="module")
 def new_floater_configuration(new_campaign):
@@ -138,14 +142,29 @@ def new_timeseries(new_sensor, new_floatertest):
         default_end_time=2,
 
     )
-    ts.id=str(uuid4())
+    ts.id = str(uuid4())
     return ts
+
 
 @pytest.fixture(scope='module')
 def new_datapoints(new_timeseries):
-    dp= DataPoints(
-        time=[random_float() for i in range(0,100)],
-        value=[random_float() for i in range(0,100)],
-        timeseries_id = new_timeseries.id
+    dp = DataPoints(
+        time=[random_float() for i in range(0, 100)],
+        value=[random_float() for i in range(0, 100)],
+        timeseries_id=new_timeseries.id
     )
     return dp
+
+
+@pytest.fixture(scope='module')
+def new_tags(new_timeseries, new_sensor, new_floatertest):
+    tags = Tags([
+        Tag(name='quality: bad', comment='bad quality', timeseries_id=new_timeseries.id),
+        Tag(name='comment', comment='comment', sensor_id=new_sensor.id),
+        Tag(name='comment', comment='another comment', test_id=new_floatertest.id)
+    ]
+    )
+    for tag in tags:
+        tag.id = str(uuid4())
+
+    return tags

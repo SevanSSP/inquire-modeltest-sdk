@@ -28,10 +28,10 @@ class Resource(BaseModel):
         try:
             if admin_key is None:
                 resource = self._api_object().create(
-                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at'})))
+                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})))
             else:
                 resource = self._api_object().create(
-                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at'})),
+                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
                     admin_key=admin_key)
             self.id = resource.id
         except AttributeError as e:
@@ -174,6 +174,36 @@ class Tag(Resource):
     sensor_id: Optional[str]
     timeseries_id: Optional[str]
 
+    @property
+    def sensor(self) -> Union[Sensor, None]:
+        if self.client and self.sensor_id:
+            return self.client.sensor.get_by_id(self.sensor_id)
+        else:
+            return None
+
+    @property
+    def test(self) -> Union[FloaterTest, WindCalibration, WaveCalibration, None]:
+        if self.client and self.test_id:
+            test = self.client.test.get_by_id(self.test_id)
+            print(test)
+            if test.type == 'Floater Test':
+                return self.client.floatertest.get_by_id(self.test_id)
+            elif test.type == 'Wave Calibration':
+                return self.client.wavecalibration.get_by_id(self.test_id)
+            elif test.type == 'Wind Calibration':
+                return self.client.windcalibration.get_by_id(self.test_id)
+            else:
+                raise ValueError('Unknown test type')
+        else:
+            return None
+
+    @property
+    def timeseries(self) -> Union[TimeSeries, None]:
+        if self.client and self.timeseries_id:
+            return self.client.timeseries.get_by_id(self.timeseries_id)
+        else:
+            return None
+
 
 class Tags(Resources[Tag]):
     pass
@@ -187,20 +217,38 @@ class DataPoints(Resource):
     def __len__(self):
         return len(self.time)
 
+    @property
     def timeseries(self):
-        return self.client.timeseries.get_by_id(self.timeseries_id)
+        if self.client:
+            return self.client.timeseries.get_by_id(self.timeseries_id)
+        else:
+            return None
 
-    def plot(self, **kwargs):  # pragma: no cover
+    def plot(self, show: bool = True, **kwargs):  # pragma: no cover
         """
-        Plot the dataapoints.
+        Plot the datapoints.
 
         Parameters
         ----------
+        show : bool, default True
+            Whether to show the plot
         kwargs
             See pandas.DataFrame.plot for options.
         """
+        # Set the x-axis label to "Time [s]" if not specified in the additional arguments
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = 'Time [s]'
+
+        # set the y-axis label based on the kind and unit if not specified in the additional arguments
+        if 'ylabel' not in kwargs:
+            try:
+                kwargs['ylabel'] = f'{self.timeseries.sensor.kind.capitalize()} [{self.timeseries.sensor.unit}]'
+            except AttributeError:
+                pass
+
         self.to_pandas().plot(**kwargs)
-        plt.show()
+        if show:
+            plt.show()
 
     def to_pandas(self) -> pd.DataFrame:
         """
@@ -215,29 +263,69 @@ class DataPoints(Resource):
         --------
         See keyword arguments on pydantic.BaseModel.dict()
         """
-        return pd.DataFrame(dict(value=self.value), index=self.time)
+        try:
+            sensor = self.timeseries.sensor
+            test = self.timeseries.test
+        except AttributeError:
+            columns = None
+        else:
+            columns = [f'{test.number} - {sensor.name}']
+        return pd.DataFrame(data=self.value, index=self.time, columns=columns)
 
     def to_qats_ts(self) -> QatsTimeSeries:
-        ts = self.client.timeseries.get_by_id(self.timeseries_id)
-        sensor = self.client.sensor.get_by_id(ts.sensor_id)
-        test_name = self.client.test.get_by_id(ts.test_id).description
-        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(self.value), t=np.array(self.time),
-                              kind=sensor.kind, unit=sensor.unit)
+        try:
+            sensor = self.timeseries.sensor
+            test = self.timeseries.test
+        except AttributeError:
+            name = 'unknown'
+            kind = None
+            unit = None
+        else:
+            name = f'{test.number} - {sensor.name}'
+            kind = sensor.kind
+            unit = sensor.unit
+        return QatsTimeSeries(name=name, x=np.array(self.value), t=np.array(self.time),
+                              kind=kind, unit=unit)
 
 
 class DataPointsList(Resources[DataPoints]):
 
-    def plot(self, **kwargs):  # pragma: no cover
+    def plot(self, show: bool = True, **kwargs):  # pragma: no cover
         """
         Plot data points.
 
         Parameters
         ----------
+        show : bool, default True
+            Whether to show the plot
         kwargs
             See pandas.DataFrame.plot for options
         """
+
+        # Set the x-axis label to "Time [s]" if not specified in the additional arguments
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = 'Time [s]'
+
+        # set the y-axis label based on the kind and unit of the first data point if not specified in the additional
+        # arguments and all sensor have the same kind and unit
+        if 'ylabel' not in kwargs:
+            try:
+                first_kind = self[0].timeseries.sensor.kind
+                first_unit = self[0].timeseries.sensor.unit
+                equal = True
+                for element in self[1:]:
+                    if element.timeseries.sensor.kind != first_kind or element.timeseries.sensor.unit != first_unit:
+                        equal = False
+                        break
+
+                if equal:
+                    kwargs['ylabel'] = f'{first_kind.capitalize()} [{first_unit}]'
+            except AttributeError:
+                pass
+
         self.to_pandas().plot(**kwargs)
-        plt.show()
+        if show:
+            plt.show()
 
     def to_pandas(self):
         """
@@ -250,7 +338,6 @@ class DataPointsList(Resources[DataPoints]):
         """
         dfs = [dps.to_pandas() for dps in self]
         conc = pd.concat(dfs, axis="columns")
-        conc.columns = [i.timeseries_id for i in self]
         return conc
 
 
@@ -287,8 +374,19 @@ class TimeSeries(Resource):
         dps = self.client.timeseries.add_data_points(self.id, time, values, secret_key)
         return dps
 
+    @property
     def sensor(self):
-        return self.client.sensor.get_by_id(self.sensor_id)
+        if self.client:
+            return self.client.sensor.get_by_id(self.sensor_id)
+        else:
+            return None
+
+    @property
+    def test(self):
+        if self.client:
+            return self.client.test.get_by_id(self.test_id)
+        else:
+            return None
 
     def get_data(self, start: float = None, end: float = None, scaling_length: float = None,
                  all_data: bool = False) -> DataPoints:
@@ -301,6 +399,8 @@ class TimeSeries(Resource):
             Fetch data points after this time (s).
         end : float, optional
             Fetch data points before this time (s).
+        all_data : bool, optional
+            Flag to fetch all available data or use default start-end values. Overrides start and end.
         scaling_length : float, optional
             Scale the data to this reference length according to Froude law (m).
 
@@ -309,11 +409,13 @@ class TimeSeries(Resource):
         DataPoints
             Data points
         """
+        self.check_tags_for_warnings()
         dps = self.client.timeseries.get_data_points(self.id, start=start, end=end, scaling_length=scaling_length,
                                                      all_data=all_data)
         return dps
 
-    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):  # pragma: no cover
+    def plot(self, start: float = None, end: float = None, all_data: bool = False,
+             scaling_length: float = None, show: bool = True, **kwargs):  # pragma: no cover
         """
         Plot time series
 
@@ -323,13 +425,26 @@ class TimeSeries(Resource):
             Fetch data points after this time (s).
         end : float, optional
             Fetch data points before this time (s).
+        all_data : bool, optional
+            Flag to fetch all available data or use default start-end values. Overrides start and end.
         scaling_length : float, optional
             Scale the data to this reference length according to Froude law (m).
+        show: bool = True, optional
+            Flag to show the plot
         kwargs
             See optional arguments for pandas.DataFrame.plot.
         """
-        dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
-        dps.plot(**kwargs)
+        dps = self.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length)
+
+        # Set the x-axis label to "Time [s]" if not specified in the additional arguments
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = 'Time [s]'
+
+        # set the y-axis label based on the kind and unit if not specified in the additional arguments
+        if 'ylabel' not in kwargs:
+            kwargs['ylabel'] = f'{self.sensor.kind.capitalize()} [{self.sensor.unit}]'
+
+        dps.plot(show=show, **kwargs)
 
     def get_qats_ts(self, start: float = None, end: float = None, scaling_length: float = None,
                     all_data: bool = False) -> QatsTimeSeries:
@@ -352,17 +467,33 @@ class TimeSeries(Resource):
             Qats TimeSeries object
         """
         dp = self.get_data(start=start, end=end, scaling_length=scaling_length, all_data=all_data)
-        sensor = self.client.sensor.get_by_id(self.sensor_id)
-        test_name = self.client.test.get_by_id(self.test_id).description
-        return QatsTimeSeries(name=f'{test_name} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
+        sensor = self.sensor
+        test = self.test
+        return QatsTimeSeries(name=f'{test.number} - {sensor.name}', x=np.array(dp.value), t=np.array(dp.time),
                               kind=sensor.kind, unit=sensor.unit)
+
+    def tags(self, limit: int = 100, skip: int = 0) -> Tags:
+        return self.client.tag.get_by_timeseries_id(self.id, limit=limit, skip=skip)
+
+    def check_tags_for_warnings(self) -> int:
+        warning_tag_names = ['quality: bad', 'quality: questionable', 'failed']
+        n_warnings = 0
+        for tag in self.tags():
+            if tag.name in warning_tag_names:
+                n_warnings += 1
+                print('## WARNING ')
+                print(f'## Timeseries {self.id} is tagged {tag.name}. Use data cautiously ##')
+                print('                   ###')
+
+        return n_warnings
 
     def get_statistics(self, scaling_length=None) -> Statistics:
         return self.client.timeseries.get_statistics(ts_id=self.id, scaling_length=scaling_length)
 
 
 class TimeSeriesList(Resources[TimeSeries]):
-    def get_data(self, start: float = None, end: float = None, scaling_length: float = None) -> DataPointsList:
+    def get_data(self, start: float = None, end: float = None, all_data: bool = False,
+                 scaling_length: float = None) -> DataPointsList:
         """
         Get data points
 
@@ -372,15 +503,18 @@ class TimeSeriesList(Resources[TimeSeries]):
             Fetch data points after this time (s).
         end : float, optional
             Fetch data points before this time (s).
+        all_data: bool = False, optional
+            Flag to fetch all available data or use default start-end values. Overrides start and end.
         scaling_length : float, optional
             Scale the data to this reference length according to Froude law (m).
 
         Returns
         -------
-        DataPoints
+        DataPointList
             Data points
         """
-        dps = DataPointsList([ts.get_data(start=start, end=end, scaling_length=scaling_length) for ts in self])
+        dps = DataPointsList(
+            [ts.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length) for ts in self])
         return dps
 
     def get_qats_tsdb(self, start: float = None, end: float = None, scaling_length: float = None,
@@ -408,7 +542,8 @@ class TimeSeriesList(Resources[TimeSeries]):
             db.add(i.get_qats_ts(start=start, end=end, scaling_length=scaling_length, all_data=all_data))
         return db
 
-    def plot(self, start: float = None, end: float = None, scaling_length: float = None, **kwargs):  # pragma: no cover
+    def plot(self, start: float = None, end: float = None, scaling_length: float = None,
+             all_data: bool = False, show: bool = True, **kwargs):  # pragma: no cover
         """
         Plot time series
 
@@ -420,11 +555,37 @@ class TimeSeriesList(Resources[TimeSeries]):
             Fetch data points before this time (s).
         scaling_length : float, optional
             Scale the data to this reference length according to Froude law (m).
+        all_data: bool = False, optional
+            Flag to fetch all available data or use default start-end values. true overrides start and end
+        show: bool = True, optional
+            Flag to show the plot
         kwargs
             See optional arguments for pandas.DataFrame.plot.
         """
-        dps = self.get_data(start=start, end=end, scaling_length=scaling_length)
-        dps.plot(**kwargs)
+        dps = self.get_data(start=start, end=end, scaling_length=scaling_length, all_data=all_data)
+
+        # Set the x-axis label to "Time [s]" if not specified in the additional arguments
+        if 'xlabel' not in kwargs:
+            kwargs['xlabel'] = 'Time [s]'
+
+        # set the y-axis label based on the kind and unit of the first data point if not specified in the additional
+        # arguments and all sensor have the same kind and unit
+        if 'ylabel' not in kwargs:
+            try:
+                first_kind = dps[0].timeseries.sensor.kind
+                first_unit = dps[0].timeseries.sensor.unit
+                equal = True
+                for element in dps[1:]:
+                    if element.timeseries.sensor.kind != first_kind or element.timeseries.sensor.unit != first_unit:
+                        equal = False
+                        break
+
+                if equal:
+                    kwargs['ylabel'] = f'{first_kind.capitalize()} [{first_unit}]'
+            except AttributeError:
+                pass
+
+        dps.plot(show=show, **kwargs)
 
 
 class Sensor(Resource):
@@ -445,13 +606,13 @@ class Sensor(Resource):
     area: Optional[float]
     read_only: Optional[bool]
 
-    def tags(self) -> Tags:
+    def tags(self, limit: int = 100, skip: int = 100) -> Tags:
         """Retrieve tags on sensor."""
-        return self.client.tag.get_by_sensor_id(self.id)
+        return self.client.tag.get_by_sensor_id(self.id, limit=limit, skip=skip)
 
-    def timeseries(self) -> TimeSeriesList:
+    def timeseries(self, limit: int = 100, skip: int = 100) -> TimeSeriesList:
         """Retrieve time series on sensor."""
-        return self.client.timeseries.get_by_sensor_id(self.id)
+        return self.client.timeseries.get_by_sensor_id(self.id, limit=limit, skip=skip)
 
 
 class Sensors(Resources[Sensor]):
@@ -479,7 +640,7 @@ class Test(Resource):
 
     __test__ = False
 
-    def delete(self, secret_key: str):
+    def delete(self, secret_key: str = None):
         """
         Delete it.
 
@@ -490,11 +651,11 @@ class Test(Resource):
         """
         self.client.test.delete(self.id, secret_key=secret_key)
 
-    def tags(self) -> Tags:
+    def tags(self, limit: int = 100, skip: int = 100) -> Tags:
         """Retrieve tags on time serie."""
-        return self.client.tag.get_by_test_id(self.id)
+        return self.client.tag.get_by_test_id(self.id, limit=limit, skip=skip)
 
-    def timeseries(self, sensor_id: str = None) -> Union[TimeSeriesList, TimeSeries]:
+    def timeseries(self, sensor_id: str = None, limit: int = 100, skip: int = 0) -> Union[TimeSeriesList, TimeSeries]:
         """
         Retrieve time series on sensor.
 
@@ -502,16 +663,23 @@ class Test(Resource):
         ----------
         sensor_id : str, optional
             Retrieve the time series for the specified sensor
+        limit : int, optional
+            Maximum number of time series to return, default 100
+        skip : int, optional
+            Number of time series to skip, default 0
 
         Returns
         -------
         TimeSeriesList
             Time series
         """
-        if sensor_id is not None:
-            return self.client.timeseries.get_by_sensor_id_and_test_id(sensor_id=sensor_id, test_id=self.id)
+        if self.client:
+            if sensor_id is not None:
+                return self.client.timeseries.get_by_sensor_id_and_test_id(sensor_id=sensor_id, test_id=self.id)
+            else:
+                return self.client.timeseries.get_by_test_id(test_id=self.id, limit=limit, skip=skip)
         else:
-            return self.client.timeseries.get_by_test_id(test_id=self.id)
+            return None
 
 
 class FloaterTest(Test):
@@ -522,6 +690,27 @@ class FloaterTest(Test):
     wave_id: Optional[str]
     wind_id: Optional[str]
     read_only: Optional[bool] = False
+
+    @property
+    def wave_calibration(self):
+        if self.client and self.wave_id:
+            return self.client.wavecalibration.get_by_id(self.wave_id)
+        else:
+            return None
+
+    @property
+    def wind_calibration(self):
+        if self.client and self.wind_id:
+            return self.client.wind_calibration.get_by_id(self.wind_id)
+        else:
+            return None
+
+    @property
+    def floater_config(self):
+        if self.client:
+            return self.client.floater_config.get_by_id(self.floaterconfig_id)
+        else:
+            return None
 
 
 class WaveCalibration(Test):
@@ -535,6 +724,11 @@ class WaveCalibration(Test):
     current_direction: Optional[float]
     read_only: Optional[bool] = False
 
+    def floater_tests(self, limit: int = 100, skip: int = 0):
+        return self.client.floater_test.get(
+            filter_by=[self.client.filter.floater_test.wave_calibration_id == self.id],
+            limit=limit, skip=skip)
+
 
 class WindCalibration(Test):
     type: Literal["Wind Calibration"] = "Wind Calibration"
@@ -543,6 +737,11 @@ class WindCalibration(Test):
     zref: Optional[float]
     wind_direction: Optional[float]
     read_only: Optional[bool] = False
+
+    def floater_tests(self, limit: int = 100, skip: int = 0):
+        return self.client.floater_test.get(
+            filter_by=[self.client.filter.floater_test.wind_calibration_id == self.id],
+            limit=limit, skip=skip)
 
 
 class Tests(Resources[Union[Test, FloaterTest, WaveCalibration, WindCalibration]]):
@@ -571,21 +770,17 @@ class Campaign(Resource):
     water_depth: float
     read_only: Optional[bool] = False
 
-    def sensors(self) -> Sensors:
+    def sensors(self, limit: int = 100, skip: int = 0) -> Sensors:
         """Fetch sensors."""
-        return self.client.sensor.get_by_campaign_id(self.id)
+        return self.client.sensor.get_by_campaign_id(self.id, limit=limit, skip=skip)
 
-    def tests(self, test_type: str = None) -> Tests:
+    def tests(self, limit: int = 100, skip: int = 0) -> Tests:
         """Fetch tests."""
-        return self.client.test.get_by_campaign_id(self.id, test_type=test_type)
+        return self.client.test.get_by_campaign_id(self.id, limit=limit, skip=skip)
 
-    def floater_configurations(self) -> FloaterConfigs:
+    def floater_configurations(self, limit: int = 100, skip: int = 0) -> FloaterConfigs:
         """Fetch floater configurations."""
-        return self.client.floaterconfig.get_by_campaign_id(self.id)
-
-    def floater_tests(self) -> Tests:
-        """Fetch floater tests."""
-        return self.client.test.get_by_campaign_id(self.id, test_type='Floater Test')
+        return self.client.floaterconfig.get_by_campaign_id(self.id, limit=limit, skip=skip)
 
 
 class Campaigns(Resources[Campaign]):
