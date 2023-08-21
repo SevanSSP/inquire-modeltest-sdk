@@ -1,9 +1,9 @@
 from typing import Optional
 from datetime import datetime
 from .base import Resource, Resources
+from .floater_config import FloaterConfigs
 from .sensor import Sensors
 from .test import Tests
-from floater_config import FloaterConfigs
 
 
 class Campaign(Resource):

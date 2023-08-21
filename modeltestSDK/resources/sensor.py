@@ -1,7 +1,7 @@
 from typing import Optional
 from .base import Resource, Resources
 from .tag import Tags
-from timeseries import TimeSeriesList
+from .timeseries import TimeSeriesList
 
 
 class Sensor(Resource):

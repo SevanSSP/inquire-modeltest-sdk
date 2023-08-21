@@ -3,9 +3,9 @@ from typing import Optional
 from qats import TimeSeries as QatsTimeSeries
 from qats import TsDB as QatsTsDB
 from .base import Resource, Resources
-from .datapoint import DataPoints, DataPointsList
-from .tag import Tags
 from .statistics import Statistics
+from .tag import Tags
+from .datapoint import DataPoints, DataPointsList
 
 
 class TimeSeries(Resource):

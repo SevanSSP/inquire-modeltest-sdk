@@ -1,8 +1,11 @@
+from __future__ import annotations
 from typing import Optional, Union
 from .base import Resource, Resources
-from .sensor import Sensor
-from .test import FloaterTest, WindCalibration, WaveCalibration
-from .timeseries import TimeSeries
+from typing import TYPE_CHECKING
+if TYPE_CHECKING:
+    from .timeseries import TimeSeries
+    from .sensor import Sensor
+    from .test import FloaterTest, WindCalibration, WaveCalibration
 
 
 class Tag(Resource):

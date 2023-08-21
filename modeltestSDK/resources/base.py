@@ -1,4 +1,3 @@
-from __future__ import annotations
 import pandas as pd
 from pydantic import BaseModel
 from typing import List, Optional, Union, Any, TypeVar
@@ -68,7 +67,7 @@ class Resources(List[ResourceType]):
             self._check_types(items)
             super().__init__(items)
 
-    def filter(self, inplace: bool = False, **kwargs) -> Union[None, Resources]:
+    def filter(self, inplace: bool = False, **kwargs) -> Union[None, "Resources"]:
         """
         Filter resources based on keyword arguments.
 
