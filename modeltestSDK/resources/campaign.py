@@ -13,7 +13,6 @@ class Campaign(Resource):
     date: datetime
     scale_factor: float
     water_depth: float
-    read_only: Optional[bool] = False
 
     def sensors(self, limit: int = 100, skip: int = 0) -> Sensors:
         """Fetch sensors."""

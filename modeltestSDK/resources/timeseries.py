@@ -17,7 +17,6 @@ class Timeseries(Resource):
     intermittent: Optional[bool] = False
     default_start_time: Optional[float]
     default_end_time: Optional[float]
-    read_only: Optional[bool] = False
 
     def add_data(self, time: list, values: list, secret_key: str = None) -> DataPoints:
         """

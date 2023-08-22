@@ -64,7 +64,6 @@ class FloaterTest(Test):
     floaterconfig_id: str
     wave_id: Optional[str]
     wind_id: Optional[str]
-    read_only: Optional[bool] = False
 
     @property
     def wave_calibration(self):
@@ -97,7 +96,6 @@ class WaveCalibration(Test):
     wave_direction: Optional[float]
     current_velocity: Optional[float]
     current_direction: Optional[float]
-    read_only: Optional[bool] = False
 
     def floater_tests(self, limit: int = 100, skip: int = 0):
         return self.client.floater_test.get(
@@ -111,7 +109,6 @@ class WindCalibration(Test):
     wind_velocity: Optional[float]
     zref: Optional[float]
     wind_direction: Optional[float]
-    read_only: Optional[bool] = False
 
     def floater_tests(self, limit: int = 100, skip: int = 0):
         return self.client.floater_test.get(

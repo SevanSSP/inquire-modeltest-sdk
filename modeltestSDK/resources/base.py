@@ -21,21 +21,25 @@ class Resource(BaseModel):
         else:
             return None
 
-    def create(self, admin_key=None):
-        try:
-            if admin_key is None:
-                resource = self._api_object().create(
-                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})))
-            else:
-                resource = self._api_object().create(
-                    **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
-                    admin_key=admin_key)
-            self.id = resource.id
-        except AttributeError as e:
-            if self.client is None:
-                raise AttributeError('No client provided, unable to create object')
-            else:
-                raise e  # pragma: no cover
+    def create(self, read_only: bool = False, admin_key=None):
+        if not self.id:
+            try:
+                if admin_key is None:
+                    resource = self._api_object().create(
+                        **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
+                        read_only=read_only)
+                else:
+                    resource = self._api_object().create(
+                        **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
+                        read_only=read_only, admin_key=admin_key)
+                self.id = resource.id
+            except AttributeError as e:
+                if self.client is None:
+                    raise AttributeError('No client provided, unable to create object')
+                else:
+                    raise e  # pragma: no cover
+        else:
+            print(f"Resource {self.__class__.__name__} with id {self.id} already exists")
 
     def update(self, secret_key: str = None):
         self._api_object().update(item_id=self.id, body=make_serializable(self.dict(exclude={"client", 'id'})),
@@ -107,14 +111,15 @@ class Resources(List[ResourceType]):
             if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
                 raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
-    def append(self, item: ResourceType, admin_key: str = None) -> None:
+    def append(self, item: ResourceType) -> None:
         if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
-        if item.id or item.__class__.__name__ == 'DataPoints':
-            super().append(item)
-        else:
-            item.create(admin_key=admin_key)
-            super().append(item)
+
+        super().append(item)
+
+    def create(self, read_only: bool = False, admin_key: str = None) -> None:
+        for item in self:
+            item.create(read_only=read_only, admin_key=admin_key)
 
     def get_by_id(self, id) -> Union[ResourceType, None]:
         for i in self:

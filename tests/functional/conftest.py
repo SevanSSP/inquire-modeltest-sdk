@@ -10,6 +10,7 @@ from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests,
 from datetime import datetime
 import os
 import random
+import numpy as np
 
 
 @pytest.fixture(scope="module")
@@ -79,10 +80,10 @@ def new_campaigns(client, secret_key, admin_key):
             date=datetime.now(),
             location=random_lower_string(),
             scale_factor=random_float(),
-            water_depth=random_float(),
-            read_only=random_bool()),
-            admin_key
-        )
+            water_depth=random_float()
+        ))
+
+        campaigns.create(read_only=random_bool(), admin_key=admin_key)
 
     yield campaigns
 
@@ -122,17 +123,18 @@ def new_sensors(client, new_campaigns, secret_key):
                 "basin derived",
                 "Sevan derived",
                 "external derived"]),
-            x=random_float(),
-            y=random_float(),
+            x=np.float32(random_float()),
+            y=np.float64(random_float()),
             position_reference=random.choice([
                 "local",
                 "global"]),
             position_draft_lock=random_bool(),
             position_heading_lock=random_bool(),
             positive_direction_definition=random_lower_string(),
-            area=random_float(),
-            read_only=random_bool()
+            area=random_float()
         ))
+
+        sensors.create(read_only=random_bool())
 
     yield sensors
 
@@ -154,6 +156,9 @@ def new_floater_config(client, new_campaigns, secret_key):
             characteristic_length=random_float(),
             draft=random_lower_int()
         ))
+
+        floater_configs.create(read_only=random_bool())
+
     yield floater_configs
 
     # clean up
@@ -200,7 +205,7 @@ def new_tests(client, secret_key, new_floater_config, new_campaigns):
             current_velocity=random_float(),
             current_direction=random_float(),
             campaign_id=camp.id,
-            number=random_int(),
+            number=str(random_int()),
             description=random_lower_string(),
             test_date=datetime.now(),
         )
@@ -214,11 +219,12 @@ def new_tests(client, secret_key, new_floater_config, new_campaigns):
             zref=random_float(),
             wind_direction=random_float(),
             campaign_id=camp.id,
-            number=random_int(),
+            number=str(random_int()),
             description=random_lower_string(),
             test_date=datetime.now(),
-        )
-        )
+        ))
+
+    tests.create(read_only=random_bool())
 
     yield tests
 
@@ -241,9 +247,10 @@ def new_timeseries(client, secret_key, new_campaigns, new_sensors, new_tests):
                     test_id=test.id,
                     fs=random_float(),
                     default_start_time=0,
-                    default_end_time=100000,
-                    read_only=True
+                    default_end_time=100000
                 ))
+
+    ts_list.create(read_only=True)
 
     yield ts_list
 
@@ -277,6 +284,8 @@ def new_tags(client, secret_key, new_timeseries, new_sensors, new_tests):
         tag_list.append(Tag(client=client, name='pitch', comment=random_lower_string(), sensor_id=sensor.id))
     for test in new_tests:
         tag_list.append(Tag(client=client, name='comment', comment=random_lower_string(), test_id=test.id))
+
+    tag_list.create(read_only=random_bool())
 
     yield tag_list
 

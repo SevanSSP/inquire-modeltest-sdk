@@ -84,6 +84,9 @@ class DataPoints(Resource):
         return QatsTimeseries(name=name, x=np.array(self.value), t=np.array(self.time),
                               kind=kind, unit=unit)
 
+    def create(self, **kwargs):
+        print('## Datapoints are created through the Timeseries API / resource')
+
 
 class DataPointsList(Resources[DataPoints]):
 
@@ -136,3 +139,6 @@ class DataPointsList(Resources[DataPoints]):
         dfs = [dps.to_pandas() for dps in self]
         conc = pd.concat(dfs, axis="columns")
         return conc
+
+    def create(self, **kwargs):
+        print('## Datapoints are created through the Timeseries API / resource')
