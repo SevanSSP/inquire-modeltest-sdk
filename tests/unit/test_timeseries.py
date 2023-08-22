@@ -1,5 +1,5 @@
 """
-Test the TimeSeries models
+Test the Timeseries models
 """
 
 

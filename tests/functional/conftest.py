@@ -5,8 +5,8 @@ from tests.utils import random_lower_int, random_float, random_lower_short_strin
 from modeltestSDK.client import Client
 from modeltestSDK.config import Config
 from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibration,
-                                    WaveCalibration, FloaterConfig, FloaterConfigs, TimeSeries,
-                                    TimeSeriesList, DataPointsList, Tags, Tag)
+                                    WaveCalibration, FloaterConfig, FloaterConfigs, Timeseries,
+                                    TimeseriesList, DataPointsList, Tags, Tag)
 from datetime import datetime
 import os
 import random
@@ -142,11 +142,11 @@ def new_sensors(client, new_campaigns, secret_key):
 
 
 @pytest.fixture(scope='module')
-def new_floaterconfig(client, new_campaigns, secret_key):
-    floaterconfigs = FloaterConfigs()
+def new_floater_config(client, new_campaigns, secret_key):
+    floater_configs = FloaterConfigs()
 
     for campaign in new_campaigns:
-        floaterconfigs.append(FloaterConfig(
+        floater_configs.append(FloaterConfig(
             client=client,
             name=random_lower_string(),
             description=random_lower_string(),
@@ -154,17 +154,17 @@ def new_floaterconfig(client, new_campaigns, secret_key):
             characteristic_length=random_float(),
             draft=random_lower_int()
         ))
-    yield floaterconfigs
+    yield floater_configs
 
     # clean up
-    for floaterconfig in floaterconfigs:
-        floaterconfig.delete(secret_key=secret_key)
+    for floater_config in floater_configs:
+        floater_config.delete(secret_key=secret_key)
 
 
 @pytest.fixture(scope='module')
-def new_tests(client, secret_key, new_floaterconfig, new_campaigns):
+def new_tests(client, secret_key, new_floater_config, new_campaigns):
     tests = Tests()
-    for fc in new_floaterconfig:
+    for fc in new_floater_config:
         tests.append(FloaterTest(
             client=client,
             floaterconfig_id=fc.id,
@@ -229,13 +229,13 @@ def new_tests(client, secret_key, new_floaterconfig, new_campaigns):
 
 @pytest.fixture(scope='module')
 def new_timeseries(client, secret_key, new_campaigns, new_sensors, new_tests):
-    ts_list = TimeSeriesList()
+    ts_list = TimeseriesList()
     for camp in new_campaigns:
         sensors = camp.sensors()
         tests = camp.tests()
         for sensor in sensors:
             for test in tests:
-                ts_list.append(TimeSeries(
+                ts_list.append(Timeseries(
                     client=client,
                     sensor_id=sensor.id,
                     test_id=test.id,

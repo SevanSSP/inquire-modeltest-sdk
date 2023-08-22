@@ -37,7 +37,7 @@ class Client:
     """
 
     def __init__(self, config=Config):
-        """Initilize objects for interacting with the API"""
+        """Initialize objects for interacting with the API"""
         self.config = config
         self.filter = Query(method_spec='filter')
         self.sort = Query(method_spec='sort')
@@ -45,11 +45,11 @@ class Client:
         self.timeseries = TimeseriesAPI(client=self)
         self.sensor = SensorAPI(client=self)
         self.test = TestAPI(client=self)
-        self.floatertest = FloaterTestAPI(client=self)
-        self.windcalibration = WindCalibrationAPI(client=self)
-        self.wavecalibration = WaveCalibrationAPI(client=self)
+        self.floater_test = FloaterTestAPI(client=self)
+        self.wind_calibration = WindCalibrationAPI(client=self)
+        self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
-        self.floaterconfig = FloaterConfigAPI(client=self)
+        self.floater_config = FloaterConfigAPI(client=self)
 
         # check environmental variables
         if os.getenv("INQUIRE_MODELTEST_API_USER") is None:

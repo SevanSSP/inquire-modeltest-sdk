@@ -33,7 +33,7 @@ def test_campaign_api(client, secret_key, admin_key):
     client.campaign.delete(camp_with_same_name.id, secret_key=secret_key)
 
 
-def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_floaterconfig):
+def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_floater_config):
     campaigns_from_db = client.campaign.get(limit=999999)
 
     for campaign in new_campaigns:
@@ -49,10 +49,13 @@ def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_f
             assert sensor in campaign.sensors()
             assert sensor in new_sensors
 
-        fc_from_db = client.floaterconfig.get(filter_by=[client.filter.floaterconfig.campaign_id == campaign.id])
+        fc_from_db = client.floater_config.get(filter_by=[client.filter.floater_config.campaign_id == campaign.id])
 
         for fc in campaign.floater_configurations():
             assert fc in fc_from_db
+
+        all_fc_from_db = client.floater_config.get()
+        assert len(all_fc_from_db) >= len(fc_from_db)
 
         tests_from_db = client.test.get(filter_by=[client.filter.test.campaign_id == campaign.id])
         for test in campaign.tests():
@@ -64,7 +67,6 @@ def test_campaign_resources(client, new_campaigns, new_sensors, new_tests, new_f
     assert len(camp_list_filtered) == 1
     camp_list.filter(name=camp_name, inplace=True)
     assert len(camp_list) == 1
-
 
 
 def test_update_campaign(client, new_campaigns, secret_key):
