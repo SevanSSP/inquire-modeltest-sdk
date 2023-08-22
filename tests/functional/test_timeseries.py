@@ -33,8 +33,10 @@ def test_timeseries_api(client, secret_key, admin_key, new_timeseries):
 
     assert client.timeseries.get_by_id(ts.id) == ts == client.timeseries.get_by_sensor_id_and_test_id(
         sensor_id=ts.sensor_id, test_id=ts.test_id)
-    assert client.timeseries.get_by_sensor_id_and_test_id(sensor_id=ts.sensor_id, test_id='invalid_id') is None
-    assert client.timeseries.get_by_sensor_id_and_test_id(sensor_id='invalid id', test_id=ts.test_id) is None
+    assert client.timeseries.get_by_sensor_id_and_test_id(sensor_id=ts.sensor_id,
+                                                          test_id='c5f16996-cec8-4380-823d-b6e77811353a') is None
+    assert client.timeseries.get_by_sensor_id_and_test_id(sensor_id='c5f16996-cec8-4380-823d-b6e77811353a',
+                                                          test_id=ts.test_id) is None
     assert ts_list == client.timeseries.get_by_test_id(ts.test_id)
 
 
