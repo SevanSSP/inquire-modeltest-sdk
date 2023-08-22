@@ -4,7 +4,7 @@ import random
 import numpy as np
 from matplotlib import pyplot as plt
 import pytest
-from modeltestSDK.resources import DataPointsList
+from modeltestsdk.resources import DataPointsList
 
 
 def test_datapoints_api(client, secret_key, admin_key, new_datapoints):

@@ -2,7 +2,7 @@
 Clearing cache example
 """
 
-from modeltestSDK import Client
+from modeltestsdk import Client
 client = Client()
 
 # clearing cache

@@ -1,4 +1,4 @@
-from modeltestSDK.utils import make_serializable, to_snake_case, to_camel_case, from_datetime_string, format_class_name
+from modeltestsdk.utils import make_serializable, to_snake_case, to_camel_case, from_datetime_string, format_class_name
 import numpy as np
 import pytest
 from datetime import datetime, timedelta

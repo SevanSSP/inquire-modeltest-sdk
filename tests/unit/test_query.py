@@ -1,4 +1,4 @@
-from modeltestSDK import query
+from modeltestsdk import query
 
 
 def test_filter_attributes():

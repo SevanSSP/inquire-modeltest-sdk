@@ -2,7 +2,7 @@
 Simple create example
 """
 from datetime import datetime
-from modeltestSDK import Client
+from modeltestsdk import Client
 
 client = Client()
 campaign = client.campaign.create(name="Campaign name",

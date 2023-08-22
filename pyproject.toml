@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "modeltestSDK"
+name = "modeltestsdk"
 version = "3.0.0"
 description = "SDK for use with modeltest API"
 authors = ["Jørgen Engelsen","Per Voie", "Snorre Fjellvang <slfv@sevanssp.com>", "Einar Glomnes <ebg@sevanssp.com>"]
 license = "MIT"
 readme = "README.md"
 repository = "https://github.com/SevanSSP/inquire-modeltest-sdk"
-packages = [{ include = "modeltestSDK" },]
+packages = [{ include = "modeltestsdk" },]
 include = [
     "LICENSE"
 ]
