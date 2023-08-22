@@ -20,7 +20,6 @@ class Sensor(Resource):
     position_draft_lock: bool
     positive_direction_definition: str
     area: Optional[float]
-    read_only: Optional[bool]
 
     def tags(self, limit: int = 100, skip: int = 100) -> Tags:
         """Retrieve tags on sensor."""
