@@ -25,9 +25,10 @@ def test_class_factory():
     class Foo:
         pass
 
-    foo = query.class_factory(name='Foo', method_spec='filter', attribute_list=['name'])
+    foo = query.class_factory(name='Foo', method_spec='filter', attribute_list=['name', 'type'])
 
     assert (foo.name == 1) == dict(name='name', op='eq', val=1)
+    assert (foo.type >= 1) == dict(name='type', op='gte', val=1)
 
 
 def test_query_parameters():

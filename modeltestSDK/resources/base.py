@@ -112,16 +112,66 @@ class Resources(List[ResourceType]):
                 raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
     def append(self, item: ResourceType) -> None:
+        """
+        Appends an item to the list.
+
+        Parameters:
+            item (ResourceType): The item to append to the list.
+
+        Returns:
+            None
+
+        Raises:
+            TypeError: If the type of the item is not one of the expected types.
+        """
         if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
             raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
 
         super().append(item)
 
     def create(self, read_only: bool = False, admin_key: str = None) -> None:
+        """
+        Create the new objects in the database.
+
+        Parameters:
+            read_only (bool): If True, the object will be called with read_only set to True for each item.
+            admin_key (str): An optional admin key to be passed to allow creation of certain objects.
+
+        Returns:
+            None
+        """
         for item in self:
             item.create(read_only=read_only, admin_key=admin_key)
 
+    def scalar(self):
+        """
+        Returns the scalar value of the object.
+
+        This function checks the length of the object. If the length is equal to one, it returns the element itself. If the length is zero, it returns None. Otherwise, it raises a ValueError with the message 'More than one resource found'.
+
+        Returns:
+            The scalar value of the object.
+
+        Raises:
+            ValueError: If the length of the object is greater than one.
+        """
+        if len(self) == 1:
+            return self[0]
+        elif len(self) == 0:
+            return None
+        else:
+            raise ValueError('More than one resource found')
+
     def get_by_id(self, id) -> Union[ResourceType, None]:
+        """
+        Returns a resource from the collection based on its ID.
+
+        Parameters:
+            id (int): The ID of the resource to retrieve.
+
+        Returns:
+            Union[ResourceType, None]: The resource with the specified ID, or None if it does not exist.
+        """
         for i in self:
             if i.id == id:
                 return i
