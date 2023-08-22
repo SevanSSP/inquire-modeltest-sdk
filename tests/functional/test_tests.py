@@ -146,6 +146,9 @@ def test_wave_calibration_api(client, secret_key, admin_key, new_campaigns):
     test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
     assert tests[0] in test_fromcampaign
 
+    all_wave_cal_test = client.wave_calibration.get()
+    assert len(all_wave_cal_test) >= len(test_from_campaign)
+
     client.test.delete(wavecal.id, secret_key=secret_key)
     client.test.delete(wavecal_samename.id, secret_key=secret_key)
 

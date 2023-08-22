@@ -4,6 +4,7 @@ from matplotlib import pyplot as plt
 from modeltestSDK.resources import Timeseries, TimeseriesList
 import numpy as np
 
+
 def test_timeseries_api(client, secret_key, admin_key, new_timeseries):
     """The Api is now verified good to go and tests can interact with it"""
     ts = new_timeseries[0]
@@ -27,8 +28,13 @@ def test_timeseries_api(client, secret_key, admin_key, new_timeseries):
 
     assert len_get_timeseries == len(new_timeseries)
 
+    all_ts = client.timeseries.get()
+    assert len(all_ts) >= len(ts_list)
+
     assert client.timeseries.get_by_id(ts.id) == ts == client.timeseries.get_by_sensor_id_and_test_id(
         sensor_id=ts.sensor_id, test_id=ts.test_id)
+    assert client.timeseries.get_by_sensor_id_and_test_id(sensor_id=ts.sensor_id, test_id='invalid_id') is None
+    assert client.timeseries.get_by_sensor_id_and_test_id(sensor_id='invalid id', test_id=ts.test_id) is None
     assert ts_list == client.timeseries.get_by_test_id(ts.test_id)
 
 
@@ -39,7 +45,6 @@ def test_timeseries_resource(client, secret_key, admin_key, new_timeseries, new_
     data = ts.get_data()
     statistics_fetch = ts.get_statistics()
     assert rounded_compare(statistics_fetch.mean, np.mean(data.value), 10 ** -3)
-
 
     data_qats = ts.get_qats_ts()
     ts_list_data = new_timeseries.get_data()
