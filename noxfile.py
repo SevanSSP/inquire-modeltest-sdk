@@ -12,7 +12,7 @@ def lint(session):
     session.install("flake8")
     session.run(
         "flake8",
-        "modeltestSDK/",
+        "modeltestsdk/",
         "--count",
         "--select=E9,F63,F7,F82",
         "--show-source",
@@ -20,7 +20,7 @@ def lint(session):
     )
     session.run(
         "flake8",
-        "modeltestSDK/",
+        "modeltestsdk/",
         "--count",
         "--per-file-ignores=__init__.py:F401",
         "--exit-zero",
@@ -49,7 +49,7 @@ def tests(session):
 
     # run tests
     session.run("pytest", "-s", "tests", "--api=http://127.0.0.1:8000",
-                "--cov=modeltestSDK", "--cov-report=term-missing", "--cov-fail-under=95")
+                "--cov=modeltestsdk", "--cov-report=term-missing", "--cov-fail-under=95")
 
 
 @nox.session
@@ -71,4 +71,4 @@ def tests_github(session):
 
     # run tests
     session.run("pytest", "-s", "tests", "--api=build",
-                "--cov=modeltestSDK", "--cov-report=term-missing", "--cov-fail-under=95")
+                "--cov=modeltestsdk", "--cov-report=term-missing", "--cov-fail-under=95")

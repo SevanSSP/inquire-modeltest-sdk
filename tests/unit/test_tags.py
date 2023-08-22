@@ -1,4 +1,4 @@
-from modeltestSDK.resources import Tag
+from modeltestsdk.resources import Tag
 import uuid
 
 

@@ -1,4 +1,4 @@
-from modeltestSDK.resources import Campaign
+from modeltestsdk.resources import Campaign
 from pandas import DataFrame
 import uuid
 import datetime

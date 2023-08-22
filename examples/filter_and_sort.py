@@ -1,7 +1,7 @@
 """
 Simple example using the sort and filter objects
 """
-from modeltestSDK import Client
+from modeltestsdk import Client
 client = Client()
 
 campaigns = client.campaign.get(filter_by=[

@@ -2,9 +2,9 @@ import pytest
 import requests
 from tests.utils import random_lower_int, random_float, random_lower_short_string, random_lower_string, random_bool, \
     random_int
-from modeltestSDK.client import Client
-from modeltestSDK.config import Config
-from modeltestSDK.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibration,
+from modeltestsdk.client import Client
+from modeltestsdk.config import Config
+from modeltestsdk.resources import (Campaign, Campaigns, Sensor, Sensors, Tests, Test, FloaterTest, WindCalibration,
                                     WaveCalibration, FloaterConfig, FloaterConfigs, Timeseries,
                                     TimeseriesList, DataPointsList, Tags, Tag)
 from datetime import datetime

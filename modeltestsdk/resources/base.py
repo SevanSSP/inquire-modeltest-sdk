@@ -2,7 +2,7 @@ from __future__ import annotations
 import pandas as pd
 from pydantic import BaseModel
 from typing import List, Optional, Union, Any, TypeVar
-from modeltestSDK.utils import make_serializable
+from modeltestsdk.utils import make_serializable
 import typing
 import re
 
