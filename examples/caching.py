@@ -2,7 +2,7 @@
 Using caching and timing get_data_point with and without caching
 """
 
-from modeltestSDK import Client
+from modeltestsdk import Client
 import time
 client = Client()
 

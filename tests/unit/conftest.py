@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from modeltestSDK.resources import Campaign, Sensor, Timeseries, Tests, FloaterTest, FloaterConfig, WaveCalibration, \
+from modeltestsdk.resources import Campaign, Sensor, Timeseries, Tests, FloaterTest, FloaterConfig, WaveCalibration, \
     WindCalibration, DataPoints, Tag, Tags
 from uuid import uuid4
 from tests.utils import random_lower_int, random_float

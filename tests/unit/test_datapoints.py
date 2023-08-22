@@ -1,7 +1,7 @@
 """
 Test the DataPoints models
 """
-from modeltestSDK.resources import DataPoints, DataPointsList, Timeseries
+from modeltestsdk.resources import DataPoints, DataPointsList, Timeseries
 from tests.utils import random_lower_int, random_float
 from uuid import uuid4
 

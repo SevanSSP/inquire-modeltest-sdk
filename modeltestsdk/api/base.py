@@ -1,4 +1,4 @@
-from modeltestSDK.utils import format_class_name
+from modeltestsdk.utils import format_class_name
 
 
 class BaseAPI:

@@ -1,4 +1,4 @@
-from modeltestSDK.resources import Sensor
+from modeltestsdk.resources import Sensor
 from pandas import DataFrame
 
 

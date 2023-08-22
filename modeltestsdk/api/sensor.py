@@ -1,7 +1,7 @@
-from modeltestSDK.resources import (
+from modeltestsdk.resources import (
     Sensor, Sensors
 )
-from modeltestSDK.query import create_query_parameters
+from modeltestsdk.query import create_query_parameters
 from pydantic import parse_obj_as
 from .base import BaseAPI
 

@@ -1,5 +1,5 @@
 import pytest
-from modeltestSDK.resources import FloaterConfig, FloaterConfigs
+from modeltestsdk.resources import FloaterConfig, FloaterConfigs
 from uuid import uuid4
 
 def test_floater_configuration(new_floater_configuration):

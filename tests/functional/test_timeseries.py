@@ -1,7 +1,7 @@
 from tests.utils import rounded_compare
 import pytest
 from matplotlib import pyplot as plt
-from modeltestSDK.resources import Timeseries, TimeseriesList
+from modeltestsdk.resources import Timeseries, TimeseriesList
 import numpy as np
 
 
