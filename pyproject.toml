@@ -30,7 +30,7 @@ mkdocs = "1.5.2"
 mkdocs-material = "^9.1.20"
 coverage = "^7.2.5"
 pytest-cov = "^4.1.0"
-pytest-docker = "^2.0.0"
+pytest-docker = "^2.0.1"
 
 [tool.poetry.urls]
 download = "https://api.packagr.app/EYvhW6SyL/"
