@@ -2920,13 +2920,13 @@ cffi = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "qats"
-version = "4.11.1"
+version = "4.12.1"
 description = "Library for efficient processing and visualization of time series."
 optional = false
 python-versions = ">=3.7, <3.11"
 files = [
-    {file = "qats-4.11.1-py3-none-any.whl", hash = "sha256:481756dd632eb0bd9a8e7a1b4fdc02e2432ba3df157051399efe4b6a889116ff"},
-    {file = "qats-4.11.1.tar.gz", hash = "sha256:63766918714dc71087bf4af4d357eb11ce5dddd910d0dae3421134e91acb7a44"},
+    {file = "qats-4.12.1-py3-none-any.whl", hash = "sha256:8023949a9865ed555f7c5a0d449c0018c2f51bc9f744159e9ae220f87fcdaaad"},
+    {file = "qats-4.12.1.tar.gz", hash = "sha256:d96af4bd361e52bb7e33e666efc4471b20d15d1ccbef13b4ed72960b555a351b"},
 ]
 
 [package.dependencies]
@@ -3764,4 +3764,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.0,<3.11"
-content-hash = "5317f788675ae8a509025cd886a9d38eb91da2599127a9158e68f6a9037e6973"
+content-hash = "4110e13afb587941c5743e94c76e52e8f98cdbd644e8919b5e20709638ca2bf7"
