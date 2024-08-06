@@ -12,7 +12,7 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-matplotlib = "^3.7.4"
+matplotlib = "^3.7.5"
 requests="2.32.3"
 python = ">=3.8.0,<3.11"
 pydantic = "^1.10.12,<2"
@@ -21,7 +21,7 @@ qats = "^4.12.1"
 pandas = ">=1,<2"
 
 [tool.poetry.group.dev.dependencies]
-bandit = "^1.7.6"
+bandit = "^1.7.9"
 pytest = "^7.4.4"
 nox = "^2023.4.22"
 scipy="^1.10.1"

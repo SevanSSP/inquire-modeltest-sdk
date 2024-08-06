@@ -48,7 +48,7 @@ def tests(session):
     session.install("-r", req_path)
 
     # run tests
-    session.run("pytest", "-s", "tests", "--api=http://127.0.0.1:8000",
+    session.run("pytest", "tests", "--api=http://127.0.0.1:8000",
                 "--cov=modeltestsdk", "--cov-report=term-missing", "--cov-fail-under=95")
 
 
@@ -70,5 +70,5 @@ def tests_github(session):
     session.install("-r", req_path)
 
     # run tests
-    session.run("pytest", "-s", "tests", "--api=build",
+    session.run("pytest", "tests", "--api=build",
                 "--cov=modeltestsdk", "--cov-report=term-missing", "--cov-fail-under=95")
