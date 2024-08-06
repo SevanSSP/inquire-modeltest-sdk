@@ -6,7 +6,7 @@ from .timeseries import Timeseries, TimeseriesList
 
 
 class Test(Resource):
-    id: Optional[str]
+    id: Optional[str] = None
     number: str
     description: str
     test_date: datetime
@@ -62,8 +62,8 @@ class FloaterTest(Test):
     category: str
     orientation: float
     floaterconfig_id: str
-    wave_id: Optional[str]
-    wind_id: Optional[str]
+    wave_id: Optional[str] = None
+    wind_id: Optional[str] = None
 
     @property
     def wave_calibration(self):
@@ -89,13 +89,13 @@ class FloaterTest(Test):
 
 class WaveCalibration(Test):
     type: Literal["Wave Calibration"] = "Wave Calibration"
-    wave_spectrum: Optional[str]
-    wave_height: Optional[float]
-    wave_period: Optional[float]
-    gamma: Optional[float]
-    wave_direction: Optional[float]
-    current_velocity: Optional[float]
-    current_direction: Optional[float]
+    wave_spectrum: Optional[str] = None
+    wave_height: Optional[float] = None
+    wave_period: Optional[float] = None
+    gamma: Optional[float] = None
+    wave_direction: Optional[float] = None
+    current_velocity: Optional[float] = None
+    current_direction: Optional[float] = None
 
     def floater_tests(self, limit: int = 100, skip: int = 0):
         return self.client.floater_test.get(
@@ -105,10 +105,10 @@ class WaveCalibration(Test):
 
 class WindCalibration(Test):
     type: Literal["Wind Calibration"] = "Wind Calibration"
-    wind_spectrum: Optional[str]
-    wind_velocity: Optional[float]
-    zref: Optional[float]
-    wind_direction: Optional[float]
+    wind_spectrum: Optional[str] = None
+    wind_velocity: Optional[float] = None
+    zref: Optional[float] = None
+    wind_direction: Optional[float] = None
 
     def floater_tests(self, limit: int = 100, skip: int = 0):
         return self.client.floater_test.get(

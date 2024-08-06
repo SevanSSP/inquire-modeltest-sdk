@@ -1,9 +1,9 @@
-from typing import Union
+from typing import Union, List
 from modeltestsdk.resources import (
     Test, Tests, FloaterTest, WaveCalibration, WindCalibration,
 )
 from modeltestsdk.query import create_query_parameters
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 from .base import BaseAPI
 
 
@@ -185,7 +185,7 @@ class FloaterTestAPI(TestAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return Tests([parse_obj_as(FloaterTest, dict(**i, client=self.client)) for i in data])
+        return Tests(TypeAdapter(List[FloaterTest]).validate_python([dict(**i, client=self.client) for i in data]))
 
     def get_by_id(self, test_id: str) -> FloaterTest:
         """
@@ -292,7 +292,7 @@ class WaveCalibrationAPI(TestAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return Tests([parse_obj_as(WaveCalibration, dict(**i, client=self.client)) for i in data])
+        return Tests(TypeAdapter(List[WaveCalibration]).validate_python([dict(**i, client=self.client) for i in data]))
 
     def get_by_id(self, test_id: str) -> WaveCalibration:
         """
@@ -389,7 +389,7 @@ class WindCalibrationAPI(TestAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return Tests([parse_obj_as(WindCalibration, dict(**i, client=self.client)) for i in data])
+        return Tests(TypeAdapter(List[WindCalibration]).validate_python([dict(**i, client=self.client) for i in data]))
 
     def get_by_id(self, test_id: str) -> WindCalibration:
         """

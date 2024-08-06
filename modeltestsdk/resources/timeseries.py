@@ -9,14 +9,14 @@ from .datapoint import DataPoints, DataPointsList
 
 
 class Timeseries(Resource):
-    id: Optional[str]
+    id: Optional[str] = None
     sensor_id: str
     test_id: str
     fs: float
-    datapoints_created_at: Optional[str]
+    datapoints_created_at: Optional[str] = None
     intermittent: Optional[bool] = False
-    default_start_time: Optional[float]
-    default_end_time: Optional[float]
+    default_start_time: Optional[float] = None
+    default_end_time: Optional[float] = None
 
     def add_data(self, time: list, values: list, secret_key: str = None) -> DataPoints:
         """

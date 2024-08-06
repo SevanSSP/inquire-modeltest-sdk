@@ -8,8 +8,8 @@ import re
 
 
 class Resource(BaseModel):
-    client: Optional[Any]
-    id: Optional[str]
+    client: Optional[Any] = None
+    id: Optional[str] = None
 
     @staticmethod
     def _api_object_name(resource_name: str):
@@ -26,11 +26,11 @@ class Resource(BaseModel):
             try:
                 if admin_key is None:
                     resource = self._api_object().create(
-                        **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
+                        **make_serializable(self.model_dump(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
                         read_only=read_only)
                 else:
                     resource = self._api_object().create(
-                        **make_serializable(self.dict(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
+                        **make_serializable(self.model_dump(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
                         read_only=read_only, admin_key=admin_key)
                 self.id = resource.id
             except AttributeError as e:
@@ -42,7 +42,7 @@ class Resource(BaseModel):
             print(f"Resource {self.__class__.__name__} with id {self.id} already exists")
 
     def update(self, secret_key: str = None):
-        self._api_object().update(item_id=self.id, body=make_serializable(self.dict(exclude={"client", 'id'})),
+        self._api_object().update(item_id=self.id, body=make_serializable(self.model_dump(exclude={"client", 'id'})),
                                   secret_key=secret_key)
 
     def delete(self, secret_key: str = None):
@@ -59,10 +59,10 @@ class Resource(BaseModel):
 
         See Also
         --------
-        See keyword arguments on pydantic.BaseModel.dict()
+        See keyword arguments on pydantic.BaseModel.model_dump()
         """
         df = pd.DataFrame(columns=["value"])
-        for name, value in self.dict().items():
+        for name, value in self.model_dump().items():
             if name not in ("client",):
                 df.loc[name] = [value]
         return df
@@ -188,6 +188,6 @@ class Resources(List[ResourceType]):
 
         See Also
         --------
-        See keyword arguments on pydantic.BaseModel.dict()
+        See keyword arguments on pydantic.BaseModel.model_dump()
         """
-        return pd.DataFrame([_.dict(exclude={"client"}, **kwargs) for _ in self])
+        return pd.DataFrame([_.model_dump(exclude={"client"}, **kwargs) for _ in self])

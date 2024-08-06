@@ -17,6 +17,7 @@ def test_floater_configurations(new_floater_configuration, new_sensor, new_campa
 
     with pytest.raises(TypeError):
         failed_floater_configs = FloaterConfigs([new_floater_configuration, new_sensor])
+        print (failed_floater_configs)
 
     with pytest.raises(TypeError):
         floater_configs.append(new_sensor)

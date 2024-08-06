@@ -58,7 +58,7 @@ class DataPoints(Resource):
 
         See Also
         --------
-        See keyword arguments on pydantic.BaseModel.dict()
+        See keyword arguments on pydantic.BaseModel.model_dump()
         """
         try:
             sensor = self.timeseries.sensor

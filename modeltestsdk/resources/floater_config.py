@@ -3,7 +3,7 @@ from .base import Resource, Resources
 
 
 class FloaterConfig(Resource):
-    id: Optional[str]
+    id: Optional[str] = None
     name: str
     description: str
     campaign_id: str

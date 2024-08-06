@@ -5,7 +5,7 @@ from .timeseries import TimeseriesList
 
 
 class Sensor(Resource):
-    id: Optional[str]
+    id: Optional[str] = None
     campaign_id: str
     name: str
     description: str
@@ -19,7 +19,7 @@ class Sensor(Resource):
     position_heading_lock: bool
     position_draft_lock: bool
     positive_direction_definition: str
-    area: Optional[float]
+    area: Optional[float] = None
 
     def tags(self, limit: int = 100, skip: int = 100) -> Tags:
         """Retrieve tags on sensor."""
