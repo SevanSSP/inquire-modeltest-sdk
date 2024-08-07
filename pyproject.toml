@@ -12,13 +12,13 @@ include = [
 ]
 
 [tool.poetry.dependencies]
-matplotlib = "^3.7.5"
+matplotlib = "^3.9"
 requests="2.32.3"
-python = ">=3.8.0,<3.11"
+python = ">=3.9,<3.13"
 pydantic = "^2.8.2"
 requests-cache = "^1.2.1"
-qats = "^4.12.1"
-pandas = ">=1,<2"
+qats = "^5"
+pandas = "<2.3"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.9"
@@ -37,5 +37,5 @@ download = "https://api.packagr.app/EYvhW6SyL/"
 issues = "https://github.com/SevanSSP/inquire-modeltest-sdk/issues"
 
 [build-system]
-requires = ["poetry>=1.1.4"]
+requires = ["poetry>=1.8"]
 build-backend = "poetry.masonry.api"
