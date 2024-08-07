@@ -236,12 +236,12 @@ class Client:
 
         serializable_body = dict()
         for key, value in body.items():
-            if type(value) == np.int64 or type(value) == np.int32:
+            if isinstance(value, np.int64) or isinstance(value, np.int32):
                 value = int(value)
-            elif type(value) == np.float64 or type(value) == np.float32:
+            elif isinstance(value, np.float64) or isinstance(value, np.float32):
                 value = float(value)
 
-            if (type(value) == float or type(value) == int) and np.isnan(value):
+            if (isinstance(value, float) or isinstance(value, int)) and np.isnan(value):
                 value = None
 
             serializable_body[key] = value

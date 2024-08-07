@@ -40,6 +40,6 @@ class Sensors(Resources[Sensor]):
             print(f"{i.to_pandas().loc[['name', 'id', 'campaign_id', 'description']]}\n")
 
     def print_list(self):  # pragma: no cover
-        print(f'id\tkind\tunit\tdescription')
+        print('id\tkind\tunit\tdescription')
         for i in self:
             print(f'{i.id}\t{i.kind}\t{i.unit}\t{i.description}')

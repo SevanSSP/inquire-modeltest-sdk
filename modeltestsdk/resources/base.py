@@ -147,7 +147,9 @@ class Resources(List[ResourceType]):
         """
         Returns the scalar value of the object.
 
-        This function checks the length of the object. If the length is equal to one, it returns the element itself. If the length is zero, it returns None. Otherwise, it raises a ValueError with the message 'More than one resource found'.
+        This function checks the length of the object. If the length is equal to one, it returns the element itself.
+        If the length is zero, it returns None. Otherwise, it raises a ValueError with the message
+        'More than one resource found'.
 
         Returns:
             The scalar value of the object.
