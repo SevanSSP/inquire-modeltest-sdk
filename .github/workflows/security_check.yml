@@ -25,14 +25,12 @@ jobs:
     - name: Generate report folder and Install Bandit
       run: mkdir -p path/to/file | pip install poetry bandit
 
-    - name: Bandit check Python ${{ matrix.python }}
+    - name: Bandit check
       if: always()
-      run: bandit -r app -o path/to/file/bandit_report_${{ matrix.python }}.txt
-      with:
-        python-version: ${{ matrix.python }}
+      run: bandit -r app -o path/to/file/bandit_report.txt
 
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: Safety Reports
+        name: Safety Reports py${{ matrix.python }}
         path: path/to/file
