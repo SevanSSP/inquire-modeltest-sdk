@@ -1,6 +1,6 @@
 from __future__ import annotations
 import pandas as pd
-from pydantic import BaseModel
+from pydantic import BaseModel, RootModel, field_validator
 from typing import List, Optional, Union, Any, TypeVar
 from modeltestsdk.utils import make_serializable
 import typing
@@ -71,11 +71,12 @@ class Resource(BaseModel):
 ResourceType = TypeVar('ResourceType', bound=Resource)
 
 
-class Resources(List[ResourceType]):
+class Resources(RootModel[List[ResourceType]]):
     def __init__(self, items: List[ResourceType] = None) -> None:
         if items:
-            self._check_types(items)
             super().__init__(items)
+        else:
+            super().__init__([])
 
     def filter(self, inplace: bool = False, **kwargs) -> Union[None, Resources]:
         """
@@ -93,41 +94,30 @@ class Resources(List[ResourceType]):
         -------
             Filtered resources.
         """
-        filtered_resources = [resource for resource in self if
+        filtered_resources = [resource for resource in self.root if
                               all(getattr(resource, attr) == value for attr, value in kwargs.items())]
         if inplace:
-            self.clear()
-            self.extend(filtered_resources)
+            self.root.clear()
+            self.root.extend(filtered_resources)
         else:
             return type(self)(filtered_resources)
 
-    def _expected_types(self):
-        return self.__orig_bases__[0].__args__[0].__args__ \
-            if isinstance(self.__orig_bases__[0].__args__[0], typing._UnionGenericAlias) \
-            else [self.__orig_bases__[0].__args__[0]]
+    def __iter__(self):
+        return iter(self.root)
 
-    def _check_types(self, items: List[Resource]) -> None:
-        for item in items:
-            if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
-                raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
+    def __getitem__(self, item):
+        return self.root[item]
+
+    def __len__(self):
+        return len(self.root)
 
     def append(self, item: ResourceType) -> None:
-        """
-        Appends an item to the list.
+        new_list = self.root + [item]
+        super().__init__(new_list)
 
-        Parameters:
-            item (ResourceType): The item to append to the list.
-
-        Returns:
-            None
-
-        Raises:
-            TypeError: If the type of the item is not one of the expected types.
-        """
-        if not any(type(item).__name__ == t.__name__ for t in self._expected_types()):
-            raise TypeError(f"Invalid type {type(item)} in {self.__class__.__name__}")
-
-        super().append(item)
+    def extend(self, items: List[ResourceType]) -> None:
+        new_list = self.root + [items]
+        super().__init__(new_list)
 
     def create(self, read_only: bool = False, admin_key: str = None) -> None:
         """
@@ -140,7 +130,7 @@ class Resources(List[ResourceType]):
         Returns:
             None
         """
-        for item in self:
+        for item in self.root:
             item.create(read_only=read_only, admin_key=admin_key)
 
     def scalar(self):
@@ -157,24 +147,24 @@ class Resources(List[ResourceType]):
         Raises:
             ValueError: If the length of the object is greater than one.
         """
-        if len(self) == 1:
-            return self[0]
-        elif len(self) == 0:
+        if len(self.root) == 1:
+            return self.root[0]
+        elif len(self.root) == 0:
             return None
         else:
             raise ValueError('More than one resource found')
 
-    def get_by_id(self, id) -> Union[ResourceType, None]:
+    def get_by_id(self, id: str) -> Union[ResourceType, None]:
         """
         Returns a resource from the collection based on its ID.
 
         Parameters:
-            id (int): The ID of the resource to retrieve.
+            id (str): The ID of the resource to retrieve.
 
         Returns:
             Union[ResourceType, None]: The resource with the specified ID, or None if it does not exist.
         """
-        for i in self:
+        for i in self.root:
             if i.id == id:
                 return i
         return None
@@ -192,4 +182,4 @@ class Resources(List[ResourceType]):
         --------
         See keyword arguments on pydantic.BaseModel.model_dump()
         """
-        return pd.DataFrame([_.model_dump(exclude={"client"}, **kwargs) for _ in self])
+        return pd.DataFrame([_.model_dump(exclude={"client"}, **kwargs) for _ in self.root])

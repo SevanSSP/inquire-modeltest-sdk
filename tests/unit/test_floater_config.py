@@ -1,6 +1,8 @@
 import pytest
 from modeltestsdk.resources import FloaterConfig, FloaterConfigs
 from uuid import uuid4
+from pydantic import ValidationError
+
 
 def test_floater_configuration(new_floater_configuration):
     assert isinstance(new_floater_configuration, FloaterConfig)
@@ -15,11 +17,10 @@ def test_floater_configurations(new_floater_configuration, new_sensor, new_campa
     assert len(floater_configs) == 1
     assert len(floater_configs.to_pandas()) == 1
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         failed_floater_configs = FloaterConfigs([new_floater_configuration, new_sensor])
-        print (failed_floater_configs)
 
-    with pytest.raises(TypeError):
+    with pytest.raises(ValidationError):
         floater_configs.append(new_sensor)
 
     fc2 = FloaterConfig(
@@ -37,4 +38,4 @@ def test_floater_configurations(new_floater_configuration, new_sensor, new_campa
     fc_check = floater_configs.get_by_id(fc2.id)
     assert fc_check == fc2
 
-    assert floater_configs.get_by_id('notfoundid') is None
+    assert floater_configs.get_by_id('not_found_id') is None
