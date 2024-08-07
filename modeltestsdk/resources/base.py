@@ -1,9 +1,8 @@
 from __future__ import annotations
 import pandas as pd
-from pydantic import BaseModel, RootModel, field_validator
+from pydantic import BaseModel, RootModel, Field
 from typing import List, Optional, Union, Any, TypeVar
 from modeltestsdk.utils import make_serializable
-import typing
 import re
 
 
@@ -72,11 +71,7 @@ ResourceType = TypeVar('ResourceType', bound=Resource)
 
 
 class Resources(RootModel[List[ResourceType]]):
-    def __init__(self, items: List[ResourceType] = None) -> None:
-        if items:
-            super().__init__(items)
-        else:
-            super().__init__([])
+    root: List[ResourceType] = Field(default_factory=list)
 
     def filter(self, inplace: bool = False, **kwargs) -> Union[None, Resources]:
         """
@@ -105,10 +100,10 @@ class Resources(RootModel[List[ResourceType]]):
     def __iter__(self):
         return iter(self.root)
 
-    def __getitem__(self, item):
+    def __getitem__(self, item) -> ResourceType:
         return self.root[item]
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.root)
 
     def append(self, item: ResourceType) -> None:

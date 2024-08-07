@@ -4,7 +4,7 @@ import requests
 import requests_cache
 import logging
 import numpy as np
-from datetime import datetime
+from datetime import datetime, UTC
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
@@ -78,7 +78,7 @@ class Client:
         current_token = os.getenv("INQUIRE_MODELTEST_API_TOKEN")
         token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
         if current_token is not None and token_expires_on is not None and \
-                datetime.utcnow().timestamp() < float(token_expires_on):
+                datetime.now(UTC).timestamp() < float(token_expires_on):
             logging.debug("Your current access token is still valid.")
             return current_token
 

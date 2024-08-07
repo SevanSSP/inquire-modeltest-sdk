@@ -180,7 +180,7 @@ class TimeseriesList(Resources[Timeseries]):
             Data points
         """
         dps = DataPointsList(
-            [ts.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length) for ts in self])
+            [ts.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length) for ts in self.root])
         return dps
 
     def get_qats_tsdb(self, start: float = None, end: float = None, scaling_length: float = None,
@@ -204,7 +204,7 @@ class TimeseriesList(Resources[Timeseries]):
             Qats TsDB object
         """
         db = QatsTsDB()
-        for i in self:
+        for i in self.root:
             db.add(i.get_qats_ts(start=start, end=end, scaling_length=scaling_length, all_data=all_data))
         return db
 

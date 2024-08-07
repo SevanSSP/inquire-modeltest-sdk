@@ -120,14 +120,14 @@ class Tests(Resources[Union[Test, FloaterTest, WaveCalibration, WindCalibration]
     __test__ = False
 
     def print_full(self):  # pragma: no cover
-        for i in self:
+        for i in self.root:
             print(f'{i.to_pandas()}\n')
 
     def print_small(self):  # pragma: no cover
-        for i in self:
+        for i in self.root:
             print(f"{i.to_pandas().loc[['id', 'campaign_id', 'description', 'type']]}\n")
 
     def print_list(self):  # pragma: no cover
         print('id\tnumber\ttype\tdescription')
-        for i in self:
+        for i in self.root:
             print(f'{i.id}\t{i.number}\t{i.type}\t{i.description}')
