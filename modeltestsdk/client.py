@@ -4,7 +4,12 @@ import requests
 import requests_cache
 import logging
 import numpy as np
-from datetime import datetime, UTC
+try:
+    from datetime import UTC
+except ImportError:
+    from datetime import timezone
+    UTC = timezone.utc
+from datetime import datetime
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
 from .query import Query
