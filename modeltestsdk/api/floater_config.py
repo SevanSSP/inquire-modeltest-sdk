@@ -2,8 +2,9 @@ from modeltestsdk.resources import (
     FloaterConfig, FloaterConfigs
 )
 from modeltestsdk.query import create_query_parameters
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 from .base import BaseAPI
+from typing import List
 
 
 class FloaterConfigAPI(BaseAPI):
@@ -73,7 +74,7 @@ class FloaterConfigAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return FloaterConfigs([parse_obj_as(FloaterConfig, dict(**i, client=self.client)) for i in data])
+        return FloaterConfigs(TypeAdapter(List[FloaterConfig]).validate_python([dict(**i, client=self.client) for i in data]))
 
     def get_by_id(self, config_id: str) -> FloaterConfig:
         """
@@ -110,6 +111,6 @@ class FloaterConfigAPI(BaseAPI):
         FloaterConfigs
             Floater configurations
         """
-        configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id],
+        configs = self.get(filter_by=[self.client.filter.floater_config.campaign_id == campaign_id],
                            limit=limit, skip=skip)
         return configs

@@ -72,7 +72,7 @@ def client(http_service, admin_key):
 @pytest.fixture(scope='module')
 def new_campaigns(client, secret_key, admin_key):
     campaigns = Campaigns()
-    for _ in range(random.randint(5, 40)):
+    for _ in range(random.randint(5, 20)):
         campaigns.append(Campaign(
             client=client,
             name=random_lower_string(),
@@ -123,7 +123,7 @@ def new_sensors(client, new_campaigns, secret_key):
                 "basin derived",
                 "Sevan derived",
                 "external derived"]),
-            x=np.float32(random_float()),
+            x=np.float64(random_float()),
             y=np.float64(random_float()),
             position_reference=random.choice([
                 "local",

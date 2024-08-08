@@ -4,6 +4,11 @@ import requests
 import requests_cache
 import logging
 import numpy as np
+try:
+    from datetime import UTC
+except ImportError:
+    from datetime import timezone
+    UTC = timezone.utc
 from datetime import datetime
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
                   WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
@@ -78,7 +83,7 @@ class Client:
         current_token = os.getenv("INQUIRE_MODELTEST_API_TOKEN")
         token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
         if current_token is not None and token_expires_on is not None and \
-                datetime.utcnow().timestamp() < float(token_expires_on):
+                datetime.now(UTC).timestamp() < float(token_expires_on):
             logging.debug("Your current access token is still valid.")
             return current_token
 
@@ -236,12 +241,12 @@ class Client:
 
         serializable_body = dict()
         for key, value in body.items():
-            if type(value) == np.int64 or type(value) == np.int32:
+            if isinstance(value, np.int64) or isinstance(value, np.int32):
                 value = int(value)
-            elif type(value) == np.float64 or type(value) == np.float32:
+            elif isinstance(value, np.float64) or isinstance(value, np.float32):
                 value = float(value)
 
-            if (type(value) == float or type(value) == int) and np.isnan(value):
+            if (isinstance(value, float) or isinstance(value, int)) and np.isnan(value):
                 value = None
 
             serializable_body[key] = value

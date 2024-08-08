@@ -2,8 +2,9 @@ from modeltestsdk.resources import (
     Campaign, Campaigns
 )
 from modeltestsdk.query import create_query_parameters
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 from .base import BaseAPI
+from typing import List
 
 
 class CampaignAPI(BaseAPI):
@@ -79,7 +80,7 @@ class CampaignAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return Campaigns([parse_obj_as(Campaign, dict(**i, client=self.client)) for i in data])
+        return Campaigns(TypeAdapter(List[Campaign]).validate_python([dict(**i, client=self.client) for i in data]))
 
     def get_by_id(self, campaign_id: str) -> Campaign:
         """

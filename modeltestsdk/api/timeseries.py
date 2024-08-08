@@ -1,9 +1,9 @@
-from typing import Union
+from typing import Union, List
 from modeltestsdk.resources import (
     Statistics, DataPoints, Timeseries, TimeseriesList
 )
 from modeltestsdk.query import create_query_parameters
-from pydantic import parse_obj_as
+from pydantic import TypeAdapter
 from .base import BaseAPI
 
 
@@ -77,7 +77,7 @@ class TimeseriesAPI(BaseAPI):
         params = create_query_parameters(filter_expressions=filter_by, sorting_expressions=sort_by)
         data = self.client.get(self._resource_path, parameters=dict(**params, skip=skip, limit=limit))
 
-        return TimeseriesList([parse_obj_as(Timeseries, dict(**i, client=self.client)) for i in data])
+        return TimeseriesList(TypeAdapter(List[Timeseries]).validate_python([dict(**i, client=self.client) for i in data]))
 
     def get_by_id(self, timeseries_id: str) -> Timeseries:
         """

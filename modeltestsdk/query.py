@@ -187,7 +187,7 @@ def create_query_parameters(filter_expressions: list, sorting_expressions: list)
     for query_filter in filter_expressions:
         if not filter_s == '':
             filter_s = filter_s + ','
-        if not type(query_filter['val']) == str:
+        if not isinstance(query_filter['val'], str):
             query_filter['val'] = str(query_filter['val'])
         filter_s = filter_s + query_filter['name'] + '[' + query_filter['op'] + ']' + '=' + query_filter['val']
 

@@ -91,10 +91,18 @@ def test_timeseries_plot(new_timeseries, new_datapoints):
                 break
 
     timeseries_with_same_sensor = TimeseriesList(timeseries_with_same_sensor)
+
     timeseries_with_same_sensor.plot(show=False, xlabel='this one', ylabel='that one')
     fig = plt.gcf()
     assert fig.axes[0].xaxis.label.get_text() == 'this one'
     assert fig.axes[0].yaxis.label.get_text() == 'that one'
+    plt.close(fig)
+
+    timeseries_with_same_sensor.plot(show=False, xlabel='this one')
+    y_label = f'{ts.sensor.kind.capitalize()} [{ts.sensor.unit}]'
+    fig = plt.gcf()
+    assert fig.axes[0].xaxis.label.get_text() == 'this one'
+    assert fig.axes[0].yaxis.label.get_text() == y_label
     plt.close(fig)
 
 

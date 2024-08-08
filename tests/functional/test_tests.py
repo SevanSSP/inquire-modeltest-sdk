@@ -60,15 +60,15 @@ def test_floater_test_api(client, secret_key, admin_key, new_floater_config):
     assert client.test.get_by_id(floater_test.id) in client.floater_test.get_by_number(number)
     assert client.test.get_by_id(floater_test_with_same_name.id) in client.floater_test.get_by_number(number)
 
-    test_fromcampaign = client.test.get_by_campaign_id(campaign_id)
-    assert len(test_fromcampaign) == 2
+    test_from_campaign = client.test.get_by_campaign_id(campaign_id)
+    assert len(test_from_campaign) == 2
 
     tests_check = client.floater_test.get(filter_by=[
         client.filter.floater_test.campaign_id == campaign_id
     ])
 
     assert len(tests_check) == 2
-    for i in test_fromcampaign:
+    for i in test_from_campaign:
         assert i in tests_check
 
     all_floater_tests = client.floater_test.get()
@@ -230,3 +230,33 @@ def test_test_limit_skip(client, new_tests):
     assert len(all_tests_in_steps) == len(all_tests)
     for test in all_tests:
         assert test in all_tests_in_steps
+
+
+def test_floater_test_calibration_references(client, secret_key, new_tests):
+    a_floater_test = random.choice(new_tests.filter(type='Floater Test'))
+    campaign_id = a_floater_test.campaign_id
+
+    assert a_floater_test.wave_calibration is None
+    assert a_floater_test.wind_calibration is None
+    assert a_floater_test.floater_config in client.floater_config.get_by_campaign_id(campaign_id)
+
+    a_wave_cal = random.choice(client.wave_calibration.get_by_campaign_id(campaign_id))
+    a_wind_cal = random.choice(client.wind_calibration.get_by_campaign_id(campaign_id))
+    a_floater_config = random.choice(client.floater_config.get_by_campaign_id(campaign_id))
+
+    floater_test_for_further_testing = client.floater_test.create(number=7, description='description',
+                                                                  test_date=str(datetime.now()),
+                                                                  campaign_id=campaign_id,
+                                                                  category="irregular wave", orientation=0,
+                                                                  floaterconfig_id=a_floater_config.id,
+                                                                  wave_id=a_wave_cal.id,
+                                                                  wind_id=a_wind_cal.id)
+
+    assert floater_test_for_further_testing.wave_calibration in client.wave_calibration.get()
+    assert floater_test_for_further_testing.wave_calibration.id == a_wave_cal.id
+    assert floater_test_for_further_testing.wind_calibration in client.wind_calibration.get()
+    assert floater_test_for_further_testing.wind_calibration.id == a_wind_cal.id
+    assert floater_test_for_further_testing.floater_config in client.floater_config.get()
+    assert floater_test_for_further_testing.floater_config.id == a_floater_config.id
+
+    client.test.delete(floater_test_for_further_testing.id, secret_key=secret_key)
