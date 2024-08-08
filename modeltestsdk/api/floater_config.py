@@ -111,6 +111,6 @@ class FloaterConfigAPI(BaseAPI):
         FloaterConfigs
             Floater configurations
         """
-        configs = self.get(filter_by=[self.client.filter.campaign.id == campaign_id],
+        configs = self.get(filter_by=[self.client.filter.floater_config.campaign_id == campaign_id],
                            limit=limit, skip=skip)
         return configs
