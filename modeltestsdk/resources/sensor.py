@@ -5,7 +5,7 @@ from .timeseries import TimeseriesList
 
 
 class Sensor(Resource):
-    id: Optional[str]
+    id: Optional[str] = None
     campaign_id: str
     name: str
     description: str
@@ -19,7 +19,7 @@ class Sensor(Resource):
     position_heading_lock: bool
     position_draft_lock: bool
     positive_direction_definition: str
-    area: Optional[float]
+    area: Optional[float] = None
 
     def tags(self, limit: int = 100, skip: int = 100) -> Tags:
         """Retrieve tags on sensor."""
@@ -32,14 +32,14 @@ class Sensor(Resource):
 
 class Sensors(Resources[Sensor]):
     def print_full(self):  # pragma: no cover
-        for i in self:
+        for i in self.root:
             print(f'{i.to_pandas()}\n')
 
     def print_small(self):  # pragma: no cover
-        for i in self:
+        for i in self.root:
             print(f"{i.to_pandas().loc[['name', 'id', 'campaign_id', 'description']]}\n")
 
     def print_list(self):  # pragma: no cover
-        print(f'id\tkind\tunit\tdescription')
-        for i in self:
+        print('id\tkind\tunit\tdescription')
+        for i in self.root:
             print(f'{i.id}\t{i.kind}\t{i.unit}\t{i.description}')

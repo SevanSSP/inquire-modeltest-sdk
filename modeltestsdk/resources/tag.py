@@ -9,12 +9,12 @@ if TYPE_CHECKING:
 
 
 class Tag(Resource):
-    id: Optional[str]
+    id: Optional[str] = None
     name: str
-    comment: Optional[str]
-    test_id: Optional[str]
-    sensor_id: Optional[str]
-    timeseries_id: Optional[str]
+    comment: Optional[str] = None
+    test_id: Optional[str] = None
+    sensor_id: Optional[str] = None
+    timeseries_id: Optional[str] = None
 
     @property
     def sensor(self) -> Union[Sensor, None]:

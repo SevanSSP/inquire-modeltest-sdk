@@ -9,14 +9,14 @@ from .datapoint import DataPoints, DataPointsList
 
 
 class Timeseries(Resource):
-    id: Optional[str]
+    id: Optional[str] = None
     sensor_id: str
     test_id: str
     fs: float
-    datapoints_created_at: Optional[str]
+    datapoints_created_at: Optional[str] = None
     intermittent: Optional[bool] = False
-    default_start_time: Optional[float]
-    default_end_time: Optional[float]
+    default_start_time: Optional[float] = None
+    default_end_time: Optional[float] = None
 
     def add_data(self, time: list, values: list, secret_key: str = None) -> DataPoints:
         """
@@ -180,7 +180,7 @@ class TimeseriesList(Resources[Timeseries]):
             Data points
         """
         dps = DataPointsList(
-            [ts.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length) for ts in self])
+            [ts.get_data(start=start, end=end, all_data=all_data, scaling_length=scaling_length) for ts in self.root])
         return dps
 
     def get_qats_tsdb(self, start: float = None, end: float = None, scaling_length: float = None,
@@ -204,7 +204,7 @@ class TimeseriesList(Resources[Timeseries]):
             Qats TsDB object
         """
         db = QatsTsDB()
-        for i in self:
+        for i in self.root:
             db.add(i.get_qats_ts(start=start, end=end, scaling_length=scaling_length, all_data=all_data))
         return db
 
