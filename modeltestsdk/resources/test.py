@@ -61,7 +61,7 @@ class FloaterTest(Test):
     type: Literal["Floater Test"] = 'Floater Test'
     category: str
     orientation: float
-    floaterconfig_id: str
+    floaterconfig_id: Optional[str] = None
     wave_id: Optional[str] = None
     wind_id: Optional[str] = None
 
