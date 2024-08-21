@@ -72,7 +72,7 @@ def client(http_service, admin_key):
 @pytest.fixture(scope='module')
 def new_campaigns(client, secret_key, admin_key):
     campaigns = Campaigns()
-    for _ in range(random.randint(2, 3)):
+    for _ in range(random.randint(5, 20)):
         campaigns.append(Campaign(
             client=client,
             name=random_lower_string(),
