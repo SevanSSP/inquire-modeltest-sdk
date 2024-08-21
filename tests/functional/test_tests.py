@@ -30,7 +30,7 @@ def test_floater_test_api(client, secret_key, admin_key, new_floater_config):
                               "freak wave"
                               ])
     orientation = random_lower_int()
-    number = random_int()
+    number = str(random_int())
     description = random_lower_string()
     test_date = str(datetime.now())
     campaign_id = fc.campaign_id
@@ -74,8 +74,8 @@ def test_floater_test_api(client, secret_key, admin_key, new_floater_config):
     all_floater_tests = client.floater_test.get()
     assert len(all_floater_tests) >= len(tests_check)
 
-    assert not client.test.get_by_number(94493)
-    assert not client.floater_test.get_by_number(94439)
+    assert not client.test.get_by_number(str(94493))
+    assert not client.floater_test.get_by_number(str(94439))
 
     client.test.delete(floater_test.id, secret_key=secret_key)
     client.test.delete(floater_test_with_same_name.id, secret_key=secret_key)
@@ -97,7 +97,7 @@ def test_wave_calibration_api(client, secret_key, admin_key, new_campaigns):
     current_velocity = random_float()
     current_direction = random_float()
     campaign_id = camp.id
-    number = random_int()
+    number = str(random_int())
     description = random_lower_string()
     test_date = str(datetime.now())
 
@@ -161,7 +161,7 @@ def test_wind_calibration_test_api(client, secret_key, admin_key, new_campaigns)
     zref = random_float()
     wind_direction = random_float()
     campaign_id = camp.id
-    number = random_int()
+    number = str(random_int())
     description = random_lower_string()
     test_date = str(datetime.now())
 
@@ -244,7 +244,7 @@ def test_floater_test_calibration_references(client, secret_key, new_tests):
     a_wind_cal = random.choice(client.wind_calibration.get_by_campaign_id(campaign_id))
     a_floater_config = random.choice(client.floater_config.get_by_campaign_id(campaign_id))
 
-    floater_test_for_further_testing = client.floater_test.create(number=7, description='description',
+    floater_test_for_further_testing = client.floater_test.create(number=str(7), description='description',
                                                                   test_date=str(datetime.now()),
                                                                   campaign_id=campaign_id,
                                                                   category="irregular wave", orientation=0,
