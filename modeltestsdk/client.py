@@ -17,9 +17,6 @@ from .config import Config
 from requests.adapters import HTTPAdapter, Retry
 
 log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
-retries = Retry(total=Config.requests_max_retries,
-                backoff_factor=Config.requests_backoff_factor,
-                status_forcelist=[500, 502, 503, 504])
 
 
 class Client:
@@ -41,9 +38,9 @@ class Client:
 
     """
 
-    def __init__(self, config=Config):
+    def __init__(self, config: Config | None):
         """Initialize objects for interacting with the API"""
-        self.config = config
+        self.config: Config = config if config is not None else Config(_env_file="../.env")
         self.filter = Query(method_spec='filter')
         self.sort = Query(method_spec='sort')
         self.campaign = CampaignAPI(client=self)
@@ -56,13 +53,9 @@ class Client:
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
 
-        # check environmental variables
-        if os.getenv("INQUIRE_MODELTEST_API_USER") is None:
-            raise EnvironmentError("You have to set the INQUIRE_MODELTEST_API_USER environment variable to login.")
-        if os.getenv("INQUIRE_MODELTEST_API_PASSWORD") is None:
-            raise EnvironmentError("You have to set the INQUIRE_MODELTEST_API_PASSWORD environment variable to login.")
-        if os.getenv("INQUIRE_MODELTEST_API_HOST") is None:
-            raise EnvironmentError("You have to set the INQUIRE_MODELTEST_API_HOST environment variable to login.")
+        self.retries = Retry(total=self.config.requests_max_retries,
+                backoff_factor=self.config.requests_backoff_factor,
+                status_forcelist=[500, 502, 503, 504])
 
         # configure logging
         log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
@@ -75,7 +68,7 @@ class Client:
         logging.basicConfig(stream=sys.stdout, level=level, format=fmt)
 
     def __str__(self):
-        return f"<Client host:'{self.config.host}'>"
+        return f"<Client host:'{self.config.api_host}'>"
 
     def _request_token(self) -> str:
         """str: Authenticate and return access token."""
@@ -94,7 +87,7 @@ class Client:
             passwd = os.getenv("INQUIRE_MODELTEST_API_PASSWORD")
 
             s = requests.session()
-            s.mount('http://', HTTPAdapter(max_retries=retries))
+            s.mount('http://', HTTPAdapter(max_retries=self.retries))
 
             r = s.post(
                 self._create_url(resource="auth", endpoint="token"),
@@ -150,7 +143,7 @@ class Client:
            '{host}/{base_url}/{version}/{resource}/{endpoint}'
 
         """
-        url = f"{self.config.host}/{self.config.base_url}/{self.config.version}/"
+        url = f"{self.config.api_host}/{self.config.base_url}/{self.config.version}/"
         url += "/".join([p for p in [resource, endpoint] if p is not None])
         return url
 
@@ -188,7 +181,7 @@ class Client:
         headers = {
             "Authorization": f"Bearer {token}",
             "Connection": "keep-alive",
-            "Host": self.config.host.split("://")[-1],  # remove leading http/https
+            "Host": self.config.api_host.split("://")[-1],  # remove leading http/https
             "Content-Type": "application/json",
             "Accept": "application/json"
         }
@@ -200,11 +193,11 @@ class Client:
         # do request (also encodes parameters)
 
         s = requests.session()
-        s.mount('http://', HTTPAdapter(max_retries=retries))
+        s.mount('http://', HTTPAdapter(max_retries=self.retries))
 
         try:
             if cache:
-                with requests_cache.enabled(**Config.cache_settings):
+                with requests_cache.enabled(**self.config.cache_settings.model_dump()):
                     r = s.request(method, url, params=parameters, json=body, headers=headers)
                 r.raise_for_status()
             else:
@@ -342,10 +335,9 @@ class Client:
         """
         return self._do_request("DELETE", resource=resource, endpoint=endpoint, parameters=parameters)
 
-    @staticmethod
-    def clear_cache():
+    def clear_cache(self):
         """
         Removes cached datapoints (from mtdb.sqlite at local cache folder)
         """
-        with requests_cache.enabled(**Config.cache_settings):  # pragma: no cover
+        with requests_cache.enabled(**self.config.cache_settings):  # pragma: no cover
             requests_cache.clear()
