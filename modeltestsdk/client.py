@@ -1,5 +1,7 @@
 import os
 import sys
+from typing import Optional
+
 import requests
 import requests_cache
 import logging
@@ -38,7 +40,7 @@ class Client:
 
     """
 
-    def __init__(self, config: Config | None):
+    def __init__(self, config: Optional[Config] = None):
         """Initialize objects for interacting with the API"""
         self.config: Config = config if config is not None else Config(_env_file="../.env")
         self.filter = Query(method_spec='filter')
