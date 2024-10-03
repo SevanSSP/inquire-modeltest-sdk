@@ -23,7 +23,7 @@ pydantic-settings = "^2.5.2"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.10"
-pytest = "^8.3.2"
+pytest = "^8.3.3"
 nox = "^2024.4.15"
 scipy="^1.10.1"
 jupyter="^1"
