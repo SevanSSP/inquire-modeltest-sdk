@@ -22,7 +22,7 @@ pandas = "<2.3"
 pydantic-settings = "^2.5.2"
 
 [tool.poetry.group.dev.dependencies]
-bandit = "^1.7.9"
+bandit = "^1.7.10"
 pytest = "^8.3.2"
 nox = "^2024.4.15"
 scipy="^1.10.1"
