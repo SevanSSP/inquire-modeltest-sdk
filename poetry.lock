@@ -3196,13 +3196,13 @@ cffi = {version = "*", markers = "implementation_name == \"pypy\""}
 
 [[package]]
 name = "qats"
-version = "5.1.1"
+version = "5.1.2"
 description = "Library for efficient processing and visualization of time series"
 optional = false
 python-versions = "<3.13,>=3.8.1"
 files = [
-    {file = "qats-5.1.1-py3-none-any.whl", hash = "sha256:c7c8b9b9e3acbd4ecdb72cc6b840bc0e6305cc858f89871950d2688344830506"},
-    {file = "qats-5.1.1.tar.gz", hash = "sha256:4855dcb69fd91f1c0ffc6c9ac011760d755ae83f027248eb7dc487b46898634d"},
+    {file = "qats-5.1.2-py3-none-any.whl", hash = "sha256:8151910330506f86b50d4651043f6dd138a4b9a26e0169a892dbef6523f8aa76"},
+    {file = "qats-5.1.2.tar.gz", hash = "sha256:07d237c1f9ff3f0e14e83ef808e75117366e16e904be1696ed6640f6888d04f4"},
 ]
 
 [package.dependencies]
