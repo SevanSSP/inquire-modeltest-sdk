@@ -27,8 +27,7 @@ def client(http_service, admin_key):
     os.environ['INQUIRE_MODELTEST_API_PASSWORD'] = 'password'
     os.environ["INQUIRE_MODELTEST_API_HOST"] = api_url
 
-    config = Config
-    config.host = api_url
+    config = Config()
 
     client = Client(config)
     assert client.__str__()

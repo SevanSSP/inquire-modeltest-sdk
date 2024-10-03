@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "modeltestsdk"
-version = "3.1.1"
+version = "3.1.2"
 description = "SDK for use with modeltest API"
 authors = ["Jørgen Engelsen","Per Voie", "Snorre Fjellvang <slf@sevanssp.com>", "Einar Glomnes <ebg@sevanssp.com>"]
 license = "MIT"
@@ -19,6 +19,7 @@ pydantic = "^2.8.2"
 requests-cache = "^1.2.1"
 qats = "^5"
 pandas = "<2.3"
+pydantic-settings = "^2.5.2"
 
 [tool.poetry.group.dev.dependencies]
 bandit = "^1.7.9"
