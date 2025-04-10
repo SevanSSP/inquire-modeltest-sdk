@@ -58,6 +58,7 @@ def tests_github(session):
     # install dependencies
     req_path = os.path.join(tempfile.gettempdir(), 'requirements.txt')
     session.install("poetry")
+    session.install("poetry-plugin-export")
 
     session.run(
         "poetry",
