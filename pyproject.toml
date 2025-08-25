@@ -29,7 +29,7 @@ scipy="^1.15.3"
 jupyter="^1.1.1"
 mkdocs = "1.6.1"
 mkdocs-material = "^9.6.16"
-coverage = "^7.10.3"
+coverage = "^7.10.5"
 pytest-cov = "^6.2.1"
 pytest-docker = "^3.2.3"
 
