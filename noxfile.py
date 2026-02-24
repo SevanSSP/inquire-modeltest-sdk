@@ -33,16 +33,14 @@ def lint(session):
 @nox.session
 def tests(session):
     """Run test suite."""
-    # install dependencies
-    req_path = os.path.join(tempfile.gettempdir(), 'requirements.txt')
-    session.install("poetry")
-
+    req_path = os.path.join(tempfile.gettempdir(), "requirements.txt")
+    session.install("uv")
     session.run(
-        "poetry",
+        "uv",
         "export",
-        "--with=dev",
-        "--format=requirements.txt",
-        f"--output={req_path}",
+        "--group", "dev",
+        "--no-hashes",
+        "-o", req_path,
         external=True,
     )
     session.install("-r", req_path)
@@ -55,17 +53,14 @@ def tests(session):
 @nox.session
 def tests_github(session):
     """Run test suite."""
-    # install dependencies
-    req_path = os.path.join(tempfile.gettempdir(), 'requirements.txt')
-    session.install("poetry")
-    session.install("poetry-plugin-export")
-
+    req_path = os.path.join(tempfile.gettempdir(), "requirements.txt")
+    session.install("uv")
     session.run(
-        "poetry",
+        "uv",
         "export",
-        "--with=dev",
-        "--format=requirements.txt",
-        f"--output={req_path}",
+        "--group", "dev",
+        "--no-hashes",
+        "-o", req_path,
         external=True,
     )
     session.install("-r", req_path)

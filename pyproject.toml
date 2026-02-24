@@ -1,42 +1,45 @@
-[tool.poetry]
+[project]
 name = "modeltestsdk"
 version = "3.1.3"
 description = "SDK for use with modeltest API"
-authors = ["Jørgen Engelsen","Per Voie", "Snorre Fjellvang <slf@sevanssp.com>", "Einar Glomnes <ebg@sevanssp.com>"]
-license = "MIT"
+authors = [
+    {name = "Jørgen Engelsen"},
+    {name = "Per Voie"},
+    {name = "Snorre Fjellvang", email = "slf@sevanssp.com"},
+    {name = "Einar Glomnes", email = "ebg@sevanssp.com"},
+]
+license = {text = "MIT"}
 readme = "README.md"
-repository = "https://github.com/SevanSSP/inquire-modeltest-sdk"
-packages = [{ include = "modeltestsdk" },]
-include = [
-    "LICENSE"
+requires-python = ">=3.10,<3.14"
+dependencies = [
+    "matplotlib>=3.10.0",
+    "requests>=2.32.5",
+    "pydantic>=2.11.0",
+    "requests-cache>=1.2.1",
+    "qats>=5",
+    "pandas>=2.2.0",
+    "pydantic-settings>=2.11.0",
 ]
 
-[tool.poetry.dependencies]
-matplotlib = "^3.10.5"
-requests="2.32.5"
-python = ">=3.10,<3.13"
-pydantic = "^2.11.7"
-requests-cache = "^1.2.1"
-qats = "^5"
-pandas = "^2.3.1"
-pydantic-settings = "^2.11.0"
+[project.urls]
+Repository = "https://github.com/SevanSSP/inquire-modeltest-sdk"
+Issues = "https://github.com/SevanSSP/inquire-modeltest-sdk/issues"
+Download = "https://api.repoforge.io/EYvhW6SyL/"
 
-[tool.poetry.group.dev.dependencies]
-bandit = "^1.8.6"
-pytest = "^8.4.1"
-nox = "^2025.5.1"
-scipy="^1.15.3"
-jupyter="^1.1.1"
-mkdocs = "1.6.1"
-mkdocs-material = "^9.6.16"
-coverage = "^7.10.3"
-pytest-cov = "^6.2.1"
-pytest-docker = "^3.2.3"
-
-[tool.poetry.urls]
-download = "https://api.packagr.app/EYvhW6SyL/"
-issues = "https://github.com/SevanSSP/inquire-modeltest-sdk/issues"
+[dependency-groups]
+dev = [
+    "bandit>=1.8.0",
+    "pytest>=8.4.0",
+    "nox>=2025.5.1",
+    "scipy>=1.15.0",
+    "jupyter>=1.1.0",
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.6.0",
+    "coverage>=7.10.0",
+    "pytest-cov>=6.2.0",
+    "pytest-docker>=3.2.0",
+]
 
 [build-system]
-requires = ["poetry>=1.8"]
-build-backend = "poetry.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
