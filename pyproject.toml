@@ -29,7 +29,7 @@ Download = "https://api.repoforge.io/EYvhW6SyL/"
 [dependency-groups]
 dev = [
     "bandit>=1.8.0",
-    "pytest>=8.4.0",
+    "pytest>=9.0.3",
     "nox>=2025.5.1",
     "scipy>=1.15.0",
     "jupyter>=1.1.0",
