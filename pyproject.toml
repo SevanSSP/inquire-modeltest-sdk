@@ -37,7 +37,7 @@ dev = [
     "mkdocs-material>=9.6.0",
     "coverage>=7.10.0",
     "pytest-cov>=6.2.0",
-    "pytest-docker>=3.2.0",
+    "pytest-docker>=3.2.5",
 ]
 
 [build-system]
