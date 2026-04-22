@@ -1,6 +1,6 @@
 [project]
 name = "modeltestsdk"
-version = "3.1.4"
+version = "3.1.5"
 description = "SDK for use with modeltest API"
 authors = [
     {name = "Jørgen Engelsen"},
@@ -12,13 +12,13 @@ license = {text = "MIT"}
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 dependencies = [
-    "matplotlib>=3.10.0",
+    "matplotlib>=3.10.8",
     "requests>=2.32.5",
-    "pydantic>=2.11.0",
-    "requests-cache>=1.2.1",
+    "pydantic>=2.12.5",
+    "requests-cache>=1.3.1",
     "qats>=5",
     "pandas>=2.2.0",
-    "pydantic-settings>=2.11.0",
+    "pydantic-settings>=2.13.1",
 ]
 
 [project.urls]
@@ -29,15 +29,15 @@ Download = "https://api.repoforge.io/EYvhW6SyL/"
 [dependency-groups]
 dev = [
     "bandit>=1.8.0",
-    "pytest>=8.4.0",
-    "nox>=2025.5.1",
-    "scipy>=1.15.0",
+    "pytest>=9.0.3",
+    "nox>=2026.4.10",
+    "scipy>=1.15.3",
     "jupyter>=1.1.0",
     "mkdocs>=1.6.1",
     "mkdocs-material>=9.6.0",
-    "coverage>=7.10.0",
-    "pytest-cov>=6.2.0",
-    "pytest-docker>=3.2.0",
+    "coverage>=7.13.5",
+    "pytest-cov>=7.1.0",
+    "pytest-docker>=3.2.5",
 ]
 
 [build-system]
