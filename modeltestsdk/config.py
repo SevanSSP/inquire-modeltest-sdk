@@ -2,7 +2,7 @@
 Configurations
 """
 import os
-from datetime import timedelta, datetime
+from datetime import timedelta
 from typing import Literal
 
 from pydantic import BaseModel
@@ -13,7 +13,7 @@ class CacheConfig(BaseModel):
     cache_name: str = "mtdb"
     backend: Literal["sqlite"] = "sqlite"
     use_cache_dir: bool = True
-    expire_after: datetime = timedelta(days=7)
+    expire_after: timedelta = timedelta(days=7)
 
 
 class Config(BaseSettings, env_prefix="INQUIRE_MODELTEST_"):
