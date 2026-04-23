@@ -31,4 +31,6 @@ jobs:
       run: uv build
 
     - name: Publish package
-      run: uv publish --publish-url ${{ secrets.REPOFORGE_REPOSITORY_URL }} --username ${{ secrets.REPOFORGE_USERNAME }} --password ${{ secrets.REPOFORGE_PASSWORD }}
+      run: uv publish --publish-url https://api.repoforge.io/EYvhW6SyL/ --token ${REPOFORGE_TOKEN}
+      env:
+        REPOFORGE_TOKEN: ${{ secrets.REPOFORGE_TOKEN }}
