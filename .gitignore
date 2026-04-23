@@ -43,3 +43,6 @@ venv.bak/
 .ipynb_checkpoints/
 
 .env
+
+# Claude Code
+.claude/

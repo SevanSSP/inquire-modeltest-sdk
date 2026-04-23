@@ -10,15 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: '3.12'
     - name: Install dependencies
       run: pip install nox uv
     - name: Login to GitHub Container Registry
-      uses: docker/login-action@v3
+      uses: docker/login-action@v4
       with:
         registry: ghcr.io
         username: ${{ github.repository_owner }}
@@ -31,4 +31,6 @@ jobs:
       run: uv build
 
     - name: Publish package
-      run: uv publish --index ${{ secrets.REPOFORGE_REPOSITORY_URL }} --username ${{ secrets.REPOFORGE_USERNAME }} --password ${{ secrets.REPOFORGE_PASSWORD }}
+      run: uv publish --publish-url https://api.repoforge.io/EYvhW6SyL/ --token ${REPOFORGE_TOKEN}
+      env:
+        REPOFORGE_TOKEN: ${{ secrets.REPOFORGE_TOKEN }}
