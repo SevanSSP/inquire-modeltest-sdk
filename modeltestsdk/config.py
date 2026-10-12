@@ -35,4 +35,5 @@ class Config(BaseSettings, env_prefix="INQUIRE_MODELTEST_"):
     requests_max_retries: int = 5
     requests_backoff_factor: float = 1.0
     request_timeout: float = 60.0
+    upload_timeout: float = 900.0  # seconds to wait for the response to a data file upload (validation, statistics)
     token_expiry_margin: float = 60.0

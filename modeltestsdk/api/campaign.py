@@ -3,7 +3,7 @@ from modeltestsdk.resources import (
 )
 from modeltestsdk.query import create_query_parameters
 from pydantic import TypeAdapter
-from .base import BaseAPI
+from .base import BaseAPI, upsert_body
 from typing import List
 
 
@@ -119,3 +119,24 @@ class CampaignAPI(BaseAPI):
         """
         return self.get(filter_by=[self.client.filter.campaign.name == name],
                         limit=limit, skip=skip)
+
+    def upsert(self, item) -> Campaign:
+        """
+        Create or update a campaign by name (import pipeline).
+
+        Parameters
+        ----------
+        item : dict or Campaign
+            Campaign fields: name, description, date, location, scale_factor, water_depth, and optionally
+            data_format, source_workbook and read_only. Fields not given are left as they are.
+
+        Returns
+        -------
+        Campaign
+            The stored campaign; upsert_status is 'created', 'updated' or 'unchanged'
+
+        Notes
+        -----
+        Creating a campaign requires the Admin role, updating one requires write access to it.
+        """
+        return self._upserted(self.client.put(self._resource_path, body=upsert_body(item)), Campaign)

@@ -1,5 +1,7 @@
 import logging
-from typing import Callable, Optional
+import os
+import time
+from typing import Callable, Optional, Union
 
 import numpy as np
 import requests
@@ -7,7 +9,7 @@ import requests_cache
 from requests.adapters import HTTPAdapter, Retry
 
 from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
-                  WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
+                  WaveCalibrationAPI, TagsAPI, FloaterConfigAPI, ImportRunAPI)
 from .auth import ClientSecretToken, CredentialToken, InteractiveToken, ProviderToken, StaticToken, TokenSource
 from .config import Config
 from .query import Query
@@ -58,6 +60,7 @@ class Client:
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
+        self.import_runs = ImportRunAPI(client=self)
 
         logger.setLevel(log_levels.get(self.config.log_level, logging.INFO))
 
@@ -67,6 +70,8 @@ class Client:
                              status_forcelist=[429, 500, 502, 503, 504], raise_on_status=False)
         self.session = self._new_session(requests.Session())
         self._cached_session: Optional[requests_cache.CachedSession] = None
+        # File uploads retry in put_file(), which re-opens the file; a retrying adapter would re-send a spent stream
+        self._upload_session = requests.Session()
 
         if token is not None:
             self._token_source: TokenSource = StaticToken(token)
@@ -89,6 +94,7 @@ class Client:
     def close(self):
         """Releases the client's connections."""
         self.session.close()
+        self._upload_session.close()
         if self._cached_session is not None:
             self._cached_session.close()
 
@@ -186,13 +192,27 @@ class Client:
 
         r = self._session_for(cache).request(method, url, params=parameters, json=body, headers=headers,
                                              timeout=self.config.request_timeout)
+        self._raise_for_status(r, body)
+        return r.json()
+
+    @staticmethod
+    def _raise_for_status(r: requests.Response, body=None):
         try:
             r.raise_for_status()
         except requests.exceptions.HTTPError:
             logger.error("Request body:  " + str(body))
             logger.error("Request response: " + r.text)
             raise
-        return r.json()
+
+    def _retry_delay(self, attempt: int, r: Optional[requests.Response] = None) -> float:
+        """Seconds to wait before retry number attempt + 1: Retry-After if given, otherwise exponential backoff."""
+        retry_after = r.headers.get("Retry-After") if r is not None else None
+        if retry_after is not None:
+            try:
+                return float(retry_after)
+            except ValueError:
+                pass
+        return self.config.requests_backoff_factor * 2 ** attempt
 
     @staticmethod
     def _ensure_serializable(body: dict):
@@ -292,6 +312,58 @@ class Client:
             Request response
         """
         return self._do_request("PUT", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
+
+    def put_file(self, resource: str, endpoint: str, path: Union[str, os.PathLike], headers: dict = None,
+                 content_type: str = "application/octet-stream"):
+        """
+        Perform PUT request with a file as body, streamed from disk.
+
+        Parameters
+        ----------
+        resource : str
+            API resource e.g. 'test'
+        endpoint : str
+            API resource endpoint e.g. '{id}/datafiles/0'
+        path : str or path
+            File to send
+        headers : dict, optional
+            Extra request headers
+        content_type : str, optional
+            Media type of the file
+
+        Returns
+        -------
+        dict
+            Request response
+
+        Notes
+        -----
+        Connection errors, timeouts, 429 (honouring Retry-After) and 500/502/503/504 are retried up to
+        requests_max_retries times, re-sending the file. Only use this for idempotent uploads.
+        """
+        url = self._create_url(resource=resource, endpoint=endpoint)
+        timeout = (self.config.request_timeout, self.config.upload_timeout)
+        attempts = self.config.requests_max_retries + 1
+        for attempt in range(attempts):
+            last = attempt == attempts - 1
+            request_headers = {**(headers or {}), "Content-Type": content_type,
+                               "Authorization": f"Bearer {self._request_token()}"}
+            try:
+                with open(path, "rb") as f:
+                    r = self._upload_session.put(url, data=f, headers=request_headers, timeout=timeout)
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+                if last:
+                    raise
+                delay = self._retry_delay(attempt)
+                logger.warning(f"Upload to {url} failed ({e}); retrying in {delay:.0f} s")
+            else:
+                if r.status_code not in self.retries.status_forcelist or last:
+                    break
+                delay = self._retry_delay(attempt, r)
+                logger.warning(f"Upload to {url} returned {r.status_code}; retrying in {delay:.0f} s")
+            time.sleep(delay)
+        self._raise_for_status(r, f"<file {path}>")
+        return r.json()
 
     def patch(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
         """

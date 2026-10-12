@@ -6,3 +6,4 @@ from .timeseries import Timeseries, TimeseriesList
 from .sensor import Sensor, Sensors
 from .test import Test, FloaterTest, WindCalibration, WaveCalibration, Tests
 from .campaign import Campaign, Campaigns
+from .datafile import DataFile, DataFileTimeseries, DataFileUpload, ImportRun

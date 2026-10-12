@@ -172,3 +172,33 @@ def from_datetime_string(s):
 def format_class_name(s):
     s = s.split("API")
     return s[0].lower()
+
+
+def to_jsonable(value):
+    """
+    Converts a request body to types the JSON encoder accepts.
+
+    Parameters
+    ----------
+    value : any
+        dict, list, tuple or scalar
+
+    Returns
+    -------
+    any
+        The same structure with numpy scalars and arrays as Python values, NaN as None, datetime as ISO string and
+        UUID as string. Infinite values are kept, so encoding them fails instead of silently changing them.
+    """
+    if isinstance(value, dict):
+        return {k: to_jsonable(v) for k, v in value.items()}
+    if isinstance(value, (list, tuple, np.ndarray)):
+        return [to_jsonable(v) for v in value]
+    if isinstance(value, np.generic):
+        value = value.item()
+    if isinstance(value, float) and np.isnan(value):
+        return None
+    if isinstance(value, datetime):
+        return value.isoformat()
+    if isinstance(value, uuid.UUID):
+        return str(value)
+    return value

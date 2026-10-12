@@ -186,3 +186,22 @@ class TagsAPI(BaseAPI):
         tags = self.get(filter_by=[self.client.filter.tag.name == name],
                         limit=limit, skip=skip)
         return tags
+
+    def upsert_many(self, campaign_id: str, items: list) -> Tags:
+        """
+        Create or update tags on tests, sensors and timeseries of a campaign (import pipeline). A tag is identified
+        by its target, name and comment, so this adds the tags that don't exist yet.
+
+        Parameters
+        ----------
+        campaign_id : str
+            Campaign identifier
+        items : list of dict or Tag
+            Tag fields: name, comment and exactly one of test_id, sensor_id and timeseries_id
+
+        Returns
+        -------
+        Tags
+            The stored tags in request order, each with its upsert_status
+        """
+        return Tags(self._upsert_many("campaign", f"{campaign_id}/tags", items, Tag))

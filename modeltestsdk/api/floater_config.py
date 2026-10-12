@@ -114,3 +114,21 @@ class FloaterConfigAPI(BaseAPI):
         configs = self.get(filter_by=[self.client.filter.floater_config.campaign_id == campaign_id],
                            limit=limit, skip=skip)
         return configs
+
+    def upsert_many(self, campaign_id: str, items: list) -> FloaterConfigs:
+        """
+        Create or update floater configurations of a campaign by name (import pipeline).
+
+        Parameters
+        ----------
+        campaign_id : str
+            Campaign identifier
+        items : list of dict or FloaterConfig
+            Floater configuration fields: name, description, characteristic_length, draft, read_only
+
+        Returns
+        -------
+        FloaterConfigs
+            The stored floater configurations in request order, each with its upsert_status
+        """
+        return FloaterConfigs(self._upsert_many("campaign", f"{campaign_id}/floaterconfigs", items, FloaterConfig))

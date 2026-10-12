@@ -160,3 +160,21 @@ class SensorAPI(BaseAPI):
         """
         return self.get(filter_by=[self.client.filter.sensor.campaign_id == campaign_id],
                         limit=limit, skip=skip)
+
+    def upsert_many(self, campaign_id: str, items: list) -> Sensors:
+        """
+        Create or update sensors of a campaign by name (import pipeline).
+
+        Parameters
+        ----------
+        campaign_id : str
+            Campaign identifier
+        items : list of dict or Sensor
+            Sensor fields, as for create()
+
+        Returns
+        -------
+        Sensors
+            The stored sensors in request order, each with its upsert_status
+        """
+        return Sensors(self._upsert_many("campaign", f"{campaign_id}/sensors", items, Sensor))

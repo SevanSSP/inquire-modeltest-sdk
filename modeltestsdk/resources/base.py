@@ -1,6 +1,6 @@
 from __future__ import annotations
 import pandas as pd
-from pydantic import BaseModel, RootModel, Field
+from pydantic import BaseModel, RootModel, Field, PrivateAttr
 from typing import List, Optional, Union, Any, TypeVar
 from modeltestsdk.utils import make_serializable
 import re
@@ -9,6 +9,12 @@ import re
 class Resource(BaseModel):
     client: Optional[Any] = None
     id: Optional[str] = None
+    _upsert_status: Optional[str] = PrivateAttr(default=None)
+
+    @property
+    def upsert_status(self) -> Optional[str]:
+        """'created', 'updated' or 'unchanged' if the resource comes from an upsert, otherwise None."""
+        return self._upsert_status
 
     @staticmethod
     def _api_object_name(resource_name: str):

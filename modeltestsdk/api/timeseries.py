@@ -243,3 +243,26 @@ class TimeseriesAPI(BaseAPI):
         parameters = dict(scaling_length=scaling_length)
         data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/statistics", parameters=parameters)
         return Statistics(**data)
+
+    def upsert_many(self, test_id: str, items: list) -> TimeseriesList:
+        """
+        Create or update the timeseries of a test by sensor (import pipeline). Do this before writing the test's data
+        file, whose columns are named by timeseries id.
+
+        Parameters
+        ----------
+        test_id : str
+            Test identifier
+        items : list of dict or Timeseries
+            Timeseries fields: sensor_id, fs, intermittent, default_start_time, default_end_time, read_only
+
+        Returns
+        -------
+        TimeseriesList
+            The stored timeseries in request order, each with its upsert_status
+
+        Notes
+        -----
+        If the default window of a timeseries with data changes, the API recomputes its statistics.
+        """
+        return TimeseriesList(self._upsert_many("test", f"{test_id}/timeseries", items, Timeseries))

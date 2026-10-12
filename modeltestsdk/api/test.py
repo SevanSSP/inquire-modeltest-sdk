@@ -1,10 +1,14 @@
+import os
 from typing import Union, List
+from modeltestsdk.datafile import CONTENT_TYPE, sha256_file
 from modeltestsdk.resources import (
-    Test, Tests, FloaterTest, WaveCalibration, WindCalibration,
+    Test, Tests, FloaterTest, WaveCalibration, WindCalibration, DataFile, DataFileUpload,
 )
 from modeltestsdk.query import create_query_parameters
 from pydantic import TypeAdapter
-from .base import BaseAPI
+from .base import BaseAPI, upsert_body
+
+TEST_TYPES = {'Floater Test': FloaterTest, 'Wave Calibration': WaveCalibration, 'Wind Calibration': WindCalibration}
 
 
 class TestAPI(BaseAPI):
@@ -103,6 +107,101 @@ class TestAPI(BaseAPI):
         """
         return self.get(filter_by=[self.client.filter.test.campaign_id == campaign_id],
                         limit=limit, skip=skip)
+
+    def upsert_many(self, campaign_id: str, items: list) -> Tests:
+        """
+        Create or update wave calibrations, wind calibrations and floater tests of a campaign by type and number
+        (import pipeline).
+
+        Parameters
+        ----------
+        campaign_id : str
+            Campaign identifier
+        items : list of dict, FloaterTest, WaveCalibration or WindCalibration
+            Test fields including 'type' ('Wave Calibration', 'Wind Calibration' or 'Floater Test'). Floater tests
+            refer to calibrations and floater configurations by id; calibrations may come earlier in the same batch.
+
+        Returns
+        -------
+        Tests
+            The stored tests in request order, each with its upsert_status
+        """
+        def body(item) -> dict:
+            b = upsert_body(item)
+            if getattr(item, "type", None) is not None:  # a resource's type is a default, so it isn't "set"
+                b.setdefault("type", item.type)
+            return b
+
+        data = self.client.put("campaign", f"{campaign_id}/tests", body=[body(item) for item in items])
+        return Tests([self._upserted(i, TEST_TYPES.get(i.get("type"), Test)) for i in data])
+
+    def datafiles(self, test_id: str, status: str = None) -> List[DataFile]:
+        """
+        Data files of a test, by group and age.
+
+        Parameters
+        ----------
+        test_id : str
+            Test identifier
+        status : {'active', 'superseded'}, optional
+            Only files with this status
+
+        Returns
+        -------
+        list of DataFile
+            Data files with the ids of the timeseries they hold
+        """
+        data = self.client.get("test", f"{test_id}/datafiles", parameters=dict(status=status))
+        return [DataFile(**i) for i in data]
+
+    def active_datafiles(self, test_id: str) -> List[DataFile]:
+        """
+        The current data file of each group of a test. Compare its sha256 with a new file to skip unchanged uploads.
+
+        Parameters
+        ----------
+        test_id : str
+            Test identifier
+
+        Returns
+        -------
+        list of DataFile
+            One data file per group
+        """
+        return self.datafiles(test_id, status="active")
+
+    def upload_datafile(self, test_id: str, group: int, path: Union[str, os.PathLike], run_id: str,
+                        sha256: str = None) -> DataFileUpload:
+        """
+        Upload the data file of a test and time base (import pipeline). The API validates it, stores it and computes
+        the statistics of every timeseries in it. Uploading the group's active file again changes nothing.
+
+        Parameters
+        ----------
+        test_id : str
+            Test identifier
+        group : int
+            Time base, 0 unless the test has several
+        path : str or path
+            Parquet file in format version 1, see modeltestsdk.datafile.write_parquet()
+        run_id : str
+            Identifier of the running import run
+        sha256 : str, optional
+            Hex sha256 of the file, if already known (e.g. from write_parquet()); computed otherwise
+
+        Returns
+        -------
+        DataFileUpload
+            The data file with status 'created' or 'unchanged', and each timeseries' statistics
+
+        Notes
+        -----
+        The file is streamed. Busy (429) and server errors are retried, re-sending the file.
+        """
+        headers = {"X-Import-Run-Id": str(run_id), "X-Content-SHA256": sha256 or sha256_file(path)}
+        data = self.client.put_file("test", f"{test_id}/datafiles/{int(group)}", path, headers=headers,
+                                    content_type=CONTENT_TYPE)
+        return DataFileUpload(**data)
 
 
 class FloaterTestAPI(TestAPI):
