@@ -11,7 +11,7 @@ class SensorAPI(BaseAPI):
     def create(self, name: str, description: str, unit: str, kind: str, source: str, x: float, y: float, z: float,
                position_reference: str, position_heading_lock: bool, position_draft_lock: bool,
                positive_direction_definition: str, campaign_id: str, area: float = None,
-               read_only: bool = False) -> Sensor:
+               read_only: bool = False, **fields) -> Sensor:
         """
         Parameters
         ----------
@@ -46,6 +46,8 @@ class SensorAPI(BaseAPI):
             Reference area
         read_only : bool, optional
             Make the test read only
+        **fields
+            Further fields of the API's schema (see the API documentation)
 
         Returns
         -------
@@ -67,7 +69,8 @@ class SensorAPI(BaseAPI):
             position_draft_lock=position_draft_lock,
             positive_direction_definition=positive_direction_definition,
             campaign_id=campaign_id,
-            read_only=read_only
+            read_only=read_only,
+            **fields
         )
         data = self.client.post(self._resource_path, body=body)
         return Sensor(**data, client=self.client)
@@ -160,3 +163,21 @@ class SensorAPI(BaseAPI):
         """
         return self.get(filter_by=[self.client.filter.sensor.campaign_id == campaign_id],
                         limit=limit, skip=skip)
+
+    def upsert_many(self, campaign_id: str, items: list) -> Sensors:
+        """
+        Create or update sensors of a campaign by name (import pipeline).
+
+        Parameters
+        ----------
+        campaign_id : str
+            Campaign identifier
+        items : list of dict or Sensor
+            Sensor fields, as for create()
+
+        Returns
+        -------
+        Sensors
+            The stored sensors in request order, each with its upsert_status
+        """
+        return Sensors(self._upsert_many("campaign", f"{campaign_id}/sensors", items, Sensor))

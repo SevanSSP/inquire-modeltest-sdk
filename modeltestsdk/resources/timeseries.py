@@ -17,28 +17,9 @@ class Timeseries(Resource):
     intermittent: Optional[bool] = False
     default_start_time: Optional[float] = None
     default_end_time: Optional[float] = None
-
-    def add_data(self, time: list, values: list, secret_key: str = None) -> DataPoints:
-        """
-        Add data points.
-
-        Parameters
-        ----------
-        time : list
-            Time in seconds
-        values : list
-            Data corresponding to time
-        secret_key : str, optional
-            Secret key, required to add new data points if old should be overwritten
-
-
-        Returns
-        -------
-        DataPoints
-            Data points
-        """
-        dps = self.client.timeseries.add_data_points(self.id, time, values, secret_key)
-        return dps
+    n_points: Optional[int] = None
+    t_first: Optional[float] = None
+    t_last: Optional[float] = None
 
     @property
     def sensor(self):
@@ -153,8 +134,10 @@ class Timeseries(Resource):
 
         return n_warnings
 
-    def get_statistics(self, scaling_length=None) -> Statistics:
-        return self.client.timeseries.get_statistics(ts_id=self.id, scaling_length=scaling_length)
+    def get_statistics(self, scaling_length=None, start: float = None, end: float = None) -> Statistics:
+        """Statistics over the default window, or over a custom window from start to end (s)."""
+        return self.client.timeseries.get_statistics(ts_id=self.id, scaling_length=scaling_length, start=start,
+                                                     end=end)
 
 
 class TimeseriesList(Resources[Timeseries]):

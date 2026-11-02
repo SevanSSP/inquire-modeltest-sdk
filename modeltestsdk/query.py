@@ -68,103 +68,39 @@ def class_factory(name: str, method_spec: query_extension_types, attribute_list:
 
 
 class Query:
-    def __init__(self, method_spec: query_extension_types):
-        self.campaign = class_factory(name='Campaign', method_spec=method_spec,
-                                      attribute_list=['name',
-                                                      'description',
-                                                      'date',
-                                                      'location',
-                                                      'scale_factor',
-                                                      'water_depth',
-                                                      'read_only',
-                                                      'id'])
-        self.sensor = class_factory(name="Sensor", method_spec=method_spec,
-                                    attribute_list=['name',
-                                                    'description',
-                                                    'unit',
-                                                    'kind', 'area',
-                                                    'x',
-                                                    'y',
-                                                    'z',
-                                                    'is_local',
-                                                    'campaign_id',
-                                                    'read_only',
-                                                    'id',
-                                                    'tag_name'])
-        self.test = class_factory(name="Test", method_spec=method_spec,
-                                  attribute_list=['number',
-                                                  'description',
-                                                  'test_date',
-                                                  'campaign_id',
-                                                  'type',
-                                                  'id'])
-        self.timeseries = class_factory(name="Timeseries", method_spec=method_spec,
-                                        attribute_list=['sensor_id',
-                                                        'test_id',
-                                                        'fs',
-                                                        'intermittent',
-                                                        'default_start_time',
-                                                        'default_end_time',
-                                                        'read_only',
-                                                        'id',
-                                                        'datapoints_created_at'])
-        self.wave_calibration = class_factory(name="WaveCalibration", method_spec=method_spec,
-                                              attribute_list=['number',
-                                                              'description',
-                                                              'test_date',
-                                                              'campaign_id',
-                                                              'type',
-                                                              'wave_spectrum',
-                                                              'wave_height',
-                                                              'wave_period',
-                                                              'gamma',
-                                                              'wave_direction',
-                                                              'current_velocity',
-                                                              'current_direction',
-                                                              'read_only',
-                                                              'id'])
+    """Filter and sort expressions on the fields the API's listings accept, e.g. Query('filter').sensor.name == 'HEAVE'."""
 
-        self.wind_calibration = class_factory(name="WindCalibration", method_spec=method_spec,
-                                              attribute_list=['number',
-                                                              'description',
-                                                              'test_date',
-                                                              'campaign_id',
-                                                              'type',
-                                                              'wind_spectrum',
-                                                              'wind_velocity',
-                                                              'zref',
-                                                              'wind_direction',
-                                                              'read_only',
-                                                              'id'])
-        self.floater_test = class_factory(name="FloaterTest", method_spec=method_spec,
-                                          attribute_list=['number',
-                                                          'description',
-                                                          'test_date',
-                                                          'campaign_id',
-                                                          'type',
-                                                          'category',
-                                                          'orientation',
-                                                          'wave_id',
-                                                          'wind_id',
-                                                          'floaterconfig_id',
-                                                          'read_only',
-                                                          'id'])
-        self.tag = class_factory(name="Tag", method_spec=method_spec,
-                                 attribute_list=['comment',
-                                                 'test_id',
-                                                 'sensor_id',
-                                                 'timeseries_id',
-                                                 'read_only',
-                                                 'name',
-                                                 'id'])
-        self.floater_config = class_factory(name="FloaterConfig", method_spec=method_spec,
-                                            attribute_list=['name',
-                                                            'description',
-                                                            'characteristic_length',
-                                                            'campaign_id',
-                                                            'draft',
-                                                            'read_only',
-                                                            'id'])
+    def __init__(self, method_spec: query_extension_types):
+        self.campaign = class_factory(name='Campaign', method_spec=method_spec, attribute_list=[
+            'name', 'description', 'date', 'location', 'scale_factor', 'water_depth', 'main_characteristic_length',
+            'data_format', 'source_workbook', 'read_only', 'lab_axis_x', 'lab_axis_y', 'lab_axis_z',
+            'lab_local_axis_x', 'lab_local_axis_y', 'lab_local_axis_z', 'lab_local_offset', 'lab_global_turns',
+            'lab_local_turns', 'lq', 'north', 'north_type', 'z_origin', 'z_origin_config_id', 'id'])
+        self.sensor = class_factory(name='Sensor', method_spec=method_spec, attribute_list=[
+            'name', 'description', 'unit', 'kind', 'source', 'area', 'x', 'y', 'z', 'position_reference',
+            'position_heading_lock', 'position_draft_lock', 'position_z_reference',
+            'positive_direction_definition', 'quantity', 'measures_frame', 'measures_axis', 'measures_sign', 'dof',
+            'campaign_id', 'read_only', 'id', 'tag_name'])
+        self.test = class_factory(name='Test', method_spec=method_spec, attribute_list=[
+            'number', 'description', 'test_date', 'campaign_id', 'type', 'id', 'tag_name'])
+        self.timeseries = class_factory(name='Timeseries', method_spec=method_spec, attribute_list=[
+            'sensor_id', 'test_id', 'fs', 'intermittent', 'default_start_time', 'default_end_time', 'read_only',
+            'id', 'datapoints_created_at', 'tag_name'])
+        self.wave_calibration = class_factory(name='WaveCalibration', method_spec=method_spec, attribute_list=[
+            'number', 'description', 'test_date', 'campaign_id', 'type', 'read_only', 'id', 'wave_spectrum',
+            'wave_height', 'wave_period', 'gamma', 'wave_direction', 'current_velocity', 'current_direction',
+            'tag_name'])
+        self.wind_calibration = class_factory(name='WindCalibration', method_spec=method_spec, attribute_list=[
+            'number', 'description', 'test_date', 'campaign_id', 'type', 'read_only', 'id', 'wind_spectrum',
+            'wind_velocity', 'zref', 'wind_direction', 'tag_name'])
+        self.floater_test = class_factory(name='FloaterTest', method_spec=method_spec, attribute_list=[
+            'number', 'description', 'test_date', 'campaign_id', 'type', 'read_only', 'id', 'category',
+            'orientation', 'wave_id', 'wind_id', 'floaterconfig_id', 'tag_name'])
+        self.tag = class_factory(name='Tag', method_spec=method_spec, attribute_list=[
+            'comment', 'test_id', 'sensor_id', 'timeseries_id', 'read_only', 'name', 'id'])
+        self.floater_config = class_factory(name='FloaterConfig', method_spec=method_spec, attribute_list=[
+            'name', 'description', 'characteristic_length', 'campaign_id', 'draft', 'heading', 'vcg', 'read_only',
+            'id'])
 
 
 def create_query_parameters(filter_expressions: list, sorting_expressions: list) -> dict:

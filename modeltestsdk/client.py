@@ -1,23 +1,20 @@
+import logging
 import os
-import sys
-from typing import Optional
+import time
+from typing import Callable, Optional, Union
 
+import numpy as np
 import requests
 import requests_cache
-import logging
-import numpy as np
-try:
-    from datetime import UTC
-except ImportError:
-    from datetime import timezone
-    UTC = timezone.utc
-from datetime import datetime
-from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
-                  WaveCalibrationAPI, TagsAPI, FloaterConfigAPI)
-from .query import Query
-from .config import Config
 from requests.adapters import HTTPAdapter, Retry
 
+from .api import (TimeseriesAPI, CampaignAPI, SensorAPI, TestAPI, FloaterTestAPI, WindCalibrationAPI,
+                  WaveCalibrationAPI, TagsAPI, FloaterConfigAPI, ImportRunAPI)
+from .auth import ClientSecretToken, CredentialToken, InteractiveToken, ProviderToken, StaticToken, TokenSource
+from .config import Config
+from .query import Query
+
+logger = logging.getLogger("modeltestsdk")
 log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
 
 
@@ -27,21 +24,30 @@ class Client:
 
     Parameters
     ----------
-    config : object, optional
-        Client configuration (host, base URL)
+    config : Config, optional
+        Client configuration. By default read from INQUIRE_MODELTEST_* environment variables.
+    token : str, optional
+        Access token to use for every request.
+    token_provider : callable, optional
+        Function returning a current access token, called for every request (e.g. a web app's user session).
+    credential : object, optional
+        azure-identity credential (anything with get_token(scope)), e.g. DefaultAzureCredential.
 
     Notes
     -----
-    Using the SDK requires setting the following environmental variables
+    Give at most one of token, token_provider and credential. Without them the client signs in with Microsoft
+    from the configuration: as a service principal if client_secret is set, otherwise in the browser (kept in a
+    token cache on disk).
+    The token is kept by this client only, so clients for different users can run in one process.
 
-        INQUIRE_MODELTEST_API_USER - Your username
-        INQUIRE_MODELTEST_API_PASSWORD - Your password
-        INQUIRE_MODELTEST_API_HOST - Model test API host
-
+    Use the client as a context manager, or call close(), to release its connections.
     """
 
-    def __init__(self, config: Optional[Config] = None):
+    def __init__(self, config: Optional[Config] = None, *, token: Optional[str] = None,
+                 token_provider: Optional[Callable[[], str]] = None, credential=None):
         """Initialize objects for interacting with the API"""
+        if sum(x is not None for x in (token, token_provider, credential)) > 1:
+            raise ValueError("Give at most one of token, token_provider and credential")
         self.config: Config = config if config is not None else Config(_env_file="../.env")
         self.filter = Query(method_spec='filter')
         self.sort = Query(method_spec='sort')
@@ -54,74 +60,70 @@ class Client:
         self.wave_calibration = WaveCalibrationAPI(client=self)
         self.tag = TagsAPI(client=self)
         self.floater_config = FloaterConfigAPI(client=self)
+        self.import_runs = ImportRunAPI(client=self)
 
+        logger.setLevel(log_levels.get(self.config.log_level, logging.INFO))
+
+        # One session per client, retrying failed connections, throttling (honouring Retry-After) and server errors
         self.retries = Retry(total=self.config.requests_max_retries,
-                backoff_factor=self.config.requests_backoff_factor,
-                status_forcelist=[500, 502, 503, 504])
+                             backoff_factor=self.config.requests_backoff_factor,
+                             status_forcelist=[429, 500, 502, 503, 504], raise_on_status=False)
+        self.session = self._new_session(requests.Session())
+        self._cached_session: Optional[requests_cache.CachedSession] = None
+        # File uploads retry in put_file(), which re-opens the file; a retrying adapter would re-send a spent stream
+        self._upload_session = requests.Session()
 
-        # configure logging
-        log_levels = dict(debug=logging.DEBUG, info=logging.INFO, error=logging.ERROR)
-        level = log_levels.get(self.config.log_level, logging.INFO)
-        if self.config.log_level == "debug":
-            fmt = "%(levelname)s at line %(lineno)d in %(filename)s - %(message)s"
+        if token is not None:
+            self._token_source: TokenSource = StaticToken(token)
+        elif token_provider is not None:
+            self._token_source = ProviderToken(token_provider)
+        elif credential is not None:
+            self._token_source = CredentialToken(credential, self._app_scope(), self.config.token_expiry_margin)
         else:
-            fmt = "%(levelname)s - %(message)s"
-
-        logging.basicConfig(stream=sys.stdout, level=level, format=fmt)
+            self._token_source = self._token_source_from_config()
 
     def __str__(self):
         return f"<Client host:'{self.config.api_host}'>"
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
+
+    def close(self):
+        """Releases the client's connections."""
+        self.session.close()
+        self._upload_session.close()
+        if self._cached_session is not None:
+            self._cached_session.close()
+
+    def _new_session(self, session: requests.Session) -> requests.Session:
+        adapter = HTTPAdapter(max_retries=self.retries)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+        session.headers.update({"Accept": "application/json"})
+        return session
+
+    def _app_scope(self) -> str:
+        if not self.config.api_client_id:
+            raise ValueError("Microsoft sign-in needs api_client_id (INQUIRE_MODELTEST_API_CLIENT_ID)")
+        return f"api://{self.config.api_client_id}/.default"
+
+    def _token_source_from_config(self) -> TokenSource:
+        c = self.config
+        margin = c.token_expiry_margin
+        if c.tenant_id and c.client_id and c.client_secret:
+            return ClientSecretToken(c.tenant_id, c.client_id, c.client_secret, self._app_scope(), margin)
+        if c.tenant_id and c.client_id and c.api_client_id:
+            return InteractiveToken(c.tenant_id, c.client_id, f"api://{c.api_client_id}/data.read",
+                                    c.token_cache_path, margin)
+        raise ValueError("No way to sign in: give a token, token_provider or credential, or configure Microsoft "
+                         "sign-in (tenant_id, api_client_id and client_id, plus client_secret for a service principal)")
+
     def _request_token(self) -> str:
-        """str: Authenticate and return access token."""
-        # check if current access token is still valid
-        current_token = os.getenv("INQUIRE_MODELTEST_API_TOKEN")
-        token_expires_on = os.getenv("INQUIRE_MODELTEST_API_TOKEN_EXPIRES")
-        if current_token is not None and token_expires_on is not None and \
-                datetime.now(UTC).timestamp() < float(token_expires_on):
-            logging.debug("Your current access token is still valid.")
-            return current_token
-
-        # authenticate and get access token
-        try:
-            logging.info("Authenticating by user impersonation.")
-            user = os.getenv("INQUIRE_MODELTEST_API_USER")
-            passwd = os.getenv("INQUIRE_MODELTEST_API_PASSWORD")
-
-            s = requests.session()
-            s.mount('http://', HTTPAdapter(max_retries=self.retries))
-
-            r = s.post(
-                self._create_url(resource="auth", endpoint="token"),
-                data=dict(grant_type=None,
-                          username=user,
-                          password=passwd,
-                          scope=None,
-                          client_id=None,
-                          client_secret=None)
-            )
-            r.raise_for_status()
-        except requests.exceptions.HTTPError as e:  # pragma: no cover
-            raise e
-        except requests.exceptions.ConnectionError as e:  # pragma: no cover
-            raise e
-        except requests.exceptions.Timeout as e:  # pragma: no cover
-            raise e
-        except requests.exceptions.RequestException as e:  # pragma: no cover
-            raise e
-        else:
-            # update env vars
-            data = r.json()
-            token = data.get("access_token")
-            expires = data.get("expires")
-            if token is None and expires is None:
-                raise ValueError(f"Unable to acquire a valid access token 'access_token'= {token} and "
-                                 f"token expiry 'expires' = {expires}")
-            else:
-                logging.info("Acquired valid access token.")
-                os.environ["INQUIRE_MODELTEST_API_TOKEN"] = token
-                os.environ["INQUIRE_MODELTEST_API_TOKEN_EXPIRES"] = str(expires)
-                return token
+        """str: A valid access token for this client."""
+        return self._token_source()
 
     def _create_url(self, resource: str = None, endpoint: str = None) -> str:
         """
@@ -149,6 +151,14 @@ class Client:
         url += "/".join([p for p in [resource, endpoint] if p is not None])
         return url
 
+    def _session_for(self, cache: bool) -> requests.Session:
+        if not cache:
+            return self.session
+        if self._cached_session is None:
+            self._cached_session = self._new_session(
+                requests_cache.CachedSession(**self.config.cache_settings.model_dump()))
+        return self._cached_session
+
     def _do_request(self, method: str, resource: str = None, endpoint: str = None, parameters: dict = None,
                     body: dict = None, cache=False):
         """
@@ -166,6 +176,8 @@ class Client:
             Request parameters.
         body : dict, optional
             Request body.
+        cache : bool, optional
+            Use the on-disk response cache.
 
         Returns
         -------
@@ -173,50 +185,34 @@ class Client:
             Request response
 
         """
-        # create base url
         url = self._create_url(resource=resource, endpoint=endpoint)
-
-        # authenticate and get access token
-        token = self._request_token()
-
-        # create request headers
-        headers = {
-            "Authorization": f"Bearer {token}",
-            "Connection": "keep-alive",
-            "Host": self.config.api_host.split("://")[-1],  # remove leading http/https
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-        }
-
-        # remove empty values from parameters
+        headers = {"Authorization": f"Bearer {self._request_token()}"}
         if parameters is not None:
             parameters = {k: v for k, v in parameters.items() if v is not None}
 
-        # do request (also encodes parameters)
+        r = self._session_for(cache).request(method, url, params=parameters, json=body, headers=headers,
+                                             timeout=self.config.request_timeout)
+        self._raise_for_status(r, body)
+        return r.json()
 
-        s = requests.session()
-        s.mount('http://', HTTPAdapter(max_retries=self.retries))
-
+    @staticmethod
+    def _raise_for_status(r: requests.Response, body=None):
         try:
-            if cache:
-                with requests_cache.enabled(**self.config.cache_settings.model_dump()):
-                    r = s.request(method, url, params=parameters, json=body, headers=headers)
-                r.raise_for_status()
-            else:
-                r = s.request(method, url, params=parameters, json=body, headers=headers)
-                r.raise_for_status()
-        except requests.exceptions.HTTPError as e:  # pragma: no cover
-            logging.error("Request body:  " + str(body))
-            logging.error("Request response: " + r.text)
-            raise e
-        except requests.exceptions.ConnectionError as e:  # pragma: no cover
-            raise e
-        except requests.exceptions.Timeout as e:  # pragma: no cover
-            raise e
-        except requests.exceptions.RequestException as e:  # pragma: no cover
-            raise e
-        else:
-            return r.json()
+            r.raise_for_status()
+        except requests.exceptions.HTTPError:
+            logger.error("Request body:  " + str(body))
+            logger.error("Request response: " + r.text)
+            raise
+
+    def _retry_delay(self, attempt: int, r: Optional[requests.Response] = None) -> float:
+        """Seconds to wait before retry number attempt + 1: Retry-After if given, otherwise exponential backoff."""
+        retry_after = r.headers.get("Retry-After") if r is not None else None
+        if retry_after is not None:
+            try:
+                return float(retry_after)
+            except ValueError:
+                pass
+        return self.config.requests_backoff_factor * 2 ** attempt
 
     @staticmethod
     def _ensure_serializable(body: dict):
@@ -295,6 +291,113 @@ class Client:
 
         return self._do_request("POST", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
 
+    def put(self, resource: str = None, endpoint: str = None, parameters: dict = None, body=None):
+        """
+        Perform PUT request
+
+        Parameters
+        ----------
+        resource : str, optional
+            API resource e.g. 'campaign'
+        endpoint : str, optional
+            API resource endpoint e.g. '{id}/sensors'
+        parameters : dict, optional
+            Request parameters.
+        body : dict or list, optional
+            Request body.
+
+        Returns
+        -------
+        dict or list
+            Request response
+        """
+        return self._do_request("PUT", resource=resource, endpoint=endpoint, parameters=parameters, body=body)
+
+    def put_file(self, resource: str, endpoint: str, path: Union[str, os.PathLike], headers: dict = None,
+                 content_type: str = "application/octet-stream"):
+        """
+        Perform PUT request with a file as body, streamed from disk.
+
+        Parameters
+        ----------
+        resource : str
+            API resource e.g. 'test'
+        endpoint : str
+            API resource endpoint e.g. '{id}/datafiles/0'
+        path : str or path
+            File to send
+        headers : dict, optional
+            Extra request headers
+        content_type : str, optional
+            Media type of the file
+
+        Returns
+        -------
+        dict
+            Request response
+
+        Notes
+        -----
+        Connection errors, timeouts, 429 (honouring Retry-After) and 500/502/503/504 are retried up to
+        requests_max_retries times, re-sending the file. Only use this for idempotent uploads.
+        """
+        url = self._create_url(resource=resource, endpoint=endpoint)
+        timeout = (self.config.request_timeout, self.config.upload_timeout)
+        attempts = self.config.requests_max_retries + 1
+        for attempt in range(attempts):
+            last = attempt == attempts - 1
+            request_headers = {**(headers or {}), "Content-Type": content_type,
+                               "Authorization": f"Bearer {self._request_token()}"}
+            try:
+                with open(path, "rb") as f:
+                    r = self._upload_session.put(url, data=f, headers=request_headers, timeout=timeout)
+            except (requests.exceptions.ConnectionError, requests.exceptions.Timeout) as e:
+                if last:
+                    raise
+                delay = self._retry_delay(attempt)
+                logger.warning(f"Upload to {url} failed ({e}); retrying in {delay:.0f} s")
+            else:
+                if r.status_code not in self.retries.status_forcelist or last:
+                    break
+                delay = self._retry_delay(attempt, r)
+                logger.warning(f"Upload to {url} returned {r.status_code}; retrying in {delay:.0f} s")
+            time.sleep(delay)
+        self._raise_for_status(r, f"<file {path}>")
+        return r.json()
+
+    def download(self, resource: str, endpoint: str, destination: Union[str, os.PathLike],
+                 parameters: dict = None) -> str:
+        """
+        Perform GET request and stream the response body to a file.
+
+        Parameters
+        ----------
+        resource : str
+            API resource e.g. 'campaign'
+        endpoint : str
+            API resource endpoint e.g. '{id}/documents/Main report/report.pdf' (URL-encoded)
+        destination : str or path
+            File to write
+        parameters : dict, optional
+            URL parameters
+
+        Returns
+        -------
+        str
+            The file written
+        """
+        url = self._create_url(resource=resource, endpoint=endpoint)
+        headers = {"Authorization": f"Bearer {self._request_token()}", "Accept": "*/*"}
+        if parameters is not None:
+            parameters = {k: v for k, v in parameters.items() if v is not None}
+        timeout = (self.config.request_timeout, self.config.upload_timeout)
+        with self.session.get(url, params=parameters, headers=headers, stream=True, timeout=timeout) as r:
+            self._raise_for_status(r)
+            with open(destination, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):
+                    f.write(chunk)
+        return str(destination)
+
     def patch(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
         """
         Perform PATCH request
@@ -339,7 +442,6 @@ class Client:
 
     def clear_cache(self):
         """
-        Removes cached datapoints (from mtdb.sqlite at local cache folder)
+        Removes cached responses (from mtdb.sqlite in the local cache folder)
         """
-        with requests_cache.enabled(**self.config.cache_settings):  # pragma: no cover
-            requests_cache.clear()
+        self._session_for(cache=True).cache.clear()

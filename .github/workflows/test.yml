@@ -23,15 +23,8 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-      - name: Login to GitHub Container Registry
-        uses: docker/login-action@v4
-        with:
-          registry: ghcr.io
-          username: ${{ github.repository_owner }}
-          password: ${{ secrets.GHCR_PAT }}
-
       - name: Install Dependencies
         run: pip install nox uv
 
       - name: Run tests with Nox
-        run: nox -s lint tests_github --verbose
+        run: nox -s lint tests --verbose

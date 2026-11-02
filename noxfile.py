@@ -32,7 +32,7 @@ def lint(session):
 
 @nox.session
 def tests(session):
-    """Run test suite."""
+    """Run the test suite: the unit tests (the functional tests run only with --api, against a real API)."""
     req_path = os.path.join(tempfile.gettempdir(), "requirements.txt")
     session.install("uv")
     session.run(
@@ -46,25 +46,4 @@ def tests(session):
     session.install("-r", req_path)
 
     # run tests
-    session.run("pytest", "tests", "--api=http://127.0.0.1:8000",
-                "--cov=modeltestsdk", "--cov-report=term-missing", "--cov-fail-under=95")
-
-
-@nox.session
-def tests_github(session):
-    """Run test suite."""
-    req_path = os.path.join(tempfile.gettempdir(), "requirements.txt")
-    session.install("uv")
-    session.run(
-        "uv",
-        "export",
-        "--group", "dev",
-        "--no-hashes",
-        "-o", req_path,
-        external=True,
-    )
-    session.install("-r", req_path)
-
-    # run tests
-    session.run("pytest", "tests", "--api=build",
-                "--cov=modeltestsdk", "--cov-report=term-missing", "--cov-fail-under=95")
+    session.run("pytest", "tests", "--cov=modeltestsdk", "--cov-report=term-missing", "--cov-fail-under=95")

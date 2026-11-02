@@ -9,7 +9,7 @@ from typing import List
 
 class TagsAPI(BaseAPI):
     def create(self, name: str, comment: str = None, test_id: str = None, sensor_id: str = None,
-               timeseries_id: str = None, read_only: bool = False) -> Tag:
+               timeseries_id: str = None, read_only: bool = False, **fields) -> Tag:
         """
         Tag a test, a sensor or a time series.
 
@@ -33,6 +33,8 @@ class TagsAPI(BaseAPI):
             Time series identifier
         read_only : bool, optional
             Make the tag read only
+        **fields
+            Further fields of the API's schema (see the API documentation)
 
         Returns
         -------
@@ -47,7 +49,8 @@ class TagsAPI(BaseAPI):
             test_id=test_id,
             sensor_id=sensor_id,
             timeseries_id=timeseries_id,
-            read_only=read_only
+            read_only=read_only,
+            **fields
         )
         data = self.client.post(self._resource_path, body=body)
         return Tag(**data, client=self.client)
@@ -186,3 +189,22 @@ class TagsAPI(BaseAPI):
         tags = self.get(filter_by=[self.client.filter.tag.name == name],
                         limit=limit, skip=skip)
         return tags
+
+    def upsert_many(self, campaign_id: str, items: list) -> Tags:
+        """
+        Create or update tags on tests, sensors and timeseries of a campaign (import pipeline). A tag is identified
+        by its target, name and comment, so this adds the tags that don't exist yet.
+
+        Parameters
+        ----------
+        campaign_id : str
+            Campaign identifier
+        items : list of dict or Tag
+            Tag fields: name, comment and exactly one of test_id, sensor_id and timeseries_id
+
+        Returns
+        -------
+        Tags
+            The stored tags in request order, each with its upsert_status
+        """
+        return Tags(self._upsert_many("campaign", f"{campaign_id}/tags", items, Tag))

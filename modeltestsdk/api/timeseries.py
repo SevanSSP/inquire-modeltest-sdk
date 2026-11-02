@@ -9,7 +9,7 @@ from .base import BaseAPI
 
 class TimeseriesAPI(BaseAPI):
     def create(self, sensor_id: str, test_id: str, default_start_time: float, default_end_time: float, fs: float,
-               intermittent: bool = False, read_only: bool = False) -> Timeseries:
+               intermittent: bool = False, read_only: bool = False, **fields) -> Timeseries:
         """
         Create time series
 
@@ -29,6 +29,8 @@ class TimeseriesAPI(BaseAPI):
             Is the time series intermittent
         read_only : bool, optional
             Make the time series read only
+        **fields
+            Further fields of the API's schema (see the API documentation)
 
         Returns
         -------
@@ -43,7 +45,8 @@ class TimeseriesAPI(BaseAPI):
             default_end_time=default_end_time,
             fs=fs,
             intermittent=intermittent,
-            read_only=read_only
+            read_only=read_only,
+            **fields
         )
         data = self.client.post(self._resource_path, body=body)
         return Timeseries(**data, client=self.client)
@@ -198,32 +201,8 @@ class TimeseriesAPI(BaseAPI):
         data['data']['timeseries_id'] = ts_id
         return DataPoints(**data.get("data"), client=self.client)
 
-    def add_data_points(self, ts_id: str, time: list, values: list, secret_key: str = None) -> DataPoints:
-        """
-        Add data points to timeseries
-
-        Parameters
-        ----------
-        ts_id : str
-            Time series identifier
-        time : list
-            Time (s)
-        values : list
-            Values corresponding to time
-        secret_key : str, optional
-            Secret key, required to add new data points if old should be overwritten
-
-        Returns
-        -------
-        DataPoints
-            Data points
-        """
-        body = dict(data=dict(time=time, value=values))
-        data = self.client.post(resource=self._resource_path, parameters=dict(secret_key=secret_key),
-                                endpoint=f"{ts_id}/data", body=body)
-        return DataPoints(**data.get("data"), timeseries_id=ts_id, client=self.client)
-
-    def get_statistics(self, ts_id: str, scaling_length: float = None) -> Statistics:
+    def get_statistics(self, ts_id: str, scaling_length: float = None, start: float = None,
+                       end: float = None) -> Statistics:
         """
         Fetch time series statistics.
 
@@ -234,12 +213,40 @@ class TimeseriesAPI(BaseAPI):
         scaling_length : float, optional
             Scale data points to the specified scaling length according to Froude law from the original
             reference length.
+        start : float, optional
+            Start of a custom window (s); the default window's start where only end is given.
+        end : float, optional
+            End of a custom window (s); the default window's end where only start is given.
 
         Returns
         -------
-        DataPoints
-            Data points
+        Statistics
+            The stored statistics over the default window, or, with start and/or end, statistics computed on
+            request over that window (not stored).
         """
-        parameters = dict(scaling_length=scaling_length)
+        parameters = dict(scaling_length=scaling_length, start_time=start, end_time=end)
         data = self.client.get(resource=self._resource_path, endpoint=f"{ts_id}/statistics", parameters=parameters)
         return Statistics(**data)
+
+    def upsert_many(self, test_id: str, items: list) -> TimeseriesList:
+        """
+        Create or update the timeseries of a test by sensor (import pipeline). Do this before writing the test's data
+        file, whose columns are named by timeseries id.
+
+        Parameters
+        ----------
+        test_id : str
+            Test identifier
+        items : list of dict or Timeseries
+            Timeseries fields: sensor_id, fs, intermittent, default_start_time, default_end_time, read_only
+
+        Returns
+        -------
+        TimeseriesList
+            The stored timeseries in request order, each with its upsert_status
+
+        Notes
+        -----
+        If the default window of a timeseries with data changes, the API recomputes its statistics.
+        """
+        return TimeseriesList(self._upsert_many("test", f"{test_id}/timeseries", items, Timeseries))

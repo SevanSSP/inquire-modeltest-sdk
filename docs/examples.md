@@ -1,30 +1,25 @@
-#Examples
+# Examples
 
 ## Basic
 
 Initiate API client and fetch all available campaigns.
 
-
 ```python hl_lines="7-8"
 --8<--- "basic.py"
 ```
 
-!!! note
+## Create campaign
 
-    the get_all() method was previously used to return several results
-
-##Create campaign
-
-Add a campaign to the database, using datetime to properly handle the date.
+Add a campaign to the database, using datetime to properly handle the date. Creating a campaign needs the Admin
+role; the import pipeline uses `client.campaign.upsert` instead.
 
 ```python hl_lines="8-14"
 --8<--- "create.py"
 ```
 
-##Get campaign
+## Get campaign
 This example will filter by campaign name and description and sort ascending by date.
-The filter object enables use of Pythonic syntax 
-
+The filter object enables use of Pythonic syntax
 
 ```python hl_lines="7-10"
 --8<--- "filter_and_sort.py"
@@ -35,12 +30,17 @@ The filter object enables use of Pythonic syntax
     Filtering and sort arguments needs to be contained inside a list.
     Sorting will be done in the order the arguments are given in the list
 
-!!! note
+## Data and statistics
+A timeseries' data over its default window or all of it, and its statistics: stored over the default window, or
+computed on request over a custom window.
 
-    the get_all() method was previously used to return several results
+```python
+--8<--- "data_and_statistics.py"
+```
 
+## Documents
+A campaign's reports and drawings, listed and downloaded.
 
-
- 
-
-
+```python
+--8<--- "documents.py"
+```

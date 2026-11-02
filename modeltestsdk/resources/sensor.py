@@ -12,20 +12,27 @@ class Sensor(Resource):
     unit: str
     kind: str
     source: str
-    x: float
-    y: float
+    x: Optional[float] = None
+    y: Optional[float] = None
     z: Optional[float] = None
     position_reference: str
     position_heading_lock: bool
-    position_draft_lock: bool
+    position_draft_lock: Optional[bool] = None
+    position_z_reference: Optional[str] = None  # z from the 'origin' (campaign's z origin), 'waterline' or 'cog'
     positive_direction_definition: str
     area: Optional[float] = None
+    # what a vector channel measures: the frame ('lab_global', 'lab_local', 'sevan_local'), axis, sign and DOF
+    quantity: Optional[str] = None
+    measures_frame: Optional[str] = None
+    measures_axis: Optional[str] = None
+    measures_sign: Optional[int] = None
+    dof: Optional[str] = None
 
-    def tags(self, limit: int = 100, skip: int = 100) -> Tags:
+    def tags(self, limit: int = 100, skip: int = 0) -> Tags:
         """Retrieve tags on sensor."""
         return self.client.tag.get_by_sensor_id(self.id, limit=limit, skip=skip)
 
-    def timeseries(self, limit: int = 100, skip: int = 100) -> TimeseriesList:
+    def timeseries(self, limit: int = 100, skip: int = 0) -> TimeseriesList:
         """Retrieve time series on sensor."""
         return self.client.timeseries.get_by_sensor_id(self.id, limit=limit, skip=skip)
 
