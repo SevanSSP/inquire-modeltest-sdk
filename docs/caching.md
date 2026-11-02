@@ -19,7 +19,7 @@ The example below shows and times
 This behaviour assumes that the specific time series has not been cached previously
 
 ## Cache expiration and clearing
-The cache is set with an expiry time of 7 days. Data is now explicitly deleted after 7 days, but a new
+The cache is set with an expiry time of 7 days. Data is not explicitly deleted after 7 days, but a new
 call of get_data_points will replace the existing data.
 
 !!! note
@@ -29,7 +29,7 @@ call of get_data_points will replace the existing data.
 
 !!! note
 
-    It is good practise to clear the cache when new data is posted
+    It is good practise to clear the cache when a test's data is uploaded again
      
 The cache can be manually cleared by the client's clear_cache() method  
 
