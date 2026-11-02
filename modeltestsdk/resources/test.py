@@ -15,18 +15,11 @@ class Test(Resource):
 
     __test__ = False
 
-    def delete(self, secret_key: str = None):
-        """
-        Delete it.
+    def delete(self):
+        """Delete it."""
+        self.client.test.delete(self.id)
 
-        Parameters
-        ----------
-        secret_key : str
-            Secret key to allow deletion of read only items
-        """
-        self.client.test.delete(self.id, secret_key=secret_key)
-
-    def tags(self, limit: int = 100, skip: int = 100) -> Tags:
+    def tags(self, limit: int = 100, skip: int = 0) -> Tags:
         """Retrieve tags on time serie."""
         return self.client.tag.get_by_test_id(self.id, limit=limit, skip=skip)
 
@@ -99,7 +92,7 @@ class WaveCalibration(Test):
 
     def floater_tests(self, limit: int = 100, skip: int = 0):
         return self.client.floater_test.get(
-            filter_by=[self.client.filter.floater_test.wave_calibration_id == self.id],
+            filter_by=[self.client.filter.floater_test.wave_id == self.id],
             limit=limit, skip=skip)
 
 
@@ -112,7 +105,7 @@ class WindCalibration(Test):
 
     def floater_tests(self, limit: int = 100, skip: int = 0):
         return self.client.floater_test.get(
-            filter_by=[self.client.filter.floater_test.wind_calibration_id == self.id],
+            filter_by=[self.client.filter.floater_test.wind_id == self.id],
             limit=limit, skip=skip)
 
 

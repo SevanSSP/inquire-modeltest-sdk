@@ -9,7 +9,7 @@ from typing import List
 
 class FloaterConfigAPI(BaseAPI):
     def create(self, name: str, description: str, campaign_id: str, draft: float, characteristic_length: float,
-               read_only: bool = False) -> FloaterConfig:
+               read_only: bool = False, **fields) -> FloaterConfig:
         """
         Create a floater config
 
@@ -25,8 +25,10 @@ class FloaterConfigAPI(BaseAPI):
             Floater draft (m)
         characteristic_length : float
             Reference length for scaling according to Froude law.
-        read_only : float
+        read_only : bool, optional
             Make it read only
+        **fields
+            Further fields of the API's schema (see the API documentation)
 
         Returns
         -------
@@ -39,7 +41,8 @@ class FloaterConfigAPI(BaseAPI):
             campaign_id=campaign_id,
             characteristic_length=characteristic_length,
             draft=draft,
-            read_only=read_only
+            read_only=read_only,
+            **fields
         )
         data = self.client.post(self._resource_path, body=body)
         return FloaterConfig(**data, client=self.client)
@@ -93,6 +96,23 @@ class FloaterConfigAPI(BaseAPI):
         data = self.client.get(self._resource_path, config_id)
         return FloaterConfig(**data, client=self.client)
 
+    def coordinates(self, config_id: str) -> dict:
+        """
+        The floater configuration's coordinates: its frames, and every sensor's position (X, Y, Z from the calm
+        waterline) and measured direction in Sevan Global, as the coordinate viewer draws them.
+
+        Parameters
+        ----------
+        config_id : str
+            Configuration identifier
+
+        Returns
+        -------
+        dict
+            The API's coordinates response
+        """
+        return self.client.get(self._resource_path, f"{config_id}/coordinates")
+
     def get_by_campaign_id(self, campaign_id: str, limit=100, skip=0) -> FloaterConfigs:
         """
         Get configuration by parent campaign
@@ -124,7 +144,8 @@ class FloaterConfigAPI(BaseAPI):
         campaign_id : str
             Campaign identifier
         items : list of dict or FloaterConfig
-            Floater configuration fields: name, description, characteristic_length, draft, read_only
+            Floater configuration fields: name, description, characteristic_length, draft, and optionally
+            heading, vcg, geometry and read_only
 
         Returns
         -------

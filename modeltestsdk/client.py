@@ -365,6 +365,39 @@ class Client:
         self._raise_for_status(r, f"<file {path}>")
         return r.json()
 
+    def download(self, resource: str, endpoint: str, destination: Union[str, os.PathLike],
+                 parameters: dict = None) -> str:
+        """
+        Perform GET request and stream the response body to a file.
+
+        Parameters
+        ----------
+        resource : str
+            API resource e.g. 'campaign'
+        endpoint : str
+            API resource endpoint e.g. '{id}/documents/Main report/report.pdf' (URL-encoded)
+        destination : str or path
+            File to write
+        parameters : dict, optional
+            URL parameters
+
+        Returns
+        -------
+        str
+            The file written
+        """
+        url = self._create_url(resource=resource, endpoint=endpoint)
+        headers = {"Authorization": f"Bearer {self._request_token()}", "Accept": "*/*"}
+        if parameters is not None:
+            parameters = {k: v for k, v in parameters.items() if v is not None}
+        timeout = (self.config.request_timeout, self.config.upload_timeout)
+        with self.session.get(url, params=parameters, headers=headers, stream=True, timeout=timeout) as r:
+            self._raise_for_status(r)
+            with open(destination, "wb") as f:
+                for chunk in r.iter_content(chunk_size=1024 * 1024):
+                    f.write(chunk)
+        return str(destination)
+
     def patch(self, resource: str = None, endpoint: str = None, parameters: dict = None, body: dict = None):
         """
         Perform PATCH request

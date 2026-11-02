@@ -6,9 +6,14 @@ from modeltestsdk.utils import make_serializable
 import re
 
 
+# Fields the API sets itself, never sent when creating or updating a resource
+SERVER_FIELDS = {"client", "id", "type", "read_only", "datapoints_created_at", "n_points", "t_first", "t_last", "turn"}
+
+
 class Resource(BaseModel):
     client: Optional[Any] = None
     id: Optional[str] = None
+    read_only: Optional[bool] = None
     _upsert_status: Optional[str] = PrivateAttr(default=None)
 
     @property
@@ -26,32 +31,25 @@ class Resource(BaseModel):
         else:
             return None
 
-    def create(self, read_only: bool = False, admin_key=None):
+    def create(self, read_only: bool = False):
+        """Creates the resource in the API and sets its id. Creating a campaign needs the Admin role."""
         if not self.id:
-            try:
-                if admin_key is None:
-                    resource = self._api_object().create(
-                        **make_serializable(self.model_dump(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
-                        read_only=read_only)
-                else:
-                    resource = self._api_object().create(
-                        **make_serializable(self.model_dump(exclude={"client", 'id', 'datapoints_created_at', 'type'})),
-                        read_only=read_only, admin_key=admin_key)
-                self.id = resource.id
-            except AttributeError as e:
-                if self.client is None:
-                    raise AttributeError('No client provided, unable to create object')
-                else:
-                    raise e  # pragma: no cover
+            if self.client is None:
+                raise AttributeError('No client provided, unable to create object')
+            fields = make_serializable(self.model_dump(exclude=SERVER_FIELDS))
+            resource = self._api_object().create(**fields, read_only=read_only)
+            self.id = resource.id
+            self.read_only = resource.read_only
         else:
             print(f"Resource {self.__class__.__name__} with id {self.id} already exists")
 
-    def update(self, secret_key: str = None):
-        self._api_object().update(item_id=self.id, body=make_serializable(self.model_dump(exclude={"client", 'id'})),
-                                  secret_key=secret_key)
+    def update(self):
+        """Sends the resource's fields to the API."""
+        self._api_object().update(item_id=self.id, body=make_serializable(self.model_dump(exclude=SERVER_FIELDS)))
 
-    def delete(self, secret_key: str = None):
-        self._api_object().delete(item_id=self.id, secret_key=secret_key)
+    def delete(self):
+        """Deletes the resource in the API."""
+        self._api_object().delete(item_id=self.id)
 
     def to_pandas(self, **kwargs) -> pd.DataFrame:
         """
@@ -120,19 +118,18 @@ class Resources(RootModel[List[ResourceType]]):
         new_list = self.root + [items]
         super().__init__(new_list)
 
-    def create(self, read_only: bool = False, admin_key: str = None) -> None:
+    def create(self, read_only: bool = False) -> None:
         """
         Create the new objects in the database.
 
         Parameters:
             read_only (bool): If True, the object will be called with read_only set to True for each item.
-            admin_key (str): An optional admin key to be passed to allow creation of certain objects.
 
         Returns:
             None
         """
         for item in self.root:
-            item.create(read_only=read_only, admin_key=admin_key)
+            item.create(read_only=read_only)
 
     def scalar(self):
         """

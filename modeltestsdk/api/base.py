@@ -41,7 +41,7 @@ class BaseAPI:
         data = self.client.put(resource, endpoint, body=[body(item) for item in items])
         return [self._upserted(i, resource_class) for i in data]
 
-    def delete(self, item_id: str, secret_key: str = None):
+    def delete(self, item_id: str):
         """
         Delete item by id
 
@@ -49,17 +49,14 @@ class BaseAPI:
         ----------
         item_id : str
             Item identifier
-        secret_key : str
-            Secret key to allow deletion of read only items
 
         Notes
         -----
-        Deleting items requires administrator privileges.
+        Deleting needs write access to the campaign; read-only items and campaigns need the Admin role.
         """
-        resp = self.client.delete(self._resource_path, endpoint=item_id, parameters=dict(secret_key=secret_key))
-        return resp
+        return self.client.delete(self._resource_path, endpoint=item_id)
 
-    def update(self, item_id: str, body: dict, secret_key: str = None):
+    def update(self, item_id: str, body: dict):
         """
         Update item by id
 
@@ -68,10 +65,10 @@ class BaseAPI:
         item_id : str
             Item identifier
         body : dict
-            Request body
-        secret_key : str
-            Secret key to allow update of read only items
+            Fields to change
+
+        Notes
+        -----
+        Updating needs write access to the campaign; read-only items need the Admin role.
         """
-        resp = self.client.patch(self._resource_path, endpoint=item_id, parameters=dict(secret_key=secret_key),
-                                 body=body)
-        return resp
+        return self.client.patch(self._resource_path, endpoint=item_id, body=body)

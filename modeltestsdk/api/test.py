@@ -207,7 +207,7 @@ class TestAPI(BaseAPI):
 class FloaterTestAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str, category: str, orientation: float,
                floaterconfig_id: str = None, wave_id: str = None, wind_id: str = None,
-               read_only: bool = False) -> FloaterTest:
+               read_only: bool = False, **fields) -> FloaterTest:
         """
         Create floater test
 
@@ -233,6 +233,8 @@ class FloaterTestAPI(TestAPI):
             Identifier of the applied wind
         read_only : bool, optional
             Make the test read only
+        **fields
+            Further fields of the API's schema (see the API documentation)
 
         Returns
         -------
@@ -250,7 +252,8 @@ class FloaterTestAPI(TestAPI):
             wave_id=wave_id,
             wind_id=wind_id,
             floaterconfig_id=floaterconfig_id,
-            read_only=read_only
+            read_only=read_only,
+            **fields
         )
         data = self.client.post(self._resource_path, body=body)
         return FloaterTest(**data, client=self.client)
@@ -308,7 +311,7 @@ class WaveCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wave_spectrum: Union[str, None], wave_height: float, wave_period: float, gamma: float,
                wave_direction: float, current_velocity: float, current_direction: float,
-               read_only: bool = False) -> WaveCalibration:
+               read_only: bool = False, **fields) -> WaveCalibration:
         """
         Create wave calibration test
 
@@ -338,6 +341,8 @@ class WaveCalibrationAPI(TestAPI):
             Current direction (degrees)
         read_only : bool, optional
             Make the test read only
+        **fields
+            Further fields of the API's schema (see the API documentation)
 
         Returns
         -------
@@ -357,7 +362,8 @@ class WaveCalibrationAPI(TestAPI):
             wave_direction=wave_direction,
             current_velocity=current_velocity,
             current_direction=current_direction,
-            read_only=read_only
+            read_only=read_only,
+            **fields
         )
         data = self.client.post(self._resource_path, body=body)
         return WaveCalibration(**data, client=self.client)
@@ -414,7 +420,7 @@ class WaveCalibrationAPI(TestAPI):
 class WindCalibrationAPI(TestAPI):
     def create(self, number: str, description: str, test_date: str, campaign_id: str,
                wind_spectrum: str, wind_velocity: float, zref: float, wind_direction: float,
-               read_only: bool = False) -> WindCalibration:
+               read_only: bool = False, **fields) -> WindCalibration:
         """
         Create wind calibration test
 
@@ -438,6 +444,8 @@ class WindCalibrationAPI(TestAPI):
             Wave direction (degrees)
         read_only : bool, optional
             Make the test read only
+        **fields
+            Further fields of the API's schema (see the API documentation)
 
         Returns
         -------
@@ -454,7 +462,8 @@ class WindCalibrationAPI(TestAPI):
             wind_velocity=wind_velocity,
             zref=zref,
             wind_direction=wind_direction,
-            read_only=read_only
+            read_only=read_only,
+            **fields
         )
         data = self.client.post(self._resource_path, body=body)
         return WindCalibration(**data, client=self.client)
